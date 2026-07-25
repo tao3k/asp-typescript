@@ -14,6 +14,12 @@
       "argsRelativeToArtifact": true
     }
   },
+  "dependencyMaterialization": {
+    "program": "npm",
+    "args": ["ci"],
+    "workingDirectory": "languages/typescript-lang-project-harness",
+    "env": {}
+  },
   "workspaceBuild": {
     "program": "npm",
     "args": ["run", "build"],
