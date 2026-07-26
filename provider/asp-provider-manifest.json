@@ -162,7 +162,7 @@
     "prime": "search/prime",
     "owner": "search/owner",
     "lexical": "search/lexical",
-    "query": "query/direct-source-read",
+    "query": "query/exact-selector",
     "ingest": "search/ingest",
     "checkChanged": "check/changed",
     "guide": "guide"
