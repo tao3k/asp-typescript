@@ -5,7 +5,6 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { tryRunFastSearchCli } from "./fast-search-cli.js";
-import { tryRunExactSourceQueryCli } from "../queries/exact-source-query-cli.js";
 
 export interface CliStreams {
   readonly stdout: { write(chunk: string): unknown };
@@ -16,9 +15,9 @@ export interface CliStreams {
 export const HELP_TEXT = `ts-harness — TypeScript semantic search and project harness
 
 Usage:
-  ts-harness search <view> ... [--json] [--code] [--package <path>] [--workspace <workspace-root>]
-  ts-harness query <owner-path> --term <symbol> [--term <symbol>] [--workspace <workspace-root>] [--names-only | --code]
-  ts-harness query (--catalog <id> | --treesitter-query <s-expression>) [<workspace-root>] [--workspace <workspace-root>] [--selector <path[:start[:end]]>] [--code] [--json]
+  ts-harness search <view> ... [--json] [--package <path>] [--workspace <workspace-root>]
+  asp typescript query --selector <exact-structural-selector> --projection <source|callable-skeleton> --workspace <workspace-root>
+  ts-harness query (--catalog <id> | --treesitter-query <s-expression>) [<workspace-root>] [--workspace <workspace-root>] [--selector <structural-selector>] [--json]
   ts-harness query --catalog flow-lite --where 'source.call=NAME sink.constructs=TYPE scope.fn=FUNCTION' [<workspace-root>] [--json] [--workspace <workspace-root>]
   ts-harness ast-patch dry-run --packet <semantic-ast-patch.json|->
   ts-harness check [--changed | --full] [--json]
@@ -31,8 +30,8 @@ SEARCH VIEWS
   search workspace          Workspace package/router index
   search prime              Project semantic-search map
   search owner <path>       Owner graph slice
-  search owner <path> items --query <symbol> [--names-only | --code]
-                             Parser-owned item query and compact code extraction
+  search owner <path> items --query <symbol>
+                             Parser-owned structural selector discovery
   search dependency <pkg>   NPM/external dependency usage
   search deps <pkg[/subpath][@ver][::api]>
                              Versioned dependency API usage
@@ -56,16 +55,12 @@ SEARCH VIEWS
   --package <path>          Run the selected search in a workspace package scope
 
 QUERY
-  query <owner-path> --term <symbol>
-                             Parser-owned owner item query
-  query <owner-path> --term <a> --term <b> --names-only
-                             Owner-local item discovery without code windows
-  query <owner-path> --term <symbol> --code
-                              Pure compact parser-owned code output
-  query --treesitter-query <s-expression> [--selector <selector>] [--code]
-                             Tree-sitter-compatible syntax locate, capture, and pure code extraction
-  query --from-hook direct-source-read --workspace <workspace-root> --selector <workspace-path:start:end> --code
-                             Source-preserved direct read for workspace-relative selectors
+  asp typescript query --selector <exact-structural-selector> --projection source --workspace <workspace-root>
+                             Exact source materialization through ASP authority
+  asp typescript query --selector <exact-structural-selector> --projection callable-skeleton --workspace <workspace-root>
+                             Typed callable skeleton materialization through ASP authority
+  query --treesitter-query <s-expression> [--selector <structural-selector>]
+                             Tree-sitter-compatible syntax locate and capture
   query --catalog declarations
                              Provider-embedded canonical tree-sitter query catalog
   query --catalog flow-lite --where 'source.call=NAME sink.constructs=TYPE scope.fn=FUNCTION'
@@ -109,10 +104,9 @@ EXAMPLES
   ts-harness search tests src/domain/order.ts --workspace .
   ts-harness search lexical OrderStatus --workspace .
   ts-harness search lexical --query-set OrderStatus --query-set findOrderStatus owner tests --workspace .
-  ts-harness query src/domain/order.ts --term findOrderStatus --workspace . --names-only
-  ts-harness query src/domain/order.ts --term findOrderStatus --workspace . --code
+  asp typescript query --selector 'typescript://src/domain/order.ts#item/function/findOrderStatus' --projection source --workspace .
   ts-harness query --treesitter-query '(function_declaration name: (identifier) @function.name)' --workspace .
-  ts-harness query --catalog declarations --selector src/domain/order.ts --workspace . --code
+  ts-harness query --catalog declarations --selector src/domain/order.ts --workspace .
   ts-harness query --catalog flow-lite --where 'source.call=payload sink.constructs=Action scope.fn=collect' --workspace .
   ts-harness ast-patch dry-run --packet semantic-ast-patch.json
   ts-harness evidence graph --json .
@@ -160,8 +154,14 @@ export async function runCli(
   streams: CliStreams,
   cwd: string,
 ): Promise<number> {
-  const exactSourceStatus = tryRunExactSourceQueryCli(argv, streams, cwd);
-  if (exactSourceStatus !== undefined) return exactSourceStatus;
+  if (argv[0] === "project-resolution-stdin") {
+    const { runProjectResolutionCommand } = await import("./project-resolution.js");
+    return runProjectResolutionCommand(argv.slice(1), streams, cwd);
+  }
+  if (argv[0] === "search" && argv[1] === "dependency-topology") {
+    const { runDependencyTopologyCommand } = await import("./dependency-topology.js");
+    return runDependencyTopologyCommand(argv.slice(2), streams, cwd);
+  }
   const fastSearchStatus = tryRunFastSearchCli(argv, streams, cwd);
   if (fastSearchStatus !== undefined) return fastSearchStatus;
   if (argv.length === 0 || argv[0] === "--help" || argv[0] === "-h") {

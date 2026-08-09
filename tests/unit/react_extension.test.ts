@@ -45,7 +45,7 @@ test("React dependency activates render purity advice from parser-native facts",
 
   assert.equal(isTypeScriptHarnessClean(report), true);
   assert.deepEqual(
-    report.projectScope?.packageJson.packageExtensions.map((extension) => ({
+    report.projectResolution?.packageJson.packageExtensions.map((extension) => ({
       name: extension.name,
       activation: extension.activation,
       coverage: extension.coverage,

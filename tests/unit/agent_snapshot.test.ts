@@ -349,7 +349,7 @@ function assertCompactSnapshotDesign(snapshot: string, hiddenPaths: readonly str
     assertOrderedSections(segment);
   }
   assert.doesNotMatch(snapshot, /^\{/u);
-  assert.doesNotMatch(snapshot, /"modules"|"projectScope"|"rootPaths"/u);
+  assert.doesNotMatch(snapshot, /"modules"|"projectResolution"|"rootPaths"/u);
   assert.doesNotMatch(
     snapshot,
     /\bdependencies\b|\bdevDependencies\b|\bpeerDependencies\b|\boptionalDependencies\b/u,

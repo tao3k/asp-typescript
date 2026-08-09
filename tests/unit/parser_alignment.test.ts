@@ -85,7 +85,7 @@ test("runner, rule, and render layers stay downstream of the reasoning tree", ()
       'from "./parser',
       'from "./reasoning',
       "report.modules",
-      "report.projectScope",
+      "report.projectResolution",
       "report.rootPaths",
       "tree.edges",
       "[package deps]",

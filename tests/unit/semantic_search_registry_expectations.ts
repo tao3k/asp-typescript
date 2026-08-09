@@ -17,7 +17,6 @@ export function expectedSearchCapabilities(method: string): readonly CapabilityE
         typeScriptCapability("test-owner-search"),
         semanticCapability("path-owner-fallback"),
         typeScriptCapability("owner-item-query"),
-        typeScriptCapability("owner-item-code-projection"),
         typeScriptCapability("owner-top-items-fallback"),
       ];
     case "search/dependency":

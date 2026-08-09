@@ -161,13 +161,6 @@ function consumeFlowLiteArg(
     state.workspaceRoot = value;
     return { kind: "ok", nextIndex: index + 1 };
   }
-  if (arg === "--code") {
-    return {
-      kind: "error",
-      message:
-        "query --catalog flow-lite is a locator/provenance surface; select an exact frontier locator and run query --selector <path-or-range> --code",
-    };
-  }
   if (arg.startsWith("-")) {
     return { kind: "error", message: `unsupported flow-lite query option: ${arg}` };
   }

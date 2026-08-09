@@ -12,5 +12,5 @@ export {
   parseTypeScriptSourceFile,
   pathFromInput,
   projectFileNames,
-  readProjectScope,
+  readProjectResolution,
 } from "./parser/index.js";

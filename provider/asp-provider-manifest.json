@@ -9,26 +9,38 @@
   "providerId": "ts-harness",
   "namespace": "agent.semantic-protocols.languages.typescript.ts-harness",
   "binary": "ts-harness",
+  "development": {
+    "schemaId": "agent.semantic-protocols.provider-development-descriptor",
+    "schemaVersion": "1",
+    "sourceRoot": "languages/typescript-lang-project-harness",
+    "buildBinding": "provider-workspace-install-v1",
+    "workspaceInstall": "provider/asp-provider-workspace-install.json",
+    "artifactDomain": "checkout"
+  },
   "execution": "external-process",
-  "source": {
-    "defaultExtensions": [".ts", ".tsx", ".js", ".jsx", ".mts", ".cts", ".mjs", ".cjs"],
-    "defaultConfigFiles": ["package.json", "tsconfig.json", "pnpm-workspace.yaml"],
-    "defaultSourceRoots": ["src", "tests", "app", "packages"],
-    "defaultIgnoredPathPrefixes": ["node_modules", "dist", "build", ".next"],
-    "defaultProjectMarkers": [
-      "package.json",
-      "tsconfig.json",
-      "jsconfig.json",
-      "pnpm-workspace.yaml"
-    ],
-    "defaultDependencyMarkers": [
-      "package.json",
-      "package-lock.json",
-      "pnpm-lock.yaml",
-      "yarn.lock",
-      "bun.lock",
-      "bun.lockb"
-    ]
+  "languageProjection": {
+    "schemaId": "agent.semantic-protocols.provider-language-projection-descriptor",
+    "schemaVersion": "1",
+    "commandBinding": "projection-batch-stdin",
+    "transport": "framed-stdin-v1",
+    "requestSchema": "https://schemas.agent-semantic-protocols.dev/provider-language-projection-batch-request.v1.schema.json",
+    "responseSchema": "https://schemas.agent-semantic-protocols.dev/provider-language-projection-batch-response.v1.schema.json",
+    "identitySchema": "https://schemas.agent-semantic-protocols.dev/canonical-language-item-identity.v1.schema.json"
+  },
+  "projectResolution": {
+    "schemaId": "agent.semantic-protocols.provider-project-resolution-descriptor",
+    "schemaVersion": "1",
+    "capabilityId": "project-resolution",
+    "entryMarkers": ["package.json"],
+    "sourceExtensions": [".ts", ".tsx", ".js", ".jsx", ".mts", ".cts", ".mjs", ".cjs"],
+    "manifestKinds": ["npm-package-json", "pnpm-workspace"],
+    "lockfileKinds": ["npm-lock", "pnpm-lock", "yarn-lock", "bun-lock"],
+    "parserId": "typescript.package-json",
+    "commandBinding": "project-resolution-stdin",
+    "requestSchema": "https://schemas.agent-semantic-protocols.dev/provider-project-resolution-request.v1.schema.json",
+    "responseSchema": "https://schemas.agent-semantic-protocols.dev/provider-project-resolution-response.v1.schema.json",
+    "packageGraphSchema": "https://schemas.agent-semantic-protocols.dev/language-package-graph.v1.schema.json",
+    "projectResolutionSchema": "https://schemas.agent-semantic-protocols.dev/project-resolution.v1.schema.json"
   },
   "searchCapabilities": {
     "sourceSnapshot": {
@@ -47,9 +59,8 @@
     },
     "ownerItems": false,
     "semanticFacts": true,
-    "dependencyTopology": false,
-    "dependencyTopologyMetadata": false,
-    "workspaceScope": true
+    "dependencyTopology": true,
+    "dependencyTopologyMetadata": false
   },
   "semanticFactsDescriptor": {
     "descriptorId": "typescript.semantic-facts",
@@ -57,10 +68,7 @@
     "packetSchemaIds": ["agent.semantic-protocols.semantic-fact-graph"],
     "factKinds": ["field", "type", "collection"],
     "intentAxes": [
-      {
-        "axis": "data-shape",
-        "terms": ["collection", "collections", "scalar", "scalars"]
-      },
+      { "axis": "data-shape", "terms": ["collection", "collections", "scalar", "scalars"] },
       {
         "axis": "collection",
         "terms": [
@@ -92,34 +100,15 @@
     "languageId": "typescript",
     "semanticFactsDescriptorId": "typescript.semantic-facts",
     "termRoleOverrides": [
-      {
-        "term": "Effect",
-        "role": "symbol",
-        "caseSensitive": true
-      },
-      {
-        "term": "Scope",
-        "role": "symbol",
-        "caseSensitive": true
-      },
-      {
-        "term": "Queue",
-        "role": "symbol",
-        "caseSensitive": true
-      },
-      {
-        "term": "Stream",
-        "role": "symbol",
-        "caseSensitive": true
-      }
+      { "term": "Effect", "role": "symbol", "caseSensitive": true },
+      { "term": "Scope", "role": "symbol", "caseSensitive": true },
+      { "term": "Queue", "role": "symbol", "caseSensitive": true },
+      { "term": "Stream", "role": "symbol", "caseSensitive": true }
     ],
     "recipes": [
       {
         "recipeId": "typescript-effect-runtime",
-        "trigger": {
-          "terms": ["Effect", "runtime", "scheduling"],
-          "match": "any"
-        },
+        "trigger": { "terms": ["Effect", "runtime", "scheduling"], "match": "any" },
         "clauses": [
           {
             "terms": ["Effect", "runtime", "scheduling"],
@@ -130,10 +119,7 @@
       },
       {
         "recipeId": "typescript-scope-lifecycle",
-        "trigger": {
-          "terms": ["Scope", "lifecycle"],
-          "match": "any"
-        },
+        "trigger": { "terms": ["Scope", "lifecycle"], "match": "any" },
         "clauses": [
           {
             "terms": ["Scope", "lifecycle"],
@@ -144,10 +130,7 @@
       },
       {
         "recipeId": "typescript-stream-backpressure",
-        "trigger": {
-          "terms": ["Queue", "Stream", "backpressure"],
-          "match": "any"
-        },
+        "trigger": { "terms": ["Queue", "Stream", "backpressure"], "match": "any" },
         "clauses": [
           {
             "terms": ["Queue", "Stream", "backpressure"],
@@ -159,6 +142,7 @@
     ]
   },
   "routeBindings": {
+    "dependencyTopology": "search/dependency-topology",
     "prime": "search/prime",
     "owner": "search/owner",
     "lexical": "search/lexical",

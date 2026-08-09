@@ -443,7 +443,7 @@ export interface TypeScriptHarnessReport {
   readonly rootPaths: readonly string[];
   readonly blockingSeverities: readonly TypeScriptDiagnosticSeverity[];
   readonly blockingRuleIds: readonly string[];
-  readonly projectScope?: TypeScriptProjectHarnessScope;
+  readonly projectResolution?: TypeScriptProjectHarnessScope;
   readonly reasoningTree: TypeScriptReasoningTree;
 }
 

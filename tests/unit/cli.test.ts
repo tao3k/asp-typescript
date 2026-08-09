@@ -376,17 +376,14 @@ test("CLI reports root asp owner for hook install and runtime", () => {
   assert.match(guide.stdout, /^\[ts-harness-guide\] project=/u);
   assert.match(
     guide.stdout,
-    /\|catalog reasoningProfiles=owner-query,query-deps,owner-tests,finding-frontier,feature-cfg entries=owner-query,query-deps,owner-tests routes=read-frontier,syntax-locate,syntax-code,query-code/u,
+    /\|catalog reasoningProfiles=owner-query,query-deps,owner-tests,finding-frontier,feature-cfg entries=owner-query,query-deps,owner-tests routes=syntax-locate,exact-source,callable-skeleton/u,
   );
   assert.match(
     guide.stdout,
     /\|route syntax-locate selectors=S:tree-sitter-query,Scope:owner-or-structural returns=locator,capture,frontier code=false/u,
   );
-  assert.match(
-    guide.stdout,
-    /\|route syntax-code selectors=S:tree-sitter-query,R:exact-selector returns=code code=pure/u,
-  );
-  assert.match(guide.stdout, /\|route query-code selectors=O:owner,Q:symbol/u);
+  assert.match(guide.stdout, /\|route exact-source selectors=R:exact-selector returns=source/u);
+  assert.match(guide.stdout, /\|route callable-skeleton selectors=R:exact-callable-selector/u);
   assert.match(
     guide.stdout,
     /\|cmd prime=asp typescript search prime --workspace <workspace-root> --view seeds/u,

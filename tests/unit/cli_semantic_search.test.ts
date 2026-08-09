@@ -151,7 +151,11 @@ test("CLI exposes semantic-search protocol commands", () => {
   assert.doesNotMatch(workspace.stdout, /\|edge /u);
 
   const workspaceJson = runCliCapture(["search", "workspace", "--json", "--workspace", "."], root);
-  assert.equal(workspaceJson.exitCode, 0);
+  assert.equal(
+    workspaceJson.exitCode,
+    0,
+    `workspace JSON failed: ${JSON.stringify(workspaceJson)}`,
+  );
   const workspacePacket = JSON.parse(workspaceJson.stdout) as {
     readonly method: string;
     readonly view: string;
@@ -251,12 +255,19 @@ test("CLI exposes semantic-search protocol commands", () => {
       "packages/core",
       "--selector",
       "packages/core/src/index.ts:1:1",
-      "--code",
+      "--json",
     ],
     root,
   );
-  assert.equal(workspaceDirectRead.exitCode, 0);
-  assert.equal(workspaceDirectRead.stdout, "export interface Core { readonly ok: true; }\n");
+  assert.equal(workspaceDirectRead.exitCode, 0, workspaceDirectRead.stderr);
+  const workspaceReadPacket = JSON.parse(workspaceDirectRead.stdout) as {
+    readonly method: string;
+    readonly ownerPath: string;
+    readonly sourceWindows: readonly { readonly text: string }[];
+  };
+  assert.equal(workspaceReadPacket.method, "query/direct-source-read");
+  assert.equal(workspaceReadPacket.ownerPath, "packages/core/src/index.ts");
+  assert.match(workspaceReadPacket.sourceWindows[0]?.text ?? "", /export interface Core/u);
 
   const primeJson = runCliCapture(["search", "prime", "--json", "--workspace", "."], root);
   assert.equal(primeJson.exitCode, 0);
@@ -378,11 +389,9 @@ test("CLI exposes semantic-search protocol commands", () => {
   assert.match(textOwnerTestsPipeSeeds.stdout, /^\[search-lexical\] /u);
   assert.match(textOwnerTestsPipeSeeds.stdout, /O\d*=owner:path\(src\/index\.ts\)!owner/u);
   assert.match(textOwnerTestsPipeSeeds.stdout, /O\d*=owner:path\(tests\/index\.test\.ts\)!owner/u);
-  assert.doesNotMatch(
-    textOwnerTestsPipeSeeds.stdout,
-    /T=test:path\(tests\/index\.test\.ts\)!tests/u,
-  );
+  assert.match(textOwnerTestsPipeSeeds.stdout, /T=test:path\(tests\/index\.test\.ts\)!tests/u);
   assert.match(textOwnerTestsPipeSeeds.stdout, /frontier=.*O\d*\.owner/u);
+  assert.match(textOwnerTestsPipeSeeds.stdout, /frontier=.*T\.tests/u);
   assert.doesNotMatch(textOwnerTestsPipeSeeds.stdout, /\|seed /u);
   assert.doesNotMatch(textOwnerTestsPipeSeeds.stdout, /\|hit /u);
 
@@ -702,7 +711,11 @@ test("CLI exposes semantic-search protocol commands", () => {
       readonly name: string;
       readonly kind: string;
       readonly ownerPath: string;
-      readonly fields: { readonly exported?: boolean; readonly exportKind?: string };
+      readonly fields: {
+        readonly exported?: boolean;
+        readonly exportKind?: string;
+        readonly structuralSelector?: string;
+      };
     }[];
   };
   assert.deepEqual(
@@ -716,6 +729,10 @@ test("CLI exposes semantic-search protocol commands", () => {
   );
   assert.equal(ownerItemsPacket.items?.[0]?.ownerPath, "src/protocol-types.ts");
   assert.equal(ownerItemsPacket.items?.[0]?.fields.exported, true);
+  assert.equal(
+    ownerItemsPacket.items?.[0]?.fields.structuralSelector,
+    "typescript://src/protocol-types.ts#item/interface/SearchPacket",
+  );
 
   const parserVisibleTestOwner = runCliCapture(
     ["search", "owner", "tests/index.test.ts", "--workspace", "."],
@@ -827,7 +844,7 @@ test("CLI exposes semantic-search protocol commands", () => {
     doctor.stdout,
     /\|namespace agent\.semantic-protocols\.languages\.typescript\.ts-harness/u,
   );
-  assert.match(doctor.stdout, /\|method search\/workspace,search\/workspace-scope,search\/prime,/u);
+  assert.match(doctor.stdout, /\|method search\/workspace,search\/prime,/u);
 
   const doctorJson = runCliCapture(["agent", "doctor", "--json", "."], root);
   assert.equal(doctorJson.exitCode, 0);
@@ -899,7 +916,6 @@ test("CLI exposes semantic-search protocol commands", () => {
   assert.equal(registry.protocolId, "agent.semantic-protocols.semantic-language");
   const expectedMethods = [
     "search/workspace",
-    "search/workspace-scope",
     "search/prime",
     "search/owner",
     "search/dependency",
@@ -991,21 +1007,19 @@ test("CLI exposes semantic-search protocol commands", () => {
             command: "search",
             view: method.slice("search/".length),
             outputSchemaIds:
-              method === "search/workspace-scope"
-                ? ["agent.semantic-protocols.semantic-workspace-scope"]
-                : method === "search/public-external-types"
+              method === "search/public-external-types"
+                ? [
+                    "agent.semantic-protocols.semantic-search-packet",
+                    "agent.semantic-protocols.semantic-type-surface",
+                  ]
+                : method === "search/policy"
                   ? [
                       "agent.semantic-protocols.semantic-search-packet",
-                      "agent.semantic-protocols.semantic-type-surface",
+                      "agent.semantic-protocols.semantic-handle",
                     ]
-                  : method === "search/policy"
-                    ? [
-                        "agent.semantic-protocols.semantic-search-packet",
-                        "agent.semantic-protocols.semantic-handle",
-                      ]
-                    : method === "search/semantic-facts"
-                      ? ["agent.semantic-protocols.semantic-fact-graph"]
-                      : ["agent.semantic-protocols.semantic-search-packet"],
+                  : method === "search/semantic-facts"
+                    ? ["agent.semantic-protocols.semantic-fact-graph"]
+                    : ["agent.semantic-protocols.semantic-search-packet"],
             requiresQuery: [
               "search/owner",
               "search/dependency",
@@ -1047,8 +1061,8 @@ test("CLI exposes semantic-search protocol commands", () => {
                   ],
                   packetSchemas: ["semantic-search-packet.v1", "semantic-tree-sitter-query.v1"],
                   grammarId: "tree-sitter-typescript",
-                  input: "search owner <path> [items] [--query <symbol-or-a|b|c>] [--code]",
-                  outputModes: ["frontier", "json", "code"],
+                  input: "search owner <path> [items] [--query <symbol-or-a|b|c>]",
+                  outputModes: ["frontier", "json"],
                 }
               : {}),
             ...(method === "search/lexical"
@@ -1298,11 +1312,6 @@ test("CLI exposes semantic-search protocol commands", () => {
           path: "schemas/semantic-search-packet.v1.schema.json",
         },
         {
-          schemaId: "agent.semantic-protocols.semantic-workspace-scope",
-          schemaVersion: "1",
-          path: "schemas/semantic-workspace-scope.v1.schema.json",
-        },
-        {
           schemaId: "agent.semantic-protocols.semantic-query-packet",
           schemaVersion: "1",
           path: "schemas/semantic-query-packet.v1.schema.json",
@@ -1447,8 +1456,6 @@ function expectedSearchCapabilities(
   switch (method) {
     case "search/workspace":
       return [semanticCapability("workspace-router")];
-    case "search/workspace-scope":
-      return [semanticCapability("workspace-scope")];
     case "search/prime":
       return [semanticCapability("package-prime-map")];
     case "search/owner":
@@ -1458,7 +1465,6 @@ function expectedSearchCapabilities(
         typeScriptCapability("test-owner-search"),
         semanticCapability("path-owner-fallback"),
         typeScriptCapability("owner-item-query"),
-        typeScriptCapability("owner-item-code-projection"),
         typeScriptCapability("owner-top-items-fallback"),
       ];
     case "search/dependency":

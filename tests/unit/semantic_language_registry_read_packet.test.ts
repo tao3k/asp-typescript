@@ -3,8 +3,6 @@ import test from "node:test";
 
 import {
   SEMANTIC_DEV_COMMAND_LOG_SCHEMA_ID,
-  SEMANTIC_QUERY_PACKET_SCHEMA_ID,
-  SEMANTIC_READ_PACKET_SCHEMA_ID,
   SEMANTIC_SOURCE_LOCATION_SCHEMA_ID,
   SEMANTIC_TREE_SITTER_PROVENANCE_SCHEMA_ID,
   SEMANTIC_TREE_SITTER_GRAMMAR_PROFILE_SCHEMA_ID,
@@ -12,30 +10,18 @@ import {
   semanticLanguageRegistryDocument,
 } from "../../src/cli/semantic-language.js";
 
-test("registry declares TypeScript direct-source-read read packet output", () => {
+test("registry replaces direct-source-read with the canonical exact-selector query", () => {
   const registry = semanticLanguageRegistryDocument();
   const language = registry.languages.find((candidate) => candidate.languageId === "typescript");
   assert.ok(language, "typescript language registration should exist");
-  assert.ok(language.methods.includes("query/direct-source-read"));
+  assert.ok(!language.methods.includes("query/direct-source-read"));
+  assert.ok(!language.methods.includes("query/owner-items"));
 
-  const descriptor = language.methodDescriptors.find(
-    (candidate) => candidate.method === "query/direct-source-read",
-  );
-  assert.ok(descriptor, "direct-source-read descriptor should exist");
+  const descriptor = language.methodDescriptors.find((candidate) => candidate.method === "query");
+  assert.ok(descriptor, "canonical query descriptor should exist");
   assert.equal(descriptor.command, "query");
-  assert.deepEqual(descriptor.requiredOptions, ["--from-hook", "--selector"]);
-  assert.deepEqual(descriptor.outputSchemaIds, [
-    SEMANTIC_QUERY_PACKET_SCHEMA_ID,
-    SEMANTIC_READ_PACKET_SCHEMA_ID,
-  ]);
-  assert.deepEqual(descriptor.packetSchemas, [
-    "semantic-query-packet.v1",
-    "semantic-read-packet.v1",
-    "semantic-tree-sitter-query.v1",
-  ]);
-  assert.deepEqual(descriptor.queryInputForms, ["selector"]);
-  assert.equal(descriptor.grammarId, "tree-sitter-typescript");
-  assert.ok(descriptor.outputModes?.includes("read-packet"));
+  assert.ok(!descriptor.outputModes?.includes("code"));
+  assert.equal("codeOutput" in descriptor, false);
   assert.equal(descriptor.supportsJson, true);
 });
 

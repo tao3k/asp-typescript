@@ -186,7 +186,6 @@ test("semantic language registry JSON documents the TypeScript provider identity
   assert.equal(language.displayName, "TypeScript");
   assert.deepEqual(stringArray(language.methods, "registry.languages[0].methods"), [
     "search/workspace",
-    "search/workspace-scope",
     "search/prime",
     "search/owner",
     "search/dependency",
@@ -212,8 +211,6 @@ test("semantic language registry JSON documents the TypeScript provider identity
     "search/semantic-facts",
     "search/ingest",
     "query",
-    "query/owner-items",
-    "query/direct-source-read",
     "check/changed",
     "check/full",
     "ast-patch/dry-run",
@@ -255,21 +252,19 @@ test("semantic language registry JSON documents the TypeScript provider identity
       assert.equal(descriptor.view, String(descriptor.method).slice("search/".length));
       assert.deepEqual(
         descriptor.outputSchemaIds,
-        String(descriptor.method) === "search/workspace-scope"
-          ? ["agent.semantic-protocols.semantic-workspace-scope"]
-          : String(descriptor.method) === "search/public-external-types"
+        String(descriptor.method) === "search/public-external-types"
+          ? [
+              "agent.semantic-protocols.semantic-search-packet",
+              "agent.semantic-protocols.semantic-type-surface",
+            ]
+          : String(descriptor.method) === "search/policy"
             ? [
                 "agent.semantic-protocols.semantic-search-packet",
-                "agent.semantic-protocols.semantic-type-surface",
+                "agent.semantic-protocols.semantic-handle",
               ]
-            : String(descriptor.method) === "search/policy"
-              ? [
-                  "agent.semantic-protocols.semantic-search-packet",
-                  "agent.semantic-protocols.semantic-handle",
-                ]
-              : String(descriptor.method) === "search/semantic-facts"
-                ? ["agent.semantic-protocols.semantic-fact-graph"]
-                : ["agent.semantic-protocols.semantic-search-packet"],
+            : String(descriptor.method) === "search/semantic-facts"
+              ? ["agent.semantic-protocols.semantic-fact-graph"]
+              : ["agent.semantic-protocols.semantic-search-packet"],
       );
       assert.equal(
         descriptor.requiresQuery,
@@ -387,12 +382,7 @@ test("semantic language registry JSON documents the TypeScript provider identity
         ]);
         assert.equal(descriptor.mutationAvailable, false);
       }
-      assert.deepEqual(
-        capabilities,
-        descriptor.method === "search/workspace-scope"
-          ? [{ languageId: "typescript", namespace: "semantic", name: "workspace-scope" }]
-          : expectedSearchCapabilities(String(descriptor.method)),
-      );
+      assert.deepEqual(capabilities, expectedSearchCapabilities(String(descriptor.method)));
       const ingestRequiredFor = descriptor.ingestRequiredFor;
       const surfaces =
         ingestRequiredFor === undefined

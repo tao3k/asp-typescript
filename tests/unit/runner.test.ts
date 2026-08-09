@@ -50,7 +50,7 @@ test("project runner anchors project scope at nearest package json", () => {
   const report = runTypeScriptProjectHarness(path.join(root, "src", "feature"));
   const snapshot = renderTypeScriptReasoningTree(report);
 
-  assert.equal(report.projectScope?.projectRoot, root);
+  assert.equal(report.projectResolution?.projectRoot, root);
   assert.deepEqual(report.rootPaths, [root]);
   assert.deepEqual(
     report.modules.map((moduleReport) => relativePath(root, moduleReport.path)),
@@ -180,7 +180,7 @@ test("explicit-path runner routes syntax diagnostics through reasoning facts", (
 
   assert.equal(report.runMode, "explicit");
   assert.equal(report.reasoningTree.runMode, report.runMode);
-  assert.equal(report.projectScope, undefined);
+  assert.equal(report.projectResolution, undefined);
   assert.deepEqual(
     report.reasoningTree.diagnostics.map((diagnostic) => ({
       phase: diagnostic.phase,

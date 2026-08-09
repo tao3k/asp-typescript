@@ -127,7 +127,7 @@ export {
   discoverTypeScriptFiles,
   parseTypeScriptProjectFiles,
   parseTypeScriptSourceFile,
-  readProjectScope,
+  readProjectResolution,
 } from "./parser.js";
 export {
   renderAssertionMessage,

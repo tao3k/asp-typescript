@@ -61,7 +61,7 @@ test("Effect dependency activates extension snapshot and async domain advice", (
     ],
   );
   assert.deepEqual(
-    report.projectScope?.packageJson.packageExtensions.map((extension) => ({
+    report.projectResolution?.packageJson.packageExtensions.map((extension) => ({
       name: extension.name,
       activation: extension.activation,
       coverage: extension.coverage,
@@ -216,7 +216,7 @@ test("configured Effect dependency is active and can be disabled through the ext
 
   assert.equal(isTypeScriptHarnessClean(defaultReport), true);
   assert.deepEqual(
-    defaultReport.projectScope?.packageJson.packageExtensions.map((extension) => ({
+    defaultReport.projectResolution?.packageJson.packageExtensions.map((extension) => ({
       activation: extension.activation,
       coverage: extension.coverage,
       configSource: extension.configSource,
@@ -477,7 +477,7 @@ test("Effect object config remains project-wide and does not suppress modules", 
 
   assert.equal(isTypeScriptHarnessClean(report), true);
   assert.deepEqual(
-    report.projectScope?.packageJson.packageExtensions.map((extension) => [
+    report.projectResolution?.packageJson.packageExtensions.map((extension) => [
       extension.activation,
       extension.coverage,
       extension.configSource,

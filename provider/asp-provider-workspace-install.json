@@ -29,7 +29,10 @@
       "languages/typescript-lang-project-harness/package-lock.json",
       "languages/typescript-lang-project-harness/pnpm-lock.yaml"
     ],
-    "derivedPaths": ["languages/typescript-lang-project-harness/dist"],
+    "derivedPaths": [
+      "languages/typescript-lang-project-harness/dist",
+      "languages/typescript-lang-project-harness/node_modules"
+    ],
     "env": {}
   }
 }

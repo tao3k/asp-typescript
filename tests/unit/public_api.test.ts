@@ -289,7 +289,7 @@ test("public facade exposes the stable M13 runtime surface", () => {
     "planTypeScriptProjectVerification",
     "planTypeScriptProjectVerificationForReport",
     "planTypeScriptProjectVerificationWithConfig",
-    "readProjectScope",
+    "readProjectResolution",
     "renderAssertionMessage",
     "renderTypeScriptHarnessRulesMarkdown",
     "renderTypeScriptProjectHarness",

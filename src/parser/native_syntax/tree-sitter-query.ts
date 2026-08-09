@@ -30,7 +30,6 @@ export interface TypeScriptTreeSitterQueryOptions {
   readonly selector?: string | undefined;
   readonly aspSyntaxQueryPlan?: SyntaxQueryPlan | undefined;
   readonly json: boolean;
-  readonly codeOnly: boolean;
 }
 
 export interface SyntaxQueryPlan {
@@ -206,12 +205,6 @@ export function renderTypeScriptTreeSitterQuery(
   const query = resolveQuery(options);
   const rows = collectSyntaxRows(projectRoot, query, options);
   if (options.json) return `${JSON.stringify(packet(projectRoot, query, rows, options))}\n`;
-  if (options.codeOnly) {
-    return rows
-      .map((row) => row.itemCode)
-      .filter((code) => code.trim() !== "")
-      .join("\n\n");
-  }
   if (rows.length === 0) {
     return [
       `|syntax-query inputForm=${query.inputForm} input=${shellToken(query.input)} grammar=${TYPE_SCRIPT_TREE_SITTER_GRAMMAR_ID} grammarProfile=${TYPE_SCRIPT_TREE_SITTER_GRAMMAR_PROFILE_VERSION} dialect=tree-sitter-query mode=native-parser-projection matchStatus=miss rows=0 captures=${query.captures.join(",") || "-"}`,

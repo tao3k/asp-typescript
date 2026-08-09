@@ -71,7 +71,7 @@ required so new output modes cannot bypass the reasoning surface. Compact file
 and parsed counts should come from reasoning-tree module validity, not from raw
 parser module reports. Compact finding locations should be relative to
 `TypeScriptHarnessReport.reasoningTree.projectRoot`. Compact renderers should
-not read `report.modules`, `report.projectScope`, or `report.rootPaths`; those
+not read `report.modules`, `report.projectResolution`, or `report.rootPaths`; those
 remain structured report fields rather than the agent output authority surface.
 Project runs resolve the nearest parent `package.json` first and treat that
 directory as the package project anchor; `tsconfig`, package metadata, roots,

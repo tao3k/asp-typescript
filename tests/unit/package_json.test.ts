@@ -48,7 +48,7 @@ test("project harness reports malformed package json without throwing", () => {
     })),
     [{ phase: "package-json", ownerPath: "package.json" }],
   );
-  assert.equal(report.projectScope?.packageJson.diagnostics.length, 1);
+  assert.equal(report.projectResolution?.packageJson.diagnostics.length, 1);
   assert.match(rendered, /\[TS-AGENT-PROJECT-003\] Info/u);
   assert.match(rendered, /package\.json parser diagnostic/u);
   assert.match(snapshot, /FindingGroups:/u);
@@ -84,7 +84,7 @@ test("project harness reports malformed project reference package json without t
     ["TS-AGENT-PROJECT-003:info"],
   );
   assert.deepEqual(
-    report.projectScope?.config.projectReferencePackages.map((referencePackage) => ({
+    report.projectResolution?.config.projectReferencePackages.map((referencePackage) => ({
       path: relativePath(root, referencePackage.path),
       diagnostics: referencePackage.diagnostics.length,
     })),
@@ -117,7 +117,7 @@ test("project parser records package dependency facts from package json", () => 
 
   const report = runTypeScriptProjectHarness(root);
 
-  const dependencies = report.projectScope?.packageJson.dependencies ?? [];
+  const dependencies = report.projectResolution?.packageJson.dependencies ?? [];
   assert.deepEqual(
     dependencies.map((dependency) => ({
       name: dependency.name,
@@ -191,7 +191,7 @@ test("project policy reports referenced package config shape as advice", () => {
     ["info:referenced project config"],
   );
   assert.deepEqual(
-    report.projectScope?.config.projectReferencePackages.map((referencePackage) => ({
+    report.projectResolution?.config.projectReferencePackages.map((referencePackage) => ({
       path: relativePath(root, referencePackage.path),
       composite: referencePackage.compilerOptions?.composite,
       declaration: referencePackage.compilerOptions?.declaration,
@@ -285,7 +285,7 @@ test("project harness reports malformed workspace package json without throwing"
     ["TS-AGENT-PROJECT-003:info"],
   );
   assert.deepEqual(
-    report.projectScope?.packageJson.workspacePackages.map((workspacePackage) => ({
+    report.projectResolution?.packageJson.workspacePackages.map((workspacePackage) => ({
       path: relativePath(root, workspacePackage.path),
       diagnostics: workspacePackage.diagnostics.length,
     })),
@@ -347,7 +347,7 @@ test("project harness discovers workspace package facts from package json", () =
   );
 
   const report = runTypeScriptProjectHarness(root);
-  const packageJson = report.projectScope?.packageJson;
+  const packageJson = report.projectResolution?.packageJson;
   assert.ok(packageJson !== undefined);
   assert.deepEqual(
     packageJson.workspacePackages.map((workspacePackage) => ({
@@ -423,7 +423,7 @@ test("project harness discovers pnpm workspace package facts", () => {
   fs.writeFileSync(path.join(root, "src", "index.ts"), "export const ok = 1;\n");
 
   const report = runTypeScriptProjectHarness(root);
-  const packageJson = report.projectScope?.packageJson;
+  const packageJson = report.projectResolution?.packageJson;
   assert.ok(packageJson !== undefined);
   assert.deepEqual(
     packageJson.workspaces.map((workspace) => ({
@@ -489,7 +489,7 @@ test("project harness keeps package entry source locations from the TypeScript J
   );
 
   const report = runTypeScriptProjectHarness(root);
-  const packageJson = report.projectScope?.packageJson;
+  const packageJson = report.projectResolution?.packageJson;
   assert.ok(packageJson !== undefined);
   assert.deepEqual(
     [
@@ -562,7 +562,7 @@ test("project harness preserves conditional package targets from the TypeScript 
   );
 
   const report = runTypeScriptProjectHarness(root);
-  const packageJson = report.projectScope?.packageJson;
+  const packageJson = report.projectResolution?.packageJson;
   assert.ok(packageJson !== undefined);
 
   const rootExport = packageJson.exports.find((entry) => entry.subpath === ".");
@@ -636,7 +636,7 @@ test("project harness records Rspack build tool facts from package json and conf
   );
 
   const report = runTypeScriptProjectHarness(root);
-  const packageJson = report.projectScope?.packageJson;
+  const packageJson = report.projectResolution?.packageJson;
   assert.ok(packageJson !== undefined);
   assert.deepEqual(
     packageJson.packageBuildTools.map((buildTool) => ({
@@ -708,7 +708,7 @@ test("Rspack script facts satisfy the build tool surface advice", () => {
   const report = runTypeScriptProjectHarness(root);
 
   assert.deepEqual(
-    report.projectScope?.packageJson.packageBuildTools.map((buildTool) => ({
+    report.projectResolution?.packageJson.packageBuildTools.map((buildTool) => ({
       name: buildTool.name,
       packageNames: buildTool.packageNames,
       configFiles: buildTool.configFiles,
@@ -749,7 +749,7 @@ test("package json harness config can explicitly expose Rspack build tool intent
   const report = runTypeScriptProjectHarness(root);
 
   assert.deepEqual(
-    report.projectScope?.packageJson.packageBuildTools.map((buildTool) => ({
+    report.projectResolution?.packageJson.packageBuildTools.map((buildTool) => ({
       name: buildTool.name,
       packageNames: buildTool.packageNames,
       configFiles: buildTool.configFiles,

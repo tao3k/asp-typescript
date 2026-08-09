@@ -8,7 +8,7 @@ import {
   defaultTypeScriptHarnessConfig,
   parseTypeScriptProjectFiles,
   parseTypeScriptSourceFile,
-  readProjectScope,
+  readProjectResolution,
 } from "../../src/index.js";
 import { relativePath } from "./path_helpers.js";
 
@@ -130,7 +130,7 @@ test("project parser falls back when compiler program hits parser Debug Failure"
   fs.writeFileSync(okPath, "export const ok = 1;\n");
   fs.writeFileSync(consumerPath, 'import { ok } from "./ok.js";\nexport const value = ok;\n');
 
-  const scope = readProjectScope(root, defaultTypeScriptHarnessConfig());
+  const scope = readProjectResolution(root, defaultTypeScriptHarnessConfig());
   const reports = parseTypeScriptProjectFiles(scope, [sourcePath, okPath, consumerPath]);
 
   assert.equal(reports.length, 3);
@@ -605,7 +605,7 @@ test("project parser reads tsconfig compiler and package metadata facts", () => 
     }),
   );
 
-  const scope = readProjectScope(root, defaultTypeScriptHarnessConfig());
+  const scope = readProjectResolution(root, defaultTypeScriptHarnessConfig());
 
   assert.equal(scope.packageJson.name, "@example/facts");
   assert.deepEqual(

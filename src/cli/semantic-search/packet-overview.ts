@@ -271,9 +271,10 @@ function ownerItems(
 }
 
 function ownerItem(ownerPath: string, exportFact: TypeScriptExportFact): SemanticSearchItem {
+  const itemKind = exportKindToItemKind(exportFact.kind);
   return {
     name: exportFact.name,
-    kind: exportKindToItemKind(exportFact.kind),
+    kind: itemKind,
     ownerPath,
     location: {
       path: ownerPath,
@@ -283,6 +284,7 @@ function ownerItem(ownerPath: string, exportFact: TypeScriptExportFact): Semanti
       exported: true,
       exportKind: exportFact.kind,
       typeOnly: exportFact.isTypeOnly,
+      structuralSelector: `typescript://${ownerPath}#item/${itemKind}/${exportFact.name}`,
     },
   };
 }

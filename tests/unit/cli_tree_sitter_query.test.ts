@@ -229,19 +229,14 @@ test("query --treesitter-query --json reports ASP typed predicates", () => {
   ]);
 });
 
-test("query --treesitter-query --selector --code prints pure code", () => {
+test("query --treesitter-query rejects removed direct code output", () => {
   const root = treeSitterQueryFixture();
   const result = runCliCapture(
     functionNameTreeSitterQueryArgs(["--selector", "src/demo.ts:1:3", "--code"]),
     root,
   );
-  assert.equal(result.exitCode, 0, result.stderr);
-  assert.equal(
-    result.stdout,
-    ["export function alpha(input: string): string {", "  return input.toUpperCase();", "}"].join(
-      "\n",
-    ),
-  );
+  assert.equal(result.exitCode, 2);
+  assert.match(result.stderr, /unknown tree-sitter query option: --code/u);
 });
 
 test("query --treesitter-query exact selector scans outside default source roots", () => {
@@ -253,41 +248,39 @@ test("query --treesitter-query exact selector scans outside default source roots
   );
 
   const result = runCliCapture(
-    functionNameTreeSitterQueryArgs(["--selector", "dist/member.ts:1:3", "--code"]),
+    functionNameTreeSitterQueryArgs(["--selector", "dist/member.ts:1:3", "--json"]),
     root,
   );
 
   assert.equal(result.exitCode, 0, result.stderr);
-  assert.equal(
-    result.stdout,
-    ["export function fromDist(): string {", "  return 'dist';", "}"].join("\n"),
-  );
+  assert.equal(array(record(JSON.parse(result.stdout), "packet").matches, "matches").length, 1);
 });
 
 test("query --treesitter-query selector uses canonical paths instead of suffix matching", () => {
   const root = treeSitterQueryFixture();
 
   const suffixSelector = runCliCapture(
-    functionNameTreeSitterQueryArgs(["--selector", "demo.ts:1:3", "--code"]),
+    functionNameTreeSitterQueryArgs(["--selector", "demo.ts:1:3", "--json"]),
     root,
   );
   assert.equal(suffixSelector.exitCode, 0, suffixSelector.stderr);
-  assert.equal(suffixSelector.stdout, "");
+  assert.equal(
+    array(record(JSON.parse(suffixSelector.stdout), "packet").matches, "matches").length,
+    0,
+  );
 
   const absoluteSelector = runCliCapture(
     functionNameTreeSitterQueryArgs([
       "--selector",
       `${path.join(root, "src", "demo.ts")}:1:3`,
-      "--code",
+      "--json",
     ]),
     root,
   );
   assert.equal(absoluteSelector.exitCode, 0, absoluteSelector.stderr);
   assert.equal(
-    absoluteSelector.stdout,
-    ["export function alpha(input: string): string {", "  return input.toUpperCase();", "}"].join(
-      "\n",
-    ),
+    array(record(JSON.parse(absoluteSelector.stdout), "packet").matches, "matches").length,
+    1,
   );
 });
 
@@ -369,7 +362,7 @@ test("query --catalog flow-lite rejects code output and open where keys", () => 
 
   const codeOutput = runCliCapture(flowLiteQueryArgs(["--code"]), root);
   assert.equal(codeOutput.exitCode, 2);
-  assert.match(codeOutput.stderr, /locator\/provenance surface/u);
+  assert.match(codeOutput.stderr, /unsupported flow-lite query option: --code/u);
 
   const openWhere = runCliCapture(
     [

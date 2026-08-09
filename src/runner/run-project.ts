@@ -4,7 +4,7 @@ import path from "node:path";
 import {
   pathFromInput,
   projectFileNames,
-  readProjectScope,
+  readProjectResolution,
   parseTypeScriptProjectFiles,
 } from "../parser.js";
 import { defaultTypeScriptHarnessConfig, typeScriptHarnessConfigForProject } from "../config.js";
@@ -41,7 +41,7 @@ export function runTypeScriptProjectHarness(
     throw new Error(`project root does not exist: ${projectRoot}`);
   }
   const selectedConfig = config ?? typeScriptHarnessConfigForProject(projectRoot);
-  const scope = readProjectScope(projectRoot, selectedConfig);
+  const scope = readProjectResolution(projectRoot, selectedConfig);
   const parseOptions = {
     ...(options.collectSemanticDiagnostics === undefined
       ? {}
@@ -65,7 +65,7 @@ export function runTypeScriptProjectHarness(
     rootPaths: [scope.projectRoot],
     blockingSeverities: selectedConfig.blockingSeverities,
     blockingRuleIds: selectedConfig.blockingRuleIds,
-    projectScope: scope,
+    projectResolution: scope,
     reasoningTree,
   };
 }
