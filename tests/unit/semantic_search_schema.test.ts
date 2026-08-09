@@ -427,7 +427,8 @@ test("semantic language registry JSON documents the TypeScript provider identity
       ]);
       assert.deepEqual(descriptor.unsupportedPredicates, []);
       assert.equal(descriptor.cacheReplay, true);
-      assert.deepEqual(descriptor.outputModes, ["frontier", "json", "code"]);
+      assert.deepEqual(descriptor.outputModes, ["frontier", "json"]);
+      assert.equal(Object.hasOwn(descriptor, "codeOutput"), false);
       const queryCatalogs = array(descriptor.queryCatalogs, "query queryCatalogs").map(
         (catalog, index) => record(catalog, `query queryCatalogs[${index}]`),
       );

@@ -941,8 +941,6 @@ test("CLI exposes semantic-search protocol commands", () => {
     "search/semantic-facts",
     "search/ingest",
     "query",
-    "query/owner-items",
-    "query/direct-source-read",
     "check/changed",
     "check/full",
     "ast-patch/dry-run",
