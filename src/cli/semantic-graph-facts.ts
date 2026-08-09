@@ -14,9 +14,18 @@ const PROVENANCE = "parser" as const;
 const CONFIDENCE = "exact" as const;
 const FRESHNESS = "fresh" as const;
 
+export type ProviderGraphNodeKind =
+  | "build"
+  | "collection"
+  | "dependency"
+  | "field"
+  | "package"
+  | "test"
+  | "type";
+
 export interface ProviderGraphNode {
   readonly id: string;
-  readonly kind: string;
+  readonly kind: ProviderGraphNodeKind;
   readonly role: string;
   readonly value: string;
   readonly action: string;

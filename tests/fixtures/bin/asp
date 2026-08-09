@@ -94,6 +94,11 @@ function collectSeeds(packet) {
   for (const action of packet.nextActions ?? []) {
     addSeed(action, ownerSeeds, testSeeds, symbolSeeds, otherSeeds);
   }
+  for (const edge of packet.edges ?? []) {
+    if (edge.kind === "test" && edge.to !== undefined) {
+      testSeeds.push({ kind: "tests", target: String(edge.to).replace(/^[^:]+:/u, "") });
+    }
+  }
   for (const item of packet.items ?? []) {
     if (item.name !== undefined) {
       itemSeeds.push({

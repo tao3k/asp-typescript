@@ -612,19 +612,9 @@ export function typeScriptSemanticLanguageRegistration(): SemanticLanguageRegist
   return {
     ...registration,
     methods: registration.methods.filter((method) => !removedMethods.has(method)),
-    methodDescriptors: registration.methodDescriptors
-      .filter((descriptor) => !removedMethods.has(descriptor.method))
-      .map((descriptor) => {
-        if (descriptor.method !== "query") {
-          return descriptor;
-        }
-        const normalized = { ...descriptor };
-        delete normalized.codeOutput;
-        if (normalized.outputModes) {
-          normalized.outputModes = normalized.outputModes.filter((mode) => mode !== "code");
-        }
-        return normalized;
-      }),
+    methodDescriptors: registration.methodDescriptors.filter(
+      (descriptor) => !removedMethods.has(descriptor.method),
+    ),
   };
 }
 
