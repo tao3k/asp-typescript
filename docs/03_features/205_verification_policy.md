@@ -161,7 +161,7 @@ const taskIndexJson = renderTypeScriptVerificationReportArtifactJson(plan, "task
 const receipt = writeTypeScriptVerificationReports(plan, {
   projectRoot: process.cwd(),
   sourceBaselineDir: ".verification/source",
-  runtimeCacheDir: ".cache/ts-harness/verification",
+  runtimeCacheDir: ".cache/asp-typescript/verification",
 });
 ```
 

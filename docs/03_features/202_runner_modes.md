@@ -130,7 +130,7 @@ modules before entering this snapshot.
 
 `runTypeScriptProjectHarnessAgentSnapshot()` and
 `renderTypeScriptProjectHarnessAgentSnapshot()` provide the project-level
-snapshot projected by `ts-harness search prime`. The runner starts from the root package
+snapshot projected by `asp-typescript search prime`. The runner starts from the root package
 report, follows parser-owned workspace and project-reference package facts, and
 runs each member package from its own package anchor. The renderer adds compact
 `pkg <path>` headings only when multiple package scopes produce source facts or

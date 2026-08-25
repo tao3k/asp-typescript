@@ -1,5 +1,5 @@
 /**
- * Agent-facing command guide for the ts-harness CLI.
+ * Agent-facing command guide for the asp-typescript CLI.
  */
 
 export function renderCodexAgentGuide(projectRoot: string): string {
@@ -18,7 +18,7 @@ function commandGuide(input: {
   const root = workspace;
   const seeds = `${workspace} --view seeds`;
   return [
-    `[ts-harness-guide] project=${project}`,
+    `[asp-typescript-guide] project=${project}`,
     "|catalog reasoningProfiles=owner-query,query-deps,owner-tests,finding-frontier,feature-cfg entries=owner-query,query-deps,owner-tests routes=syntax-locate,exact-source,callable-skeleton",
     "|routing evidence-state prime=owner-map-only pipe=ambiguous-query owner=known-owner selector=exact-parser-id deps=known-dependency tests=known-owner ingest=stdin",
     `|route syntax-locate selectors=S:tree-sitter-query,Scope:owner-or-structural returns=locator,capture,frontier code=false cmd=asp typescript query --treesitter-query '(function_declaration name: (identifier) @function.name)' --selector <owner-path-or-structural-scope> ${workspace}`,

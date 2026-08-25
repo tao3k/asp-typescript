@@ -9,7 +9,7 @@ import { parseOrReuse } from "../../src/cache/invalidation.js";
 import { runCliCapture } from "./cli_helpers.js";
 
 function tmpDir(): string {
-  return fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-bench-"));
+  return fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-bench-"));
 }
 
 function writeFile(dir: string, name: string, content: string): string {

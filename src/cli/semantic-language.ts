@@ -47,15 +47,18 @@ export const SEMANTIC_ASSURANCE_CASE_SCHEMA_ID =
 export const SEMANTIC_AST_PATCH_SCHEMA_ID = "agent.semantic-protocols.semantic-ast-patch" as const;
 export const SEMANTIC_AST_PATCH_RECEIPT_SCHEMA_ID =
   "agent.semantic-protocols.semantic-ast-patch-receipt" as const;
-export const TYPE_SCRIPT_CAPABILITIES_SCHEMA_ID =
-  "agent.semantic-protocols.languages.typescript.ts-harness.capabilities" as const;
+import {
+  TYPE_SCRIPT_PROVIDER_DESCRIPTOR,
+  TYPE_SCRIPT_PROVIDER_REGISTRATION,
+} from "./provider-descriptor.js";
+
+export const TYPE_SCRIPT_CAPABILITIES_SCHEMA_ID = `${TYPE_SCRIPT_PROVIDER_DESCRIPTOR.namespace}.capabilities`;
 const SEMANTIC_TYPE_SURFACE_SCHEMA_ID = "agent.semantic-protocols.semantic-type-surface" as const;
 const SEMANTIC_HANDLE_SCHEMA_ID = "agent.semantic-protocols.semantic-handle" as const;
-export const TYPE_SCRIPT_LANGUAGE_ID = "typescript" as const;
-export const TYPE_SCRIPT_PROVIDER_ID = "ts-harness" as const;
-export const TYPE_SCRIPT_BINARY = "ts-harness" as const;
-export const TYPE_SCRIPT_PROVIDER_NAMESPACE =
-  "agent.semantic-protocols.languages.typescript.ts-harness" as const;
+export const TYPE_SCRIPT_LANGUAGE_ID = TYPE_SCRIPT_PROVIDER_DESCRIPTOR.languageId;
+export const TYPE_SCRIPT_PROVIDER_ID = TYPE_SCRIPT_PROVIDER_DESCRIPTOR.providerId;
+export const TYPE_SCRIPT_BINARY = TYPE_SCRIPT_PROVIDER_DESCRIPTOR.binary;
+export const TYPE_SCRIPT_PROVIDER_NAMESPACE = TYPE_SCRIPT_PROVIDER_DESCRIPTOR.namespace;
 
 type TypeScriptSemanticSearchCoreView =
   | "workspace"
@@ -645,143 +648,7 @@ function typeScriptSemanticLanguageRegistrationWithLegacyQueryDescriptors(): Sem
     ],
     methodDescriptors: typeScriptSemanticLanguageMethodDescriptors(),
     queryPackDescriptor: typeScriptQueryPackDescriptor(),
-    schemas: [
-      {
-        schemaId: SEMANTIC_SEARCH_PACKET_SCHEMA_ID,
-        schemaVersion: "1",
-        path: "schemas/semantic-search-packet.v1.schema.json",
-      },
-      {
-        schemaId: SEMANTIC_QUERY_PACKET_SCHEMA_ID,
-        schemaVersion: "1",
-        path: "schemas/semantic-query-packet.v1.schema.json",
-      },
-      {
-        schemaId: SEMANTIC_READ_PACKET_SCHEMA_ID,
-        schemaVersion: "1",
-        path: "schemas/semantic-read-packet.v1.schema.json",
-      },
-      {
-        schemaId: SEMANTIC_SOURCE_LOCATION_SCHEMA_ID,
-        schemaVersion: "1",
-        path: "schemas/semantic-source-location.v1.schema.json",
-      },
-      {
-        schemaId: SEMANTIC_TREE_SITTER_PROVENANCE_SCHEMA_ID,
-        schemaVersion: "1",
-        path: "schemas/semantic-tree-sitter-provenance.v1.schema.json",
-      },
-      {
-        schemaId: SEMANTIC_TREE_SITTER_QUERY_SCHEMA_ID,
-        schemaVersion: "1",
-        path: "schemas/semantic-tree-sitter-query.v1.schema.json",
-      },
-      {
-        schemaId: SEMANTIC_TREE_SITTER_GRAMMAR_PROFILE_SCHEMA_ID,
-        schemaVersion: "1",
-        path: "schemas/semantic-tree-sitter-grammar-profile.v1.schema.json",
-      },
-      {
-        schemaId: SEMANTIC_GRAPH_SCHEMA_ID,
-        schemaVersion: "1",
-        path: "schemas/semantic-graph.v1.schema.json",
-      },
-      {
-        schemaId: SEMANTIC_GRAPH_TURBO_REQUEST_SCHEMA_ID,
-        schemaVersion: "1",
-        path: "schemas/semantic-graph-turbo-request.v1.schema.json",
-      },
-      {
-        schemaId: SEMANTIC_FACT_GRAPH_SCHEMA_ID,
-        schemaVersion: "1",
-        path: "schemas/semantic-fact-graph.v1.schema.json",
-      },
-      {
-        schemaId: SEMANTIC_FACT_ONTOLOGY_SCHEMA_ID,
-        schemaVersion: "1",
-        path: "schemas/semantic-fact-ontology.v1.schema.json",
-      },
-      {
-        schemaId: SEMANTIC_VERIFICATION_RECEIPT_SCHEMA_ID,
-        schemaVersion: "1",
-        path: "schemas/semantic-verification-receipt.v1.schema.json",
-      },
-      {
-        schemaId: SEMANTIC_BEHAVIOR_SNAPSHOT_SCHEMA_ID,
-        schemaVersion: "1",
-        path: "schemas/semantic-behavior-snapshot.v1.schema.json",
-      },
-      {
-        schemaId: SEMANTIC_DETERMINISM_READINESS_SCHEMA_ID,
-        schemaVersion: "1",
-        path: "schemas/semantic-determinism-readiness.v1.schema.json",
-      },
-      {
-        schemaId: SEMANTIC_DEV_COMMAND_LOG_SCHEMA_ID,
-        schemaVersion: "1",
-        path: "schemas/semantic-dev-command-log.v1.schema.json",
-      },
-      {
-        schemaId: SEMANTIC_FORMAL_PROOF_PILOT_SCHEMA_ID,
-        schemaVersion: "1",
-        path: "schemas/semantic-formal-proof-pilot.v1.schema.json",
-      },
-      {
-        schemaId: SEMANTIC_REVIEW_PACKET_SCHEMA_ID,
-        schemaVersion: "1",
-        path: "schemas/semantic-review-packet.v1.schema.json",
-      },
-      {
-        schemaId: SEMANTIC_EVIDENCE_GRAPH_SCHEMA_ID,
-        schemaVersion: "1",
-        path: "schemas/semantic-evidence-graph.v1.schema.json",
-      },
-      {
-        schemaId: SEMANTIC_ASSURANCE_CASE_SCHEMA_ID,
-        schemaVersion: "1",
-        path: "schemas/semantic-assurance-case.v1.schema.json",
-      },
-      {
-        schemaId: SEMANTIC_AST_PATCH_SCHEMA_ID,
-        schemaVersion: "1",
-        path: "schemas/semantic-ast-patch.v1.schema.json",
-      },
-      {
-        schemaId: SEMANTIC_AST_PATCH_RECEIPT_SCHEMA_ID,
-        schemaVersion: "1",
-        path: "schemas/semantic-ast-patch-receipt.v1.schema.json",
-      },
-      {
-        schemaId: SEMANTIC_TYPE_SURFACE_SCHEMA_ID,
-        schemaVersion: "1",
-        path: "schemas/semantic-type-surface.v1.schema.json",
-      },
-      {
-        schemaId: SEMANTIC_HANDLE_SCHEMA_ID,
-        schemaVersion: "1",
-        path: "schemas/semantic-handle.v1.schema.json",
-      },
-      {
-        schemaId: SEMANTIC_LANGUAGE_REGISTRY_ID,
-        schemaVersion: SEMANTIC_LANGUAGE_REGISTRY_VERSION,
-        path: "schemas/semantic-language-registry.v1.schema.json",
-      },
-      {
-        schemaId: "agent.semantic-protocols.semantic-provider-doctor",
-        schemaVersion: "1",
-        path: "schemas/semantic-provider-doctor.v1.schema.json",
-      },
-      {
-        schemaId: "agent.semantic-protocols.provider-query-pack-descriptor",
-        schemaVersion: "1",
-        path: "schemas/provider-query-pack-descriptor.v1.schema.json",
-      },
-      {
-        schemaId: TYPE_SCRIPT_CAPABILITIES_SCHEMA_ID,
-        schemaVersion: "1",
-        path: "schemas/typescript-semantic-capabilities.v1.schema.json",
-      },
-    ],
+    schemas: TYPE_SCRIPT_PROVIDER_REGISTRATION.schemas,
   };
 }
 

@@ -23,10 +23,10 @@ export function buildTypeScriptEvidenceGraph(projectRoot: string): JsonObject {
   const ownerPath = selectOwnerPath(root);
   const ownerId = nodeId("typescript:owner", ownerPath);
   const claimId = nodeId("typescript:claim", ownerPath);
-  const receiptId = nodeId("typescript:receipt", "ts-harness-check-full");
-  const actionId = nodeId("typescript:action", "run-ts-harness-check-full");
+  const receiptId = nodeId("typescript:receipt", "asp-typescript-check-full");
+  const actionId = nodeId("typescript:action", "run-asp-typescript-check-full");
   const gapId = nodeId("typescript:gap", `${ownerPath}:receipt`);
-  const checkCommand = "ts-harness check --full .";
+  const checkCommand = "asp-typescript check --full .";
   const nodes: JsonObject[] = [
     {
       nodeId: ownerId,
@@ -56,7 +56,7 @@ export function buildTypeScriptEvidenceGraph(projectRoot: string): JsonObject {
       nodeId: receiptId,
       kind: "verification-receipt",
       label: checkCommand,
-      receiptId: "typescript.ts-harness.check.full",
+      receiptId: "typescript.asp-typescript.check.full",
       status: "needs-injection",
       summary:
         "Run the TypeScript harness full check and attach the receipt before treating the claim as verified.",
@@ -65,8 +65,8 @@ export function buildTypeScriptEvidenceGraph(projectRoot: string): JsonObject {
     {
       nodeId: actionId,
       kind: "review-action",
-      label: "Run ts-harness check --full .",
-      actionId: "typescript.run-ts-harness-check-full",
+      label: "Run asp-typescript check --full .",
+      actionId: "typescript.run-asp-typescript-check-full",
       status: "missing",
       summary: "run-receipt",
       fields: {
@@ -84,7 +84,7 @@ export function buildTypeScriptEvidenceGraph(projectRoot: string): JsonObject {
     {
       gapId,
       ownerPath,
-      summary: "No attached ts-harness full-check receipt for this evidence graph.",
+      summary: "No attached asp-typescript full-check receipt for this evidence graph.",
       severity: "warning",
       fields: { nextCommand: checkCommand },
     },

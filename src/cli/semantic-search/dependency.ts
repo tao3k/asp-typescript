@@ -20,7 +20,6 @@ import {
 import { ownerNode } from "./facts.js";
 import {
   dependencyEdge,
-  dependencyHit,
   dependencyImportMatches,
   dependencyManifestHit,
   dependencyManifestMatches,

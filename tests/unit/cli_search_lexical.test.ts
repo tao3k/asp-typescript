@@ -7,7 +7,7 @@ import test from "node:test";
 import { runCliCapture } from "./cli_helpers.js";
 
 test("search lexical matches path-only TypeScript candidates", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-lexical-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-lexical-"));
   const workspaceRenderer = path.resolve(
     process.cwd(),
     "..",

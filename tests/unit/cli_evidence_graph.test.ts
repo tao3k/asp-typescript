@@ -4,6 +4,12 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
+import {
+  TYPE_SCRIPT_BINARY,
+  TYPE_SCRIPT_LANGUAGE_ID,
+  TYPE_SCRIPT_PROVIDER_ID,
+} from "../../src/cli/semantic-language.js";
+
 import { runCliCapture } from "./cli_helpers.js";
 
 test("evidence graph renders semantic evidence graph JSON", () => {
@@ -26,8 +32,8 @@ test("evidence graph renders semantic evidence graph JSON", () => {
   };
   assert.equal(payload.schemaId, "agent.semantic-protocols.semantic-evidence-graph");
   assert.equal(payload.protocolId, "agent.semantic-protocols.evidence-graph");
-  assert.equal(payload.producer.languageId, "typescript");
-  assert.equal(payload.producer.providerId, "ts-harness");
+  assert.equal(payload.producer.languageId, TYPE_SCRIPT_LANGUAGE_ID);
+  assert.equal(payload.producer.providerId, TYPE_SCRIPT_PROVIDER_ID);
   assert.equal(payload.project.package, "@scope/evidence");
   assert.deepEqual(payload.summary, {
     nodes: 4,
@@ -39,7 +45,7 @@ test("evidence graph renders semantic evidence graph JSON", () => {
   });
   assert.ok(payload.nodes.some((node) => node.kind === "owner"));
   assert.ok(payload.edges.some((edge) => edge.kind === "requires-evidence"));
-  assert.equal(payload.gaps[0]?.fields?.nextCommand, "ts-harness check --full .");
+  assert.equal(payload.gaps[0]?.fields?.nextCommand, `${TYPE_SCRIPT_BINARY} check --full .`);
 });
 
 test("evidence analyze renders graph-turbo request JSON", () => {

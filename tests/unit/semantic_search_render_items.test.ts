@@ -1,6 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
+import {
+  TYPE_SCRIPT_BINARY,
+  TYPE_SCRIPT_LANGUAGE_ID,
+  TYPE_SCRIPT_PROVIDER_ID,
+  TYPE_SCRIPT_PROVIDER_NAMESPACE,
+} from "../../src/cli/semantic-language.js";
 import { renderSemanticSearchPacket } from "../../src/cli/semantic-search/render.js";
 import type { SemanticSearchPacket } from "../../src/cli/semantic-search/types.js";
 
@@ -10,10 +16,10 @@ test("owner items render as compact item inventory", () => {
     schemaVersion: "1",
     protocolId: "agent.semantic-protocols.semantic-language",
     protocolVersion: "1",
-    languageId: "typescript",
-    providerId: "ts-harness",
-    binary: "ts-harness",
-    namespace: "agent.semantic-protocols.languages.typescript.ts-harness",
+    languageId: TYPE_SCRIPT_LANGUAGE_ID,
+    providerId: TYPE_SCRIPT_PROVIDER_ID,
+    binary: TYPE_SCRIPT_BINARY,
+    namespace: TYPE_SCRIPT_PROVIDER_NAMESPACE,
     method: "search/owner",
     projectRoot: ".",
     view: "owner",
@@ -68,7 +74,7 @@ test("owner items render as compact item inventory", () => {
         ownerPath: "src/cli/semantic-search/item-query.ts",
         fields: {
           command:
-            "ts-harness search lexical --query-set SemanticReadPacket owner --workspace . --view seeds",
+            "asp-typescript search lexical --query-set SemanticReadPacket owner --workspace . --view seeds",
         },
       },
     ],
@@ -100,10 +106,10 @@ test("owner items render as graph frontier in seeds mode", () => {
     schemaVersion: "1",
     protocolId: "agent.semantic-protocols.semantic-language",
     protocolVersion: "1",
-    languageId: "typescript",
-    providerId: "ts-harness",
-    binary: "ts-harness",
-    namespace: "agent.semantic-protocols.languages.typescript.ts-harness",
+    languageId: TYPE_SCRIPT_LANGUAGE_ID,
+    providerId: TYPE_SCRIPT_PROVIDER_ID,
+    binary: TYPE_SCRIPT_BINARY,
+    namespace: TYPE_SCRIPT_PROVIDER_NAMESPACE,
     method: "search/owner",
     projectRoot: ".",
     view: "owner",

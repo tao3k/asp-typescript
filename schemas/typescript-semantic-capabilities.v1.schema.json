@@ -13,7 +13,7 @@
   ],
   "properties": {
     "schemaId": {
-      "const": "agent.semantic-protocols.languages.typescript.ts-harness.capabilities"
+      "const": "agent.semantic-protocols.languages.typescript.asp-typescript.capabilities"
     },
     "schemaVersion": {
       "const": "1"
@@ -22,7 +22,7 @@
       "const": "typescript"
     },
     "providerId": {
-      "const": "ts-harness"
+      "const": "asp-typescript"
     },
     "capability": {
       "$ref": "#/$defs/capabilityDescriptor"

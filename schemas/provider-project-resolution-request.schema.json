@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.agent-semantic-protocols.dev/provider-project-resolution-request.v1.schema.json",
+  "$id": "https://schemas.agent-semantic-protocols.dev/provider-project-resolution-request.schema.json",
   "title": "Provider Project Scope Request",
   "type": "object",
   "additionalProperties": false,

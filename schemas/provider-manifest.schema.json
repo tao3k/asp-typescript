@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://tao3k.github.io/agent-semantic-protocols/schemas/provider-manifest.v1.schema.json",
-  "title": "ASP Provider Manifest v1",
+  "$id": "https://tao3k.github.io/agent-semantic-protocols/schemas/provider-manifest.schema.json",
+  "title": "ASP Provider Manifest",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -15,6 +15,7 @@
     "providerId",
     "namespace",
     "binary",
+    "runtimeContract",
     "development",
     "searchCapabilities",
     "queryPackDescriptor",
@@ -50,7 +51,7 @@
     },
     "providerId": {
       "type": "string",
-      "minLength": 1
+      "pattern": "^asp-[a-z0-9][a-z0-9-]*$"
     },
     "namespace": {
       "type": "string",
@@ -60,6 +61,9 @@
       "type": "string",
       "minLength": 1
     },
+    "runtimeContract": {
+      "$ref": "https://schemas.agent-semantic-protocols.dev/provider-runtime-contract-descriptor.schema.json"
+    },
     "execution": {
       "$ref": "#/$defs/providerExecution"
     },
@@ -67,7 +71,7 @@
       "$ref": "#/$defs/providerDevelopmentDescriptor"
     },
     "projectResolution": {
-      "$ref": "https://schemas.agent-semantic-protocols.dev/provider-project-resolution-descriptor.v1.schema.json"
+      "$ref": "https://schemas.agent-semantic-protocols.dev/provider-project-resolution-descriptor.schema.json"
     },
     "documentResolution": {
       "$ref": "https://schemas.agent-semantic-protocols.dev/provider-document-resolution-descriptor.v1.schema.json"
@@ -79,7 +83,7 @@
       "$ref": "#/$defs/providerSemanticFactsDescriptor"
     },
     "queryPackDescriptor": {
-      "$ref": "https://tao3k.github.io/agent-semantic-protocols/schemas/provider-query-pack-descriptor.v1.schema.json"
+      "$ref": "https://schemas.agent-semantic-protocols.dev/provider-query-pack-descriptor.schema.json"
     },
     "policy": {
       "$ref": "#/$defs/hookPolicy"
@@ -88,29 +92,70 @@
       "$ref": "#/$defs/hookRouteBindings"
     }
   },
-  "oneOf": [
+  "allOf": [
     {
-      "required": [
-        "projectResolution"
-      ],
-      "not": {
-        "required": [
-          "documentResolution"
-        ]
-      }
-    },
-    {
-      "required": [
-        "documentResolution"
-      ],
-      "not": {
-        "required": [
-          "projectResolution"
-        ]
-      }
+      "$ref": "#/$defs/canonicalProviderIdentity"
     }
   ],
+"anyOf": [
+  {
+    "required": [
+      "projectResolution"
+    ]
+  },
+  {
+    "required": [
+      "documentResolution"
+    ]
+  }
+],
   "$defs": {
+    "canonicalProviderIdentity": {
+      "oneOf": [
+        {
+          "properties": {
+            "languageId": {"const": "gerbil-scheme"},
+            "providerId": {"const": "asp-gerbil-scheme"}
+          }
+        },
+        {
+          "properties": {
+            "languageId": {"const": "julia"},
+            "providerId": {"const": "asp-julia"}
+          }
+        },
+        {
+          "properties": {
+            "languageId": {"const": "md"},
+            "providerId": {"const": "asp-md"}
+          }
+        },
+        {
+          "properties": {
+            "languageId": {"const": "org"},
+            "providerId": {"const": "asp-org"}
+          }
+        },
+        {
+          "properties": {
+            "languageId": {"const": "python"},
+            "providerId": {"const": "asp-python"}
+          }
+        },
+        {
+          "properties": {
+            "languageId": {"const": "rust"},
+            "providerId": {"const": "asp-rust"}
+          }
+        },
+        {
+          "properties": {
+            "languageId": {"const": "typescript"},
+            "providerId": {"const": "asp-typescript"}
+          }
+        }
+      ]
+    },
     "stringArray": {
       "type": "array",
       "items": {
@@ -149,7 +194,18 @@
           }
         },
         "buildBinding": {
-          "const": "root-development-installer-v1"
+          "enum": [
+            "root-development-installer-v1",
+            "provider-workspace-install-v1"
+          ]
+        },
+        "workspaceInstall": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[^/].*\\.json$",
+          "not": {
+            "pattern": "(^|/)\\.\\.(/|$)"
+          }
         },
         "artifactDomain": {
           "enum": [
@@ -157,7 +213,23 @@
             "state-home-provider-staging"
           ]
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "buildBinding": {
+                "const": "provider-workspace-install-v1"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "workspaceInstall"
+            ]
+          }
+        }
+      ]
     },
     "providerSearchCapabilities": {
       "type": "object",

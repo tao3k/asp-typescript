@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { existsSync, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -24,16 +24,7 @@ interface ProviderIdentity {
 
 function providerManifestPath(): string {
   const moduleDirectory = path.dirname(fileURLToPath(import.meta.url));
-  const candidates = [
-    path.resolve(moduleDirectory, "asp-provider-manifest.json"),
-    path.resolve(moduleDirectory, "..", "..", "..", "provider", "asp-provider-manifest.json"),
-    path.resolve(moduleDirectory, "..", "..", "provider", "asp-provider-manifest.json"),
-  ];
-  const manifestPath = candidates.find((candidate) => existsSync(candidate));
-  if (manifestPath === undefined) {
-    throw new Error("provider manifest not found");
-  }
-  return manifestPath;
+  return path.resolve(moduleDirectory, "..", "..", "provider", "asp-provider-registration.json");
 }
 
 function providerIdentity(): ProviderIdentity {

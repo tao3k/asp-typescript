@@ -5,11 +5,10 @@
   "description": "Project-level TypeScript language harness with native parser facts and compact diagnostics for agents",
   "license": "Apache-2.0",
   "bin": {
-    "ts-harness": "./dist/src/cli/main.js"
+    "asp-typescript": "./dist/src/cli/main.js"
   },
   "files": [
     "dist",
-    "provider",
     "schemas",
     "!schemas/provider-query-pack-descriptor.v1.schema.json",
     "!schemas/semantic-language-registry.v1.schema.json",
@@ -35,7 +34,8 @@
     "lint": "oxlint .",
     "test": "npm run test:implementation && npm run test:policy",
     "test:implementation": "npm run build && node scripts/run-node-tests.mjs implementation",
-    "test:perf": "npm run build && node --test dist/tests/perf/query-search.microbench.js",
+    "test:perf": "npm run build && node --test dist/tests/perf/query-search.microbench.js dist/tests/perf/provider-runtime-server.microbench.js",
+    "test:perf:provider-runtime": "npm run build && node --test dist/tests/perf/provider-runtime-server.microbench.js",
     "test:policy": "npm run build && node scripts/run-node-tests.mjs policy",
     "harness": "npm run build && node dist/src/cli/main.js check --full ."
   },

@@ -5,6 +5,8 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import test from "node:test";
 
+import { TYPE_SCRIPT_BINARY } from "../../src/cli/semantic-language.js";
+
 import { buildDependencyTopologyPacket } from "../../src/cli/dependency-topology.js";
 import { runCli } from "../../src/cli/main.js";
 
@@ -109,7 +111,7 @@ test("search dependency-topology emits the canonical JSON packet", async () => {
 
 test("bundled provider emits dependency topology through the canonical CLI", async () => {
   await withPackageJson((workspaceRoot) => {
-    const providerBinary = resolve(import.meta.dirname, "../../provider/ts-harness.mjs");
+    const providerBinary = resolve(import.meta.dirname, `../../provider/${TYPE_SCRIPT_BINARY}.mjs`);
     const result = spawnSync(
       process.execPath,
       [providerBinary, "search", "dependency-topology", "--json", "--workspace", workspaceRoot],
@@ -125,13 +127,16 @@ test("bundled provider emits dependency topology through the canonical CLI", asy
   });
 });
 
-test("provider manifest advertises the canonical dependency-topology route", () => {
-  const manifest = JSON.parse(
-    readFileSync(resolve(import.meta.dirname, "../../provider/asp-provider-manifest.json"), "utf8"),
+test("provider registration advertises dependency topology and a search route", () => {
+  const registration = JSON.parse(
+    readFileSync(
+      resolve(import.meta.dirname, "../../provider/asp-provider-registration.json"),
+      "utf8",
+    ),
   ) as {
     readonly searchCapabilities: { readonly dependencyTopology?: boolean };
-    readonly routeBindings: { readonly dependencyTopology?: string };
+    readonly routes: readonly { readonly operation: string }[];
   };
-  assert.equal(manifest.searchCapabilities.dependencyTopology, true);
-  assert.equal(manifest.routeBindings.dependencyTopology, "search/dependency-topology");
+  assert.equal(registration.searchCapabilities.dependencyTopology, true);
+  assert.ok(registration.routes.some(({ operation }) => operation === "search"));
 });

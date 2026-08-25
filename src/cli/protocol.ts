@@ -1,5 +1,5 @@
 /**
- * Protocol command parsing and dispatch for the ts-harness CLI.
+ * Protocol command parsing and dispatch for the asp-typescript CLI.
  */
 
 import fs from "node:fs";
@@ -338,13 +338,13 @@ function parseAstPatchArgs(argv: readonly string[]): ProtocolArgs {
   if (mode === "apply") {
     return {
       kind: "error",
-      message: "ts-harness ast-patch apply is unavailable; use dry-run and Codex apply_patch",
+      message: "asp-typescript ast-patch apply is unavailable; use dry-run and Codex apply_patch",
     };
   }
   if (mode !== "dry-run") {
     return {
       kind: "error",
-      message: "usage: ts-harness ast-patch dry-run --packet <path-or-> [PROJECT_ROOT]",
+      message: "usage: asp-typescript ast-patch dry-run --packet <path-or-> [PROJECT_ROOT]",
     };
   }
   let packetPath: string | undefined;
@@ -433,7 +433,7 @@ function parseSearchArgs(argv: readonly string[]): ProtocolArgs {
     return {
       kind: "error",
       message:
-        "usage: ts-harness search <workspace|prime|owner|dependency|deps|docs|api|public-external-types|policy|symbol|callsite|import|tests|reasoning|env|runtime-source|lang|std|capability|extension|pattern|compare|ingest> ... [--json] [--package PATH] [--workspace <workspace-root>]",
+        "usage: asp-typescript search <workspace|prime|owner|dependency|deps|docs|api|public-external-types|policy|symbol|callsite|import|tests|reasoning|env|runtime-source|lang|std|capability|extension|pattern|compare|ingest> ... [--json] [--package PATH] [--workspace <workspace-root>]",
     };
   }
   const searchView = typeScriptSemanticSearchViewDescriptor(viewValue);
@@ -908,124 +908,6 @@ function isPathWithin(pathToCheck: string, root: string): boolean {
   return relativePath === "" || (!relativePath.startsWith("..") && !path.isAbsolute(relativePath));
 }
 
-function collectTextSearchOwners(
-  packageRoot: string,
-  workspaceRoot: string,
-  terms: readonly string[],
-  limit: number,
-): { readonly path: string; readonly score: number }[] {
-  const files: { readonly path: string; readonly size: number }[] = [];
-  collectTypeScriptFiles(packageRoot, files);
-  const filenameMatches = collectFilenameSearchOwners(files, workspaceRoot, terms, limit);
-  if (filenameMatches.length > 0) return filenameMatches;
-  const loweredTerms = terms.map((term) => term.toLowerCase());
-  const scored: { readonly path: string; readonly score: number; readonly size: number }[] = [];
-  for (const file of files) {
-    let text: string;
-    try {
-      text = fs.readFileSync(file.path, "utf8");
-    } catch {
-      continue;
-    }
-    const lowerText = text.toLowerCase();
-    const lowerName = path.basename(file.path).toLowerCase();
-    let score = 0;
-    for (let index = 0; index < terms.length; index++) {
-      const term = terms[index]!;
-      const lowerTerm = loweredTerms[index]!;
-      if (lowerName.includes(lowerTerm)) score += 40;
-      score += countOccurrences(lowerText, lowerTerm, 8) * 10;
-      if (text.includes(`function ${term}`) || text.includes(`const ${term}`)) score += 30;
-      if (text.includes(`export ${term}`) || text.includes(`export function ${term}`)) score += 20;
-    }
-    if (score > 0) {
-      scored.push({
-        path: path.relative(workspaceRoot, file.path).split(path.sep).join("/"),
-        score,
-        size: text.length,
-      });
-    }
-  }
-  return scored
-    .sort(
-      (left, right) =>
-        right.score - left.score || right.size - left.size || left.path.localeCompare(right.path),
-    )
-    .slice(0, limit)
-    .map(({ path: ownerPath, score }) => ({ path: ownerPath, score }));
-}
-
-function collectFilenameSearchOwners(
-  files: readonly { readonly path: string; readonly size: number }[],
-  workspaceRoot: string,
-  terms: readonly string[],
-  limit: number,
-): { readonly path: string; readonly score: number }[] {
-  const termTokens = terms.map(queryTokens);
-  const primaryTokens = queryTokens(selectSymbolTerm(terms) ?? "");
-  const scored: { readonly path: string; readonly score: number; readonly size: number }[] = [];
-  for (const file of files) {
-    const lowerName = path.basename(file.path).toLowerCase();
-    let score = 0;
-    for (let index = 0; index < terms.length; index++) {
-      const lowerTerm = terms[index]!.toLowerCase();
-      if (lowerName.includes(lowerTerm)) score += 80;
-      for (const token of termTokens[index]!) {
-        if (lowerName.includes(token)) score += 25;
-      }
-    }
-    for (const token of primaryTokens) {
-      if (lowerName.includes(token)) score += 70;
-    }
-    if (score > 0) {
-      scored.push({
-        path: path.relative(workspaceRoot, file.path).split(path.sep).join("/"),
-        score,
-        size: file.size,
-      });
-    }
-  }
-  return scored
-    .sort(
-      (left, right) =>
-        right.score - left.score || right.size - left.size || left.path.localeCompare(right.path),
-    )
-    .slice(0, limit)
-    .map(({ path: ownerPath, score }) => ({ path: ownerPath, score }));
-}
-
-function queryTokens(term: string): string[] {
-  return term
-    .replace(/([a-z0-9])([A-Z])/gu, "$1 $2")
-    .split(/[^A-Za-z0-9_$]+/u)
-    .map((token) => token.toLowerCase())
-    .filter((token) => token.length > 2);
-}
-
-function countOccurrences(text: string, term: string, limit: number): number {
-  if (term.length === 0) return 0;
-  let count = 0;
-  let offset = 0;
-  while (count < limit) {
-    const index = text.indexOf(term, offset);
-    if (index === -1) return count;
-    count += 1;
-    offset = index + term.length;
-  }
-  return count;
-}
-
-function selectSymbolTerm(terms: readonly string[]): string | undefined {
-  return (
-    terms.find((term) => queryTokens(term).some((token) => token === "program")) ??
-    terms.find(isIdentifierTerm)
-  );
-}
-
-function isIdentifierTerm(term: string): boolean {
-  return /^[A-Za-z_$][\w$]*$/u.test(term);
-}
-
 function parseSearchQuerySurfaces(value: string): TypeScriptSemanticSearchPipe[] | string {
   const surfaces = value
     .split(",")
@@ -1102,7 +984,7 @@ function parseCheckArgs(argv: readonly string[]): ProtocolArgs {
     } else if (arg === "--help" || arg === "-h") {
       return {
         kind: "error",
-        message: "usage: ts-harness check [--changed | --full] [--json] [PROJECT_ROOT]",
+        message: "usage: asp-typescript check [--changed | --full] [--json] [PROJECT_ROOT]",
       };
     } else if (arg.startsWith("-")) {
       return { kind: "error", message: `unknown check option: ${arg}` };

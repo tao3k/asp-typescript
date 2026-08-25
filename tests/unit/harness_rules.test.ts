@@ -83,7 +83,7 @@ test("generated harness rules matches unit fixture", () => {
 });
 
 test("harness rules writer targets requested unit directory", () => {
-  const unitDir = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-rules-"));
+  const unitDir = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-rules-"));
   try {
     const output = writeTypeScriptHarnessRulesToUnitTests(unitDir);
 

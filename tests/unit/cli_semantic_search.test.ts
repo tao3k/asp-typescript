@@ -4,6 +4,14 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
+import {
+  TYPE_SCRIPT_BINARY,
+  TYPE_SCRIPT_LANGUAGE_ID,
+  TYPE_SCRIPT_PROVIDER_ID,
+  TYPE_SCRIPT_PROVIDER_NAMESPACE,
+} from "../../src/cli/semantic-language.js";
+import { TYPE_SCRIPT_PROVIDER_REGISTRATION } from "../../src/cli/provider-descriptor.js";
+
 import { runCliCapture } from "./cli_helpers.js";
 
 test("CLI exposes semantic-search protocol commands", () => {
@@ -307,10 +315,10 @@ test("CLI exposes semantic-search protocol commands", () => {
   assert.equal(packet.schemaVersion, "1");
   assert.equal(packet.protocolId, "agent.semantic-protocols.semantic-language");
   assert.equal(packet.protocolVersion, "1");
-  assert.equal(packet.languageId, "typescript");
-  assert.equal(packet.providerId, "ts-harness");
-  assert.equal(packet.binary, "ts-harness");
-  assert.equal(packet.namespace, "agent.semantic-protocols.languages.typescript.ts-harness");
+  assert.equal(packet.languageId, TYPE_SCRIPT_LANGUAGE_ID);
+  assert.equal(packet.providerId, TYPE_SCRIPT_PROVIDER_ID);
+  assert.equal(packet.binary, TYPE_SCRIPT_BINARY);
+  assert.equal(packet.namespace, TYPE_SCRIPT_PROVIDER_NAMESPACE);
   assert.equal(packet.method, "search/prime");
   assert.equal(packet.view, "prime");
   assert.equal(packet.header.fields.extensions, 1);
@@ -839,10 +847,14 @@ test("CLI exposes semantic-search protocol commands", () => {
     doctor.stdout,
     /^\[agent-doctor\] status=ok protocol=agent\.semantic-protocols\.semantic-language/u,
   );
-  assert.match(doctor.stdout, /\|language id=typescript provider=ts-harness binary=ts-harness/u);
+  assert.ok(
+    doctor.stdout.includes(
+      `|language id=${TYPE_SCRIPT_LANGUAGE_ID} provider=${TYPE_SCRIPT_PROVIDER_ID} binary=${TYPE_SCRIPT_BINARY}`,
+    ),
+  );
   assert.match(
     doctor.stdout,
-    /\|namespace agent\.semantic-protocols\.languages\.typescript\.ts-harness/u,
+    new RegExp(`\\|namespace ${TYPE_SCRIPT_PROVIDER_NAMESPACE.replaceAll(".", "\\.")}`, "u"),
   );
   assert.match(doctor.stdout, /\|method search\/workspace,search\/prime,/u);
 
@@ -963,7 +975,7 @@ test("CLI exposes semantic-search protocol commands", () => {
   assert.equal(providerRegistration.methodDescriptors.length, expectedMethods.length);
   assert.equal(
     providerRegistration.methodDescriptors.every(
-      (descriptor) => descriptor.invocation?.argv[0] === "ts-harness",
+      (descriptor) => descriptor.invocation?.argv[0] === TYPE_SCRIPT_BINARY,
     ),
     true,
   );
@@ -991,10 +1003,10 @@ test("CLI exposes semantic-search protocol commands", () => {
       ),
     },
     {
-      languageId: "typescript",
-      providerId: "ts-harness",
-      binary: "ts-harness",
-      namespace: "agent.semantic-protocols.languages.typescript.ts-harness",
+      languageId: TYPE_SCRIPT_LANGUAGE_ID,
+      providerId: TYPE_SCRIPT_PROVIDER_ID,
+      binary: TYPE_SCRIPT_BINARY,
+      namespace: TYPE_SCRIPT_PROVIDER_NAMESPACE,
       displayName: "TypeScript",
       methods: expectedMethods,
       methodDescriptors: [
@@ -1234,143 +1246,7 @@ test("CLI exposes semantic-search protocol commands", () => {
           supportsCompact: true,
         },
       ],
-      schemas: [
-        {
-          schemaId: "agent.semantic-protocols.semantic-search-packet",
-          schemaVersion: "1",
-          path: "schemas/semantic-search-packet.v1.schema.json",
-        },
-        {
-          schemaId: "agent.semantic-protocols.semantic-query-packet",
-          schemaVersion: "1",
-          path: "schemas/semantic-query-packet.v1.schema.json",
-        },
-        {
-          schemaId: "agent.semantic-protocols.semantic-read-packet",
-          schemaVersion: "1",
-          path: "schemas/semantic-read-packet.v1.schema.json",
-        },
-        {
-          schemaId: "agent.semantic-protocols.semantic-source-location",
-          schemaVersion: "1",
-          path: "schemas/semantic-source-location.v1.schema.json",
-        },
-        {
-          schemaId: "agent.semantic-protocols.semantic-tree-sitter-provenance",
-          schemaVersion: "1",
-          path: "schemas/semantic-tree-sitter-provenance.v1.schema.json",
-        },
-        {
-          schemaId: "agent.semantic-protocols.semantic-tree-sitter-query",
-          schemaVersion: "1",
-          path: "schemas/semantic-tree-sitter-query.v1.schema.json",
-        },
-        {
-          schemaId: "agent.semantic-protocols.semantic-tree-sitter-grammar-profile",
-          schemaVersion: "1",
-          path: "schemas/semantic-tree-sitter-grammar-profile.v1.schema.json",
-        },
-        {
-          schemaId: "agent.semantic-protocols.semantic-graph",
-          schemaVersion: "1",
-          path: "schemas/semantic-graph.v1.schema.json",
-        },
-        {
-          schemaId: "agent.semantic-protocols.semantic-graph-turbo-request",
-          schemaVersion: "1",
-          path: "schemas/semantic-graph-turbo-request.v1.schema.json",
-        },
-        {
-          schemaId: "agent.semantic-protocols.semantic-fact-graph",
-          schemaVersion: "1",
-          path: "schemas/semantic-fact-graph.v1.schema.json",
-        },
-        {
-          schemaId: "agent.semantic-protocols.semantic-fact-ontology",
-          schemaVersion: "1",
-          path: "schemas/semantic-fact-ontology.v1.schema.json",
-        },
-        {
-          schemaId: "agent.semantic-protocols.semantic-verification-receipt",
-          schemaVersion: "1",
-          path: "schemas/semantic-verification-receipt.v1.schema.json",
-        },
-        {
-          schemaId: "agent.semantic-protocols.semantic-behavior-snapshot",
-          schemaVersion: "1",
-          path: "schemas/semantic-behavior-snapshot.v1.schema.json",
-        },
-        {
-          schemaId: "agent.semantic-protocols.semantic-determinism-readiness",
-          schemaVersion: "1",
-          path: "schemas/semantic-determinism-readiness.v1.schema.json",
-        },
-        {
-          schemaId: "agent.semantic-protocols.dev-command-log",
-          schemaVersion: "1",
-          path: "schemas/semantic-dev-command-log.v1.schema.json",
-        },
-        {
-          schemaId: "agent.semantic-protocols.semantic-formal-proof-pilot",
-          schemaVersion: "1",
-          path: "schemas/semantic-formal-proof-pilot.v1.schema.json",
-        },
-        {
-          schemaId: "agent.semantic-protocols.semantic-review-packet",
-          schemaVersion: "1",
-          path: "schemas/semantic-review-packet.v1.schema.json",
-        },
-        {
-          schemaId: "agent.semantic-protocols.semantic-evidence-graph",
-          schemaVersion: "1",
-          path: "schemas/semantic-evidence-graph.v1.schema.json",
-        },
-        {
-          schemaId: "agent.semantic-protocols.semantic-assurance-case",
-          schemaVersion: "1",
-          path: "schemas/semantic-assurance-case.v1.schema.json",
-        },
-        {
-          schemaId: "agent.semantic-protocols.semantic-ast-patch",
-          schemaVersion: "1",
-          path: "schemas/semantic-ast-patch.v1.schema.json",
-        },
-        {
-          schemaId: "agent.semantic-protocols.semantic-ast-patch-receipt",
-          schemaVersion: "1",
-          path: "schemas/semantic-ast-patch-receipt.v1.schema.json",
-        },
-        {
-          schemaId: "agent.semantic-protocols.semantic-type-surface",
-          schemaVersion: "1",
-          path: "schemas/semantic-type-surface.v1.schema.json",
-        },
-        {
-          schemaId: "agent.semantic-protocols.semantic-handle",
-          schemaVersion: "1",
-          path: "schemas/semantic-handle.v1.schema.json",
-        },
-        {
-          schemaId: "agent.semantic-protocols.semantic-language-registry",
-          schemaVersion: "1",
-          path: "schemas/semantic-language-registry.v1.schema.json",
-        },
-        {
-          schemaId: "agent.semantic-protocols.semantic-provider-doctor",
-          schemaVersion: "1",
-          path: "schemas/semantic-provider-doctor.v1.schema.json",
-        },
-        {
-          schemaId: "agent.semantic-protocols.provider-query-pack-descriptor",
-          schemaVersion: "1",
-          path: "schemas/provider-query-pack-descriptor.v1.schema.json",
-        },
-        {
-          schemaId: "agent.semantic-protocols.languages.typescript.ts-harness.capabilities",
-          schemaVersion: "1",
-          path: "schemas/typescript-semantic-capabilities.v1.schema.json",
-        },
-      ],
+      schemas: TYPE_SCRIPT_PROVIDER_REGISTRATION.schemas,
     },
   );
 

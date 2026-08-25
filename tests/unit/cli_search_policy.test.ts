@@ -58,7 +58,7 @@ test("search policy JSON exposes semanticHandles", () => {
 });
 
 function policySearchFixture(): string {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-policy-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-policy-"));
   fs.mkdirSync(path.join(root, "src"), { recursive: true });
   fs.writeFileSync(
     path.join(root, "package.json"),

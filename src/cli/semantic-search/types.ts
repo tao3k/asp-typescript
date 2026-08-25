@@ -59,10 +59,10 @@ export interface SemanticSearchPacket {
   readonly schemaVersion: "1";
   readonly protocolId: "agent.semantic-protocols.semantic-language";
   readonly protocolVersion: "1";
-  readonly languageId: "typescript";
-  readonly providerId: "ts-harness";
-  readonly binary: "ts-harness";
-  readonly namespace: "agent.semantic-protocols.languages.typescript.ts-harness";
+  readonly languageId: string;
+  readonly providerId: string;
+  readonly binary: string;
+  readonly namespace: string;
   readonly method: `search/${SemanticSearchView}`;
   readonly projectRoot: string;
   readonly packageName?: string;

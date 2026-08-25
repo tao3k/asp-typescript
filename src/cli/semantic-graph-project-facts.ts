@@ -7,9 +7,11 @@ import {
   type TypeScriptSemanticGraphTestFact,
 } from "../parser/semantic_graph_project_facts.js";
 import { type ProviderGraphEdge, type ProviderGraphNode } from "./semantic-graph-facts.js";
+import {
+  TYPE_SCRIPT_LANGUAGE_ID as LANGUAGE_ID,
+  TYPE_SCRIPT_PROVIDER_ID as PROVIDER_ID,
+} from "./semantic-language.js";
 
-const LANGUAGE_ID = "typescript" as const;
-const PROVIDER_ID = "ts-harness" as const;
 const TEST_COMMAND = "npm test";
 
 export function projectGraphPayload(project: TypeScriptSemanticGraphProjectFact | undefined): {

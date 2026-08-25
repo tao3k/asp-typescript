@@ -4,6 +4,11 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
+import {
+  TYPE_SCRIPT_LANGUAGE_ID,
+  TYPE_SCRIPT_PROVIDER_ID,
+} from "../../src/cli/semantic-language.js";
+
 import { runCliCapture } from "./cli_helpers.js";
 
 type JsonObject = Record<string, unknown>;
@@ -51,8 +56,8 @@ test("query direct-source-read emits semantic read packet", () => {
   assert.equal(packet.schemaId, "agent.semantic-protocols.semantic-read-packet");
   assert.equal(packet.schemaVersion, "1");
   assert.equal(packet.protocolId, "agent.semantic-protocols.semantic-language");
-  assert.equal(packet.languageId, "typescript");
-  assert.equal(packet.providerId, "ts-harness");
+  assert.equal(packet.languageId, TYPE_SCRIPT_LANGUAGE_ID);
+  assert.equal(packet.providerId, TYPE_SCRIPT_PROVIDER_ID);
   assert.equal(packet.method, "query/direct-source-read");
   assert.equal(packet.ownerPath, "src/demo.ts");
   assert.equal(packet.selector, "owner:src/demo.ts:1:3");

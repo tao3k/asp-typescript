@@ -30,39 +30,39 @@ console.log(renderTypeScriptProjectHarnessAgentCompactText(report));
 
 ## CLI
 
-The public binary is `ts-harness`.
+The public binary is `asp-typescript`.
 
 ```shell
-ts-harness search workspace .
-ts-harness search prime --workspace . --view seeds
-ts-harness search owner src/index.ts --workspace . --view seeds
-ts-harness search lexical OrderStatus .
-ts-harness search lexical --query-set OrderStatus --query-set findOrderStatus owner tests .
-rg -n "OrderStatus" src tests | ts-harness search ingest .
+asp-typescript search workspace .
+asp-typescript search prime --workspace . --view seeds
+asp-typescript search owner src/index.ts --workspace . --view seeds
+asp-typescript search lexical OrderStatus .
+asp-typescript search lexical --query-set OrderStatus --query-set findOrderStatus owner tests .
+rg -n "OrderStatus" src tests | asp-typescript search ingest .
 
-ts-harness check --changed .
-ts-harness check --full .
-ts-harness agent doctor --json .
-ts-harness agent install --client codex .
-ts-harness agent guide --client codex .
+asp-typescript check --changed .
+asp-typescript check --full .
+asp-typescript agent doctor --json .
+asp-typescript agent install --client codex .
+asp-typescript agent guide --client codex .
 ```
 
 Compact text is the default agent surface. `--json` emits the shared semantic
 search packet, and `agent doctor --json` emits the semantic language registry.
 `agent install --client codex` writes `.codex/config.toml` so Codex hooks route
 raw TypeScript/JavaScript source reads and broad candidate searches back through
-`ts-harness search` packets. Existing multi-language hook config is preserved:
+`asp-typescript search` packets. Existing multi-language hook config is preserved:
 the installer updates its own marked block or appends one when another harness
 already owns hooks. `agent guide --client codex` prints the command-line guide
-used in hook denials; every actionable line uses the installed `ts-harness`
+used in hook denials; every actionable line uses the installed `asp-typescript`
 binary.
 The provider identity is:
 
 ```text
 languageId=typescript
-providerId=ts-harness
-binary=ts-harness
-namespace=agent.semantic-protocols.languages.typescript.ts-harness
+providerId=asp-typescript
+binary=asp-typescript
+namespace=agent.semantic-protocols.languages.typescript.asp-typescript
 ```
 
 ## Rule Packs

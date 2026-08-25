@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-semantic-protocols.dev/schemas/asp-client-cancellation-probe-request.schema.json",
+  "title": "ASP Client Cancellation Probe Request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaId", "schemaVersion"],
+  "properties": {
+    "schemaId": {
+      "const": "agent.semantic-protocols.asp-client-cancellation-probe-request"
+    },
+    "schemaVersion": {
+      "const": "1"
+    }
+  }
+}

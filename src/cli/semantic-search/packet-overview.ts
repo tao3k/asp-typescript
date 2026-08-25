@@ -296,7 +296,7 @@ function ownerItemNextActions(
   const terms = selectedOwnerItemTerms(items);
   if (terms.length === 0) return [];
   const command = [
-    "ts-harness",
+    "asp-typescript",
     "search",
     "lexical",
     ...terms.flatMap((term) => ["--query-set", term]),

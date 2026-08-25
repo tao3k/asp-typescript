@@ -4,9 +4,11 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
+import { TYPE_SCRIPT_BINARY } from "../../src/cli/semantic-language.js";
+
 import { hasCommand, runCliCapture } from "./cli_helpers.js";
 test("CLI exposes only search, check, and agent protocol entrypoints", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-cli-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-cli-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(path.join(root, "tsconfig.json"), JSON.stringify({ include: ["src/**/*.ts"] }));
   fs.writeFileSync(path.join(root, "src", "index.ts"), "export const ok = 1;\n");
@@ -26,7 +28,7 @@ test("CLI exposes only search, check, and agent protocol entrypoints", () => {
   assert.equal(jsonReport.reasoningTree.runMode, "project");
   assert.equal(jsonReport.modules.length, 1);
 
-  const noTsconfig = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-cli-no-config-"));
+  const noTsconfig = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-cli-no-config-"));
   fs.mkdirSync(path.join(noTsconfig, "src"));
   fs.writeFileSync(path.join(noTsconfig, "src", "index.ts"), "export const ok = 1;\n");
   const changed = runCliCapture(["check", "--changed", "."], noTsconfig);
@@ -358,7 +360,7 @@ test("CLI reports root asp owner for hook install and runtime", () => {
   const install = runCliCapture(["agent", "install", "--client", "codex", "."], root);
   assert.equal(install.exitCode, 2);
   assert.equal(install.stdout, "");
-  assert.match(install.stderr, /ts-harness agent install moved to asp/u);
+  assert.ok(install.stderr.includes(`${TYPE_SCRIPT_BINARY} agent install moved to asp`));
   assert.match(install.stderr, /asp hook install --client codex/u);
 
   const hook = runCliCapture(
@@ -368,12 +370,12 @@ test("CLI reports root asp owner for hook install and runtime", () => {
   );
   assert.equal(hook.exitCode, 2);
   assert.equal(hook.stdout, "");
-  assert.match(hook.stderr, /ts-harness agent hook moved to asp/u);
+  assert.ok(hook.stderr.includes(`${TYPE_SCRIPT_BINARY} agent hook moved to asp`));
   assert.match(hook.stderr, /asp hook <event> --client codex/u);
 
   const guide = runCliCapture(["agent", "guide", "."], root);
   assert.equal(guide.exitCode, 0);
-  assert.match(guide.stdout, /^\[ts-harness-guide\] project=/u);
+  assert.ok(guide.stdout.startsWith(`[${TYPE_SCRIPT_BINARY}-guide] project=`));
   assert.match(
     guide.stdout,
     /\|catalog reasoningProfiles=owner-query,query-deps,owner-tests,finding-frontier,feature-cfg entries=owner-query,query-deps,owner-tests routes=syntax-locate,exact-source,callable-skeleton/u,
@@ -399,5 +401,5 @@ test("CLI reports root asp owner for hook install and runtime", () => {
 
   const guideWithClient = runCliCapture(["agent", "guide", "--client", "claude", "."], root);
   assert.equal(guideWithClient.exitCode, 0);
-  assert.match(guideWithClient.stdout, /^\[ts-harness-guide\] project=/u);
+  assert.ok(guideWithClient.stdout.startsWith(`[${TYPE_SCRIPT_BINARY}-guide] project=`));
 });

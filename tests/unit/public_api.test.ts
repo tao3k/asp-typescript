@@ -347,7 +347,7 @@ test("public facade exposes the stable M13 runtime surface", () => {
 });
 
 test("public runner renders compact agent snapshots from parser-native facts", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-public-api-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-public-api-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.mkdirSync(path.join(root, "generated"));
   fs.writeFileSync(
@@ -406,7 +406,7 @@ test("public runner renders compact agent snapshots from parser-native facts", (
 });
 
 test("public agent-clean assertion surfaces advisory findings as test-gate feedback", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-agent-clean-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-agent-clean-"));
   writeAdviceOnlyProject(root);
 
   const blockingOnlyReport = api.assertTypeScriptProjectHarnessClean(root);
@@ -448,7 +448,7 @@ test("public agent-clean assertion surfaces advisory findings as test-gate feedb
 });
 
 test("public embedded assertion emits advice without failing info-only projects", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-embedded-clean-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-embedded-clean-"));
   writeAdviceOnlyProject(root);
   const advice: string[] = [];
 
@@ -463,7 +463,7 @@ test("public embedded assertion emits advice without failing info-only projects"
 });
 
 test("public embedded assertion defaults to a fast non-semantic policy pass", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-embedded-fast-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-embedded-fast-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(path.join(root, "package.json"), JSON.stringify({ type: "module" }));
   fs.writeFileSync(path.join(root, "tsconfig.json"), JSON.stringify({ include: ["src/**/*.ts"] }));
@@ -484,7 +484,7 @@ test("public embedded assertion defaults to a fast non-semantic policy pass", ()
 });
 
 test("public agent compact text renderer can select blocking or all findings", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-agent-compact-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-agent-compact-"));
   writeAdviceOnlyProject(root);
 
   const report = api.runTypeScriptProjectHarness(root);

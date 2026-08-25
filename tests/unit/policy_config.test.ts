@@ -162,7 +162,7 @@ test("agent snapshot uses policy-configured findings", () => {
 });
 
 function unresolvedImportProject(label: string): string {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), `ts-harness-policy-${label}-`));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), `asp-typescript-policy-${label}-`));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(
     path.join(root, "tsconfig.json"),

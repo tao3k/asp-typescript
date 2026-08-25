@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 
 import { tryRunFastSearchCli } from "../../src/cli/fast-search-cli.js";
 import { runCli } from "../../src/cli/main.js";
+import { TYPE_SCRIPT_PROVIDER_ID } from "../../src/cli/semantic-language.js";
 
 const packageRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 
@@ -54,7 +55,7 @@ describe("metadata-only search fast path", () => {
       assert.equal(packet.method, `search/${view}`);
       assert.equal(packet.projectRoot, packageRoot);
       assert.equal(packet.schemaId, "agent.semantic-protocols.semantic-search-packet");
-      assert.equal(packet.providerId, "ts-harness");
+      assert.equal(packet.providerId, TYPE_SCRIPT_PROVIDER_ID);
     }
   });
 

@@ -15,7 +15,7 @@ import {
 import { relativePath } from "./path_helpers.js";
 
 test("project harness reports malformed package json without throwing", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-package-json-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-package-json-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(path.join(root, "tsconfig.json"), JSON.stringify({ include: ["src/**/*.ts"] }));
   fs.writeFileSync(path.join(root, "package.json"), '{ "name": }\n');
@@ -56,7 +56,7 @@ test("project harness reports malformed package json without throwing", () => {
 });
 
 test("project harness reports malformed project reference package json without throwing", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-reference-package-json-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-reference-package-json-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.mkdirSync(path.join(root, "packages", "broken"), { recursive: true });
   fs.writeFileSync(
@@ -100,7 +100,7 @@ test("project harness reports malformed project reference package json without t
 });
 
 test("project parser records package dependency facts from package json", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-package-deps-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-package-deps-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(
     path.join(root, "package.json"),
@@ -156,7 +156,7 @@ test("project parser records package dependency facts from package json", () => 
 });
 
 test("project policy reports referenced package config shape as advice", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-reference-config-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-reference-config-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.mkdirSync(path.join(root, "packages", "core", "src"), { recursive: true });
   fs.writeFileSync(path.join(root, "package.json"), JSON.stringify({ name: "@example/root" }));
@@ -201,7 +201,7 @@ test("project policy reports referenced package config shape as advice", () => {
 });
 
 test("project policy reports package entry module resolution as advice", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-package-resolution-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-package-resolution-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(
     path.join(root, "package.json"),
@@ -235,7 +235,7 @@ test("project policy reports package entry module resolution as advice", () => {
 });
 
 test("project policy uses TypeScript effective module resolution facts", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-effective-resolution-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-effective-resolution-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(
     path.join(root, "package.json"),
@@ -263,7 +263,7 @@ test("project policy uses TypeScript effective module resolution facts", () => {
 });
 
 test("project harness reports malformed workspace package json without throwing", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-workspace-package-json-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-workspace-package-json-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.mkdirSync(path.join(root, "packages", "broken"), { recursive: true });
   fs.writeFileSync(
@@ -304,7 +304,7 @@ test("project harness reports malformed workspace package json without throwing"
 });
 
 test("project harness discovers workspace package facts from package json", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-workspace-packages-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-workspace-packages-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.mkdirSync(path.join(root, "packages", "core"), { recursive: true });
   fs.writeFileSync(
@@ -396,7 +396,7 @@ test("project harness discovers workspace package facts from package json", () =
 });
 
 test("project harness discovers pnpm workspace package facts", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-pnpm-workspace-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-pnpm-workspace-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.mkdirSync(path.join(root, "packages", "core"), { recursive: true });
   fs.mkdirSync(path.join(root, "playground", "demo"), { recursive: true });
@@ -451,7 +451,7 @@ test("project harness discovers pnpm workspace package facts", () => {
 });
 
 test("project harness keeps package entry source locations from the TypeScript JSON AST", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-package-json-locations-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-package-json-locations-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(
     path.join(root, "tsconfig.json"),
@@ -521,7 +521,7 @@ test("project harness keeps package entry source locations from the TypeScript J
 });
 
 test("project harness preserves conditional package targets from the TypeScript JSON AST", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-package-json-conditions-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-package-json-conditions-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(
     path.join(root, "tsconfig.json"),
@@ -611,7 +611,7 @@ test("project harness preserves conditional package targets from the TypeScript 
 });
 
 test("project harness records Rspack build tool facts from package json and config files", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-rspack-build-tool-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-rspack-build-tool-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(path.join(root, "src", "index.ts"), "export const ok = 1;\n");
   fs.writeFileSync(
@@ -680,7 +680,7 @@ test("project harness records Rspack build tool facts from package json and conf
 });
 
 test("Rspack script facts satisfy the build tool surface advice", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-rspack-script-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-rspack-script-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(path.join(root, "src", "index.ts"), "export const ok = 1;\n");
   fs.writeFileSync(
@@ -730,7 +730,7 @@ test("Rspack script facts satisfy the build tool surface advice", () => {
 });
 
 test("package json harness config can explicitly expose Rspack build tool intent", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-rspack-config-intent-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-rspack-config-intent-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(path.join(root, "src", "index.ts"), "export const ok = 1;\n");
   fs.writeFileSync(path.join(root, "tsconfig.json"), JSON.stringify({ include: ["src/**/*.ts"] }));

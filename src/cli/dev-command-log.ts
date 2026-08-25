@@ -96,19 +96,19 @@ export function startDevCommandLog(args: readonly string[], cwd: string): DevCom
   const session = resolveSessionContext(logRoot, projectRootHash);
   const sessionOrdinal = allocateSessionOrdinal(logRoot, session.sessionId);
   const startedAtMs = Date.now();
-  const eventId = `ts-harness-${startedAtMs}-${process.pid}-${sessionOrdinal
+  const eventId = `asp-typescript-${startedAtMs}-${process.pid}-${sessionOrdinal
     .toString()
     .padStart(6, "0")}`;
   const logFile = path.join(
     logRoot,
     "typescript",
-    "ts-harness",
+    "asp-typescript",
     "commands",
     `${formatUtcFileTimestamp(startedAtMs)}-${sessionOrdinal
       .toString()
       .padStart(6, "0")}-${sanitizeFileComponent(eventId)}.jsonl`,
   );
-  const argv = ["ts-harness", ...redactArgv(args)];
+  const argv = ["asp-typescript", ...redactArgv(args)];
 
   return {
     enabled: true,
@@ -149,8 +149,8 @@ export function finishDevCommandLog(log: DevCommandLog, exitCode: number): void 
       sessionId: log.sessionId,
       sessionOrdinal: log.sessionOrdinal,
       languageId: "typescript",
-      providerId: "ts-harness",
-      binary: "ts-harness",
+      providerId: "asp-typescript",
+      binary: "asp-typescript",
       argv: log.argv,
       cwd: log.cwd,
       projectRoot: log.projectRoot,
@@ -242,7 +242,7 @@ function readActiveContext(logRoot: string, projectRootHash: string): SessionCon
 }
 
 function allocateSessionOrdinal(logRoot: string, sessionId: string): number {
-  const dir = path.join(logRoot, "typescript", "ts-harness", "sessions");
+  const dir = path.join(logRoot, "typescript", "asp-typescript", "sessions");
   const key = sanitizeFileComponent(sessionId);
   const counterPath = path.join(dir, `${key}.counter`);
   const lockPath = path.join(dir, `${key}.lock`);

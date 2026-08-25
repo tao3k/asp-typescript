@@ -4,6 +4,11 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
+import {
+  TYPE_SCRIPT_LANGUAGE_ID,
+  TYPE_SCRIPT_PROVIDER_ID,
+} from "../../src/cli/semantic-language.js";
+
 import { runCliCapture } from "./cli_helpers.js";
 
 type JsonObject = Record<string, unknown>;
@@ -26,8 +31,8 @@ test("query --treesitter-query --json emits semantic tree-sitter query packet", 
   const packet = JSON.parse(result.stdout) as JsonObject;
   assert.equal(packet.schemaId, "agent.semantic-protocols.semantic-tree-sitter-query");
   assert.equal(packet.method, "query");
-  assert.equal(packet.languageId, "typescript");
-  assert.equal(packet.providerId, "ts-harness");
+  assert.equal(packet.languageId, TYPE_SCRIPT_LANGUAGE_ID);
+  assert.equal(packet.providerId, TYPE_SCRIPT_PROVIDER_ID);
   assert.equal(packet.grammarId, "tree-sitter-typescript");
   assert.equal(packet.grammarProfileVersion, "2026-06-05.v1");
   assert.equal(packet.sourceAuthority, "native-parser-adapter");
@@ -339,8 +344,8 @@ test("query --catalog flow-lite --json emits semantic flow-lite bounded packet",
   assert.equal(result.exitCode, 0, result.stderr);
   const packet = JSON.parse(result.stdout) as JsonObject;
   assert.equal(packet.schemaId, "agent.semantic-protocols.semantic-flow-lite");
-  assert.equal(packet.languageId, "typescript");
-  assert.equal(packet.providerId, "ts-harness");
+  assert.equal(packet.languageId, TYPE_SCRIPT_LANGUAGE_ID);
+  assert.equal(packet.providerId, TYPE_SCRIPT_PROVIDER_ID);
   assert.equal(packet.flowKind, "local-source-sink");
   assert.equal(packet.sourceAuthority, "native-parser");
   assert.equal(packet.executionBackend, "native-parser");

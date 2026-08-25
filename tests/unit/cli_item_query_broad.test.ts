@@ -7,7 +7,7 @@ import test from "node:test";
 import { runCli } from "../../src/cli/main.js";
 
 async function withTypeScriptProject<T>(callback: (root: string) => T | Promise<T>): Promise<T> {
-  const root = mkdtempSync(path.join(tmpdir(), "ts-harness-item-query-"));
+  const root = mkdtempSync(path.join(tmpdir(), "asp-typescript-item-query-"));
   try {
     mkdirSync(path.join(root, "src"), { recursive: true });
     writeFileSync(

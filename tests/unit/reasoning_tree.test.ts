@@ -8,7 +8,7 @@ import { renderTypeScriptReasoningTree, runTypeScriptProjectHarness } from "../.
 import { relativePath } from "./path_helpers.js";
 
 test("reasoning tree renders tsconfig paths, package entries, roles, and import edges", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-reasoning-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-reasoning-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.mkdirSync(path.join(root, "tests"));
   fs.mkdirSync(path.join(root, "generated"));
@@ -39,7 +39,7 @@ test("reasoning tree renders tsconfig paths, package entries, roles, and import 
       },
       scripts: {
         build: "tsc -p tsconfig.json",
-        harness: "ts-harness check --full .",
+        harness: "asp-typescript check --full .",
       },
       workspaces: ["packages/*"],
     }),
@@ -134,7 +134,7 @@ test("reasoning tree renders tsconfig paths, package entries, roles, and import 
   );
   assert.deepEqual(
     tree.packageScripts.map((script) => `${script.name}:${script.command}`),
-    ["build:tsc -p tsconfig.json", "harness:ts-harness check --full ."],
+    ["build:tsc -p tsconfig.json", "harness:asp-typescript check --full ."],
   );
   assert.deepEqual(
     tree.packageWorkspaces.map((workspace) => workspace.pattern),
@@ -292,7 +292,7 @@ test("reasoning tree renders tsconfig paths, package entries, roles, and import 
 });
 
 test("reasoning tree reports shadowed TypeScript source owner shapes", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-shadowed-source-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-shadowed-source-"));
   fs.mkdirSync(path.join(root, "src", "domain"), { recursive: true });
   fs.writeFileSync(
     path.join(root, "package.json"),
@@ -330,7 +330,7 @@ test("reasoning tree reports shadowed TypeScript source owner shapes", () => {
 });
 
 test("reasoning tree does not treat explicit facade forwarding as shadowed source", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-facade-forward-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-facade-forward-"));
   fs.mkdirSync(path.join(root, "src", "domain"), { recursive: true });
   fs.writeFileSync(
     path.join(root, "package.json"),
@@ -355,7 +355,7 @@ test("reasoning tree does not treat explicit facade forwarding as shadowed sourc
 });
 
 test("reasoning tree reports orphaned TypeScript source files from entry roots", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-orphaned-source-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-orphaned-source-"));
   fs.mkdirSync(path.join(root, "src"), { recursive: true });
   fs.writeFileSync(
     path.join(root, "package.json"),

@@ -24,7 +24,7 @@ TypeScript native parser facts
   blocking by default; semantic diagnostics, package metadata diagnostics,
   modularity, test-layout, and `TS-AGENT-*` advice remain visible `info`
   findings unless callers configure otherwise.
-- Improve `ts-harness search prime` with Rust-style caps, empty-placeholder
+- Improve `asp-typescript search prime` with Rust-style caps, empty-placeholder
   suppression, deterministic owner dependency fan-out/fan-in grouping, and
   configured finding output.
 

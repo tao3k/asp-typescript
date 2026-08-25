@@ -1,24 +1,22 @@
 {
+  "$schema": "../schemas/provider-workspace-install.schema.json",
   "schemaId": "agent.semantic-protocols.provider-workspace-install",
   "schemaVersion": "1",
   "schemaAuthority": "https://tao3k.github.io/agent-semantic-protocols/schemas/",
-  "providerId": "ts-harness",
-  "binary": "ts-harness",
+  "languageId": "typescript",
+  "providerId": "asp-typescript",
+  "binary": "asp-typescript",
+  "providerRegistration": "asp-provider-registration.json",
+  "schemaBundleReceipt": "../schemas/.asp-schema-manager-receipt.json",
   "workspaceArtifact": {
-    "root": "languages/typescript-lang-project-harness/dist/provider",
-    "entrypoint": "ts-harness.mjs",
+    "root": "languages/typescript-lang-project-harness/dist",
+    "entrypoint": "src/cli/main.js",
     "launch": {
       "program": "node",
-      "args": ["ts-harness.mjs"],
+      "args": ["src/cli/main.js"],
       "programRelativeToArtifact": false,
       "argsRelativeToArtifact": true
     }
-  },
-  "dependencyMaterialization": {
-    "program": "npm",
-    "args": ["ci"],
-    "workingDirectory": "languages/typescript-lang-project-harness",
-    "env": {}
   },
   "workspaceBuild": {
     "program": "npm",
@@ -26,8 +24,7 @@
     "workingDirectory": "languages/typescript-lang-project-harness",
     "sourceSnapshotAnchors": [
       "languages/typescript-lang-project-harness/package.json",
-      "languages/typescript-lang-project-harness/package-lock.json",
-      "languages/typescript-lang-project-harness/pnpm-lock.yaml"
+      "languages/typescript-lang-project-harness/package-lock.json"
     ],
     "derivedPaths": [
       "languages/typescript-lang-project-harness/dist",

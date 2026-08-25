@@ -6,7 +6,7 @@ import { spawn } from "node:child_process";
 import test from "node:test";
 
 test("lexical query-set ranks owner-local exported item matches before broad declaration hits", async () => {
-  const root = mkdtempSync(join(tmpdir(), "ts-harness-lexical-ranking-"));
+  const root = mkdtempSync(join(tmpdir(), "asp-typescript-lexical-ranking-"));
   mkdirSync(join(root, "src", "server"), { recursive: true });
   mkdirSync(join(root, "types"), { recursive: true });
   mkdirSync(join(root, "tests"), { recursive: true });

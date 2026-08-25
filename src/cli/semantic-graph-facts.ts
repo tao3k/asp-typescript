@@ -7,9 +7,11 @@ import {
 } from "../parser/semantic_graph_facts.js";
 import { collectTypeScriptSemanticGraphProjectFact } from "../parser/semantic_graph_project_facts.js";
 import { projectGraphPayload } from "./semantic-graph-project-facts.js";
+import {
+  TYPE_SCRIPT_LANGUAGE_ID as LANGUAGE_ID,
+  TYPE_SCRIPT_PROVIDER_ID as PROVIDER_ID,
+} from "./semantic-language.js";
 
-const LANGUAGE_ID = "typescript" as const;
-const PROVIDER_ID = "ts-harness" as const;
 const PROVENANCE = "parser" as const;
 const CONFIDENCE = "exact" as const;
 const FRESHNESS = "fresh" as const;

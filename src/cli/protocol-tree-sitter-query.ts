@@ -1,5 +1,5 @@
 /**
- * Tree-sitter query argument parsing for the ts-harness CLI.
+ * Tree-sitter query argument parsing for the asp-typescript CLI.
  */
 
 import type {

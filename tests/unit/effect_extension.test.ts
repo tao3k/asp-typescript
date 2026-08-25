@@ -787,7 +787,7 @@ function effectProject(
       | Readonly<Record<string, string | readonly string[]>>;
   },
 ): string {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), `ts-harness-effect-${name}-`));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), `asp-typescript-effect-${name}-`));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(
     path.join(root, "package.json"),

@@ -196,7 +196,7 @@ test("configured verification skill binding keeps compact output quiet and expan
 });
 
 function writeVerificationProject(label: string, source: string): string {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), `ts-harness-verification-${label}-`));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), `asp-typescript-verification-${label}-`));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(
     path.join(root, "tsconfig.json"),

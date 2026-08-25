@@ -10,6 +10,8 @@ export interface TypeScriptItemQueryMatch {
   readonly lineStart: number;
   readonly lineEnd: number;
   readonly column: number;
+  readonly sourceByteStart: number;
+  readonly sourceByteEnd: number;
   readonly code: string;
   readonly sourceLines: readonly string[];
   readonly projectionNodes: readonly TypeScriptItemProjectionNode[];
@@ -63,14 +65,7 @@ export function queryTypeScriptOwnerItems(
     ? ownerPath
     : path.join(projectRoot, normalizedOwnerPath);
   const sourceText = fs.readFileSync(absolutePath, "utf8");
-  const sourceFile = ts.createSourceFile(
-    absolutePath,
-    sourceText,
-    ts.ScriptTarget.Latest,
-    true,
-    scriptKindForPath(normalizedOwnerPath),
-  );
-  const items = collectTopLevelItems(sourceFile, sourceText);
+  const items = projectTypeScriptOwnerSource(normalizedOwnerPath, sourceText);
   const matches = itemMatches(items, queryTerms);
   return {
     ownerPath: normalizedOwnerPath,
@@ -80,6 +75,20 @@ export function queryTypeScriptOwnerItems(
       ? {}
       : { fallback: "owner-top-items" as const }),
   };
+}
+
+export function projectTypeScriptOwnerSource(
+  ownerPath: string,
+  sourceText: string,
+): readonly TypeScriptItemQueryMatch[] {
+  const sourceFile = ts.createSourceFile(
+    ownerPath,
+    sourceText,
+    ts.ScriptTarget.Latest,
+    true,
+    scriptKindForPath(ownerPath),
+  );
+  return collectTopLevelItems(sourceFile, sourceText);
 }
 
 function collectTopLevelItems(
@@ -183,6 +192,8 @@ function itemFromNode(
     lineStart,
     lineEnd,
     column: start.character,
+    sourceByteStart: Buffer.byteLength(sourceText.slice(0, node.getStart(sourceFile)), "utf8"),
+    sourceByteEnd: Buffer.byteLength(sourceText.slice(0, node.getEnd()), "utf8"),
     code: sourceCompactCode(sourceText, lineStart, lineEnd),
     sourceLines: sourceText.split(/\r?\n/u),
     projectionNodes,

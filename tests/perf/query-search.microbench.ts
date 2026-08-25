@@ -13,7 +13,7 @@ import { renderExactSourceWindowCode } from "../../src/queries/exact-source-wind
 import { runTypeScriptProjectHarness } from "../../src/runner/run-project.js";
 
 function tmpDir(): string {
-  return fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-perf-"));
+  return fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-perf-"));
 }
 
 function writeFile(dir: string, name: string, content: string): string {

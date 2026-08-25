@@ -307,7 +307,7 @@ test("verification report bundle stays quiet when receipts satisfy all tasks", (
 });
 
 function writeReportBundleProject(label: string, source: string): string {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), `ts-harness-report-bundle-${label}-`));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), `asp-typescript-report-bundle-${label}-`));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(path.join(root, "package.json"), JSON.stringify({ type: "module" }));
   fs.writeFileSync(

@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://schemas.agent-semantic-protocols.dev/project-resolution.v1.schema.json",
+  "$id": "https://schemas.agent-semantic-protocols.dev/project-resolution.schema.json",
   "title": "Project Scope",
   "description": "One provider-owned package-manager resolution receipt rooted at one registered entry inside a Git-worktree workspace. The receipt contributes to that workspace generation's source scope; it does not define a child project, a standalone project scope, or any identity.",
   "type": "object",
@@ -19,7 +19,7 @@
       "description": "Project entry relative to the containing Git-worktree workspace or to the explicitly bounded non-Git candidate base.",
       "$ref": "#/$defs/path"
     },
-    "packageGraph": { "$ref": "https://schemas.agent-semantic-protocols.dev/language-package-graph.v1.schema.json" },
+    "packageGraph": { "$ref": "https://schemas.agent-semantic-protocols.dev/language-package-graph.schema.json" },
     "sourceScopes": {
       "description": "Package and target scopes derived by the provider from this project entry; not workspace identities.",
       "type": "array",

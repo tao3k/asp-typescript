@@ -4,6 +4,8 @@ import path from "node:path";
 
 import ts from "typescript";
 
+import { TYPE_SCRIPT_LANGUAGE_ID, TYPE_SCRIPT_PROVIDER_ID } from "../cli/semantic-language.js";
+
 import { packageDependencyFacts } from "../parser/package_dependencies.js";
 import { parsePackageJsonDocument } from "../parser/package_document.js";
 import { parsePnpmWorkspacePackages } from "../parser/pnpm_workspace.js";
@@ -67,6 +69,65 @@ interface ProjectResolutionFailure {
   readonly nextAction: string;
 }
 
+class ProjectResolutionNotApplicable extends Error {}
+
+export function resolveProjectResolutionRequest(
+  requestValue: unknown,
+  cwd: string,
+): Record<string, unknown> {
+  let request: ProjectResolutionRequest;
+  try {
+    request = requestValue as ProjectResolutionRequest;
+    validateRequest(request);
+  } catch (error) {
+    return projectResolutionFailure({
+      reasonKind: "project-entry-invalid",
+      message: error instanceof Error ? error.message : String(error),
+      nextAction: "send-valid-project-resolution-request",
+    });
+  }
+
+  try {
+    const workspaceRoot = fs.realpathSync(cwd);
+    const candidatePaths = normalizedCandidatePaths(request, workspaceRoot);
+    const scope = resolveTypeScriptProject(request, workspaceRoot, candidatePaths);
+    return {
+      schemaId: RESPONSE_SCHEMA_ID,
+      schemaVersion: "1",
+      languageId: TYPE_SCRIPT_LANGUAGE_ID,
+      providerId: TYPE_SCRIPT_PROVIDER_ID,
+      state: "resolved",
+      scope,
+    };
+  } catch (error) {
+    if (error instanceof ProjectResolutionNotApplicable) {
+      return {
+        schemaId: RESPONSE_SCHEMA_ID,
+        schemaVersion: "1",
+        languageId: TYPE_SCRIPT_LANGUAGE_ID,
+        providerId: TYPE_SCRIPT_PROVIDER_ID,
+        state: "not-applicable",
+      };
+    }
+    return projectResolutionFailure({
+      reasonKind: "project-entry-invalid",
+      message: error instanceof Error ? error.message : String(error),
+      nextAction: "repair-typescript-project-entry",
+    });
+  }
+}
+
+function projectResolutionFailure(failure: ProjectResolutionFailure): Record<string, unknown> {
+  return {
+    schemaId: RESPONSE_SCHEMA_ID,
+    schemaVersion: "1",
+    languageId: TYPE_SCRIPT_LANGUAGE_ID,
+    providerId: TYPE_SCRIPT_PROVIDER_ID,
+    state: "failed",
+    failure,
+  };
+}
+
 /** Resolve package-manager scope from a typed repository candidate snapshot. */
 export function runProjectResolutionCommand(
   _argv: readonly string[],
@@ -76,7 +137,7 @@ export function runProjectResolutionCommand(
   let request: ProjectResolutionRequest;
   try {
     if (streams.stdin === undefined) {
-      throw new Error("project-resolution-stdin requires a typed stdin request");
+      throw new Error("project-resolution requires a typed request payload");
     }
     request = decodeJsonObjectEnvelope<ProjectResolutionRequest>(
       streams.stdin,
@@ -92,27 +153,7 @@ export function runProjectResolutionCommand(
     return 0;
   }
 
-  try {
-    const workspaceRoot = fs.realpathSync(cwd);
-    const candidatePaths = normalizedCandidatePaths(request, workspaceRoot);
-    const scope = resolveTypeScriptProject(request, workspaceRoot, candidatePaths);
-    streams.stdout.write(
-      `${JSON.stringify({
-        schemaId: RESPONSE_SCHEMA_ID,
-        schemaVersion: "1",
-        languageId: "typescript",
-        providerId: "ts-harness",
-        state: "resolved",
-        scope,
-      })}\n`,
-    );
-  } catch (error) {
-    writeFailure(streams, {
-      reasonKind: "project-entry-invalid",
-      message: error instanceof Error ? error.message : String(error),
-      nextAction: "repair-typescript-project-entry",
-    });
-  }
+  streams.stdout.write(`${JSON.stringify(resolveProjectResolutionRequest(request, cwd))}\n`);
   return 0;
 }
 
@@ -120,8 +161,11 @@ function validateRequest(request: ProjectResolutionRequest): void {
   if (request.schemaId !== REQUEST_SCHEMA_ID || request.schemaVersion !== "1") {
     throw new Error("project-resolution request schema must be v1");
   }
-  if (request.languageId !== "typescript" || request.providerId !== "ts-harness") {
-    throw new Error("project-resolution request provider identity does not match ts-harness");
+  if (
+    request.languageId !== TYPE_SCRIPT_LANGUAGE_ID ||
+    request.providerId !== TYPE_SCRIPT_PROVIDER_ID
+  ) {
+    throw new Error("project-resolution request provider identity does not match asp-typescript");
   }
   if (request.candidateBase !== "." || request.candidateGeneration.digest.length === 0) {
     throw new Error("project-resolution requires candidateBase=. and candidateGeneration.digest");
@@ -194,6 +238,11 @@ function resolveTypeScriptProject(
   const candidateManifestPaths = candidatePaths.filter(
     (candidatePath) => path.posix.basename(candidatePath) === "package.json",
   );
+  if (candidateManifestPaths.length === 0) {
+    throw new ProjectResolutionNotApplicable(
+      "TypeScript project scope has no candidate project entry package.json",
+    );
+  }
   if (!candidateManifestPaths.includes("package.json")) {
     throw new Error("TypeScript project scope requires candidate project entry package.json");
   }
@@ -276,8 +325,8 @@ function resolveTypeScriptProject(
   const packageGraph = {
     schemaId: PACKAGE_GRAPH_SCHEMA_ID,
     schemaVersion: "1",
-    languageId: "typescript",
-    providerId: "ts-harness",
+    languageId: TYPE_SCRIPT_LANGUAGE_ID,
+    providerId: TYPE_SCRIPT_PROVIDER_ID,
     projectEntry: entryManifest,
     parserId,
     manifests: manifestPaths.map((manifestPath) =>
@@ -320,8 +369,8 @@ function resolveTypeScriptProject(
     schemaVersion: "1",
     state: "resolved",
     completeness: "exact",
-    languageId: "typescript",
-    providerId: "ts-harness",
+    languageId: TYPE_SCRIPT_LANGUAGE_ID,
+    providerId: TYPE_SCRIPT_PROVIDER_ID,
     parserId,
     candidateGenerationDigest: request.candidateGeneration.digest,
     projectEntry: entryManifest,
@@ -648,8 +697,8 @@ function writeFailure(streams: CliStreams, failure: ProjectResolutionFailure): v
     `${JSON.stringify({
       schemaId: RESPONSE_SCHEMA_ID,
       schemaVersion: "1",
-      languageId: "typescript",
-      providerId: "ts-harness",
+      languageId: TYPE_SCRIPT_LANGUAGE_ID,
+      providerId: TYPE_SCRIPT_PROVIDER_ID,
       state: "failed",
       failure,
     })}\n`,

@@ -5,6 +5,53 @@ import { join } from "node:path";
 import test from "node:test";
 
 import { runCli } from "../../src/cli/main.js";
+import {
+  TYPE_SCRIPT_LANGUAGE_ID,
+  TYPE_SCRIPT_PROVIDER_ID,
+} from "../../src/cli/semantic-language.js";
+
+test("ProjectResolution reports not-applicable without a package entry candidate", async () => {
+  const workspaceRoot = mkdtempSync(join(tmpdir(), "ts-project-resolution-not-applicable-"));
+  try {
+    const request = {
+      schemaId: "agent.semantic-protocols.provider-project-resolution-request",
+      schemaVersion: "1",
+      languageId: TYPE_SCRIPT_LANGUAGE_ID,
+      providerId: TYPE_SCRIPT_PROVIDER_ID,
+      candidateBase: ".",
+      candidateGeneration: {
+        algorithm: "blake3-path-set-v1",
+        digest: `blake3:${"0".repeat(64)}`,
+        authorities: ["asp-workspace-generation"],
+      },
+      collectionScope: { kind: "complete-generation" },
+      candidatePaths: ["src/index.ts"],
+      policyExclusions: [],
+    };
+    let stdout = "";
+    let stderr = "";
+    const exitCode = await runCli(
+      ["project-resolution"],
+      {
+        stdin: JSON.stringify(request),
+        stdout: { write: (chunk: string) => (stdout += chunk) },
+        stderr: { write: (chunk: string) => (stderr += chunk) },
+      },
+      workspaceRoot,
+    );
+    assert.equal(exitCode, 0);
+    assert.equal(stderr, "");
+    assert.deepEqual(JSON.parse(stdout), {
+      schemaId: "agent.semantic-protocols.provider-project-resolution-response",
+      schemaVersion: "1",
+      languageId: TYPE_SCRIPT_LANGUAGE_ID,
+      providerId: TYPE_SCRIPT_PROVIDER_ID,
+      state: "not-applicable",
+    });
+  } finally {
+    rmSync(workspaceRoot, { recursive: true, force: true });
+  }
+});
 
 test("ProjectResolution derives package and source scope only from ASP candidates", async () => {
   const workspaceRoot = mkdtempSync(join(tmpdir(), "ts-project-resolution-"));
@@ -51,8 +98,8 @@ test("ProjectResolution derives package and source scope only from ASP candidate
     const request = {
       schemaId: "agent.semantic-protocols.provider-project-resolution-request",
       schemaVersion: "1",
-      languageId: "typescript",
-      providerId: "ts-harness",
+      languageId: TYPE_SCRIPT_LANGUAGE_ID,
+      providerId: TYPE_SCRIPT_PROVIDER_ID,
       candidateBase: ".",
       candidateGeneration: {
         algorithm: "blake3-path-set-v1",
@@ -75,7 +122,7 @@ test("ProjectResolution derives package and source scope only from ASP candidate
     let stdout = "";
     let stderr = "";
     const exitCode = await runCli(
-      ["project-resolution-stdin"],
+      ["project-resolution"],
       {
         stdin: JSON.stringify(request),
         stdout: { write: (chunk: string) => (stdout += chunk) },

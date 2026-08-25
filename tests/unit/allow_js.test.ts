@@ -8,7 +8,7 @@ import { renderTypeScriptReasoningTree, runTypeScriptProjectHarness } from "../.
 import { relativePath } from "./path_helpers.js";
 
 test("project runner preserves tsconfig allowJs native file selection", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-allow-js-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-allow-js-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(
     path.join(root, "package.json"),
