@@ -6,7 +6,6 @@ import { fileURLToPath } from "node:url";
 import { build } from "esbuild";
 
 const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const repositoryRoot = resolve(packageRoot, "../..");
 
 await build({
   entryPoints: ["src/cli/main.ts"],
@@ -40,6 +39,16 @@ await copyFile(
 const registration = JSON.parse(
   await readFile(resolve(packageRoot, "provider/asp-provider-registration.json"), "utf8"),
 );
+const schemaBundleReceipt = JSON.parse(
+  await readFile(resolve(packageRoot, "schemas/.asp-schema-manager-receipt.json"), "utf8"),
+);
+const distributedSchemaNames = new Set();
+for (const schema of schemaBundleReceipt.schemas) {
+  if (typeof schema.name !== "string" || !/^[^/]+\.schema\.json$/u.test(schema.name)) {
+    throw new Error("invalid SchemaManager bundle receipt entry");
+  }
+  distributedSchemaNames.add(schema.name);
+}
 for (const schema of registration.schemas) {
   if (
     (schema.authority !== "asp" && schema.authority !== "provider") ||
@@ -48,19 +57,14 @@ for (const schema of registration.schemas) {
   ) {
     throw new Error("invalid provider schema registration");
   }
-  const authorityRoot = schema.authority === "asp" ? repositoryRoot : packageRoot;
-  const destination = resolve(packageRoot, "dist", schema.path);
-  await mkdir(dirname(destination), { recursive: true });
-  await copyFile(resolve(authorityRoot, schema.path), destination);
-}
-
-const schemaBundleReceipt = JSON.parse(
-  await readFile(resolve(packageRoot, "schemas/.asp-schema-manager-receipt.json"), "utf8"),
-);
-for (const schema of schemaBundleReceipt.schemas) {
-  if (typeof schema.name !== "string" || !/^[^/]+\.schema\.json$/u.test(schema.name)) {
-    throw new Error("invalid SchemaManager bundle receipt entry");
+  const schemaName = schema.path.slice("schemas/".length);
+  if (!distributedSchemaNames.has(schemaName)) {
+    throw new Error(
+      `provider registration schema is absent from SchemaManager bundle: ${schemaName}`,
+    );
   }
+}
+for (const schema of schemaBundleReceipt.schemas) {
   await copyFile(
     resolve(packageRoot, "schemas", schema.name),
     resolve(packageRoot, "dist/schemas", schema.name),
