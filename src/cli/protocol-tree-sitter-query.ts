@@ -1,5 +1,5 @@
 /**
- * Tree-sitter query argument parsing for the ts-harness CLI.
+ * Tree-sitter query argument parsing for the asp-typescript CLI.
  */
 
 import type {
@@ -20,7 +20,6 @@ export interface TreeSitterQueryArgs {
   readonly packagePath: string | undefined;
   readonly workspace: boolean;
   readonly json: boolean;
-  readonly codeOnly: boolean;
 }
 
 export type TreeSitterQueryParseResult =
@@ -44,7 +43,6 @@ interface TreeSitterQueryParseState {
   workspaceRoot: string | undefined;
   aspSyntaxQueryPlan: MutableSyntaxQueryPlan | undefined;
   json: boolean;
-  codeOnly: boolean;
   terms: string[];
   positionals: string[];
 }
@@ -127,8 +125,6 @@ function parseTreeSitterQueryOptions(argv: readonly string[]): TreeSitterQueryOp
       index += 1;
     } else if (arg === "--json") {
       state.json = true;
-    } else if (arg === "--code") {
-      state.codeOnly = true;
     } else if (arg.startsWith("-")) {
       return { kind: "error", message: `unknown tree-sitter query option: ${arg}` };
     } else {
@@ -148,7 +144,6 @@ function initialTreeSitterQueryParseState(): TreeSitterQueryParseState {
     workspaceRoot: undefined,
     aspSyntaxQueryPlan: undefined,
     json: false,
-    codeOnly: false,
     terms: [],
     positionals: [],
   };
@@ -166,21 +161,11 @@ function finalizeTreeSitterQueryArgs(state: TreeSitterQueryParseState): TreeSitt
     workspace,
     workspaceRoot,
     json,
-    codeOnly,
   } = state;
   if ((catalogId === undefined) === (treeSitterQuery === undefined)) {
     return {
       kind: "error",
       message: "query requires exactly one of --catalog or --treesitter-query",
-    };
-  }
-  if (json && codeOnly) {
-    return { kind: "error", message: "--code cannot be combined with --json" };
-  }
-  if (codeOnly && positionals.length > 0) {
-    return {
-      kind: "error",
-      message: "query does not accept positional WORKSPACE; use --workspace <workspace-root>",
     };
   }
   const positionalWorkspace = positionalWorkspaceRoot(positionals, workspaceRoot);
@@ -205,7 +190,6 @@ function finalizeTreeSitterQueryArgs(state: TreeSitterQueryParseState): TreeSitt
     packagePath,
     workspace: workspace || projectRoot !== undefined,
     json,
-    codeOnly,
   };
 }
 

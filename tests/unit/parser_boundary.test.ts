@@ -44,7 +44,7 @@ test("TypeScript semantics stay in the parser layer", () => {
     .join("\n");
   assert.doesNotMatch(
     rulesSource,
-    /from "\.\.\/parser|from "\.\/parser|parseTypeScript(ProjectFiles|SourceFile)|readProjectScope|projectFileNames/u,
+    /from "\.\.\/parser|from "\.\/parser|parseTypeScript(ProjectFiles|SourceFile)|readProjectResolution|projectFileNames/u,
   );
   assert.doesNotMatch(
     rulesSource,
@@ -66,7 +66,7 @@ test("TypeScript semantics stay in the parser layer", () => {
     .join("\n");
   assert.doesNotMatch(
     verificationSource,
-    /from "\.\.\/parser|from "\.\/parser|parseTypeScript(ProjectFiles|SourceFile)|readProjectScope|projectFileNames/u,
+    /from "\.\.\/parser|from "\.\/parser|parseTypeScript(ProjectFiles|SourceFile)|readProjectResolution|projectFileNames/u,
   );
   assert.doesNotMatch(
     verificationSource,
@@ -80,7 +80,7 @@ test("TypeScript semantics stay in the parser layer", () => {
   const renderSource =
     fs.readFileSync(path.join(projectRoot, "src", "render.ts"), "utf8") +
     fs.readFileSync(path.join(projectRoot, "src", "render", "agent-snapshot.ts"), "utf8");
-  assert.doesNotMatch(renderSource, /report\.(modules|projectScope|rootPaths)/u);
+  assert.doesNotMatch(renderSource, /report\.(modules|projectResolution|rootPaths)/u);
   assert.match(renderSource, /report\.reasoningTree\.projectRoot/u);
   assert.match(renderSource, /tree\.ownerBranches/u);
   assert.match(renderSource, /tree\.ownerDependencies/u);

@@ -15,7 +15,7 @@ The single-package renderer consumes
 package owner facts, and grouped findings. The project-level snapshot renderer
 consumes package reports prepared by the runner from parser-owned
 workspace/project-reference facts. Neither renderer inspects raw source files,
-`tsconfig`, `package.json`, `report.modules`, `report.projectScope`,
+`tsconfig`, `package.json`, `report.modules`, `report.projectResolution`,
 `report.rootPaths`, or raw import edges to rediscover owner structure.
 
 ## Format Shape

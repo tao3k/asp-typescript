@@ -16,7 +16,7 @@ function writeFile(root: string, relativePath: string, content: string): string 
 
 describe("TypeScript file discovery", () => {
   it("skips generated parser compact TypeScript projection artifacts", () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-files-"));
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-files-"));
     const source = writeFile(root, "src/index.ts", "export const value = 1;\n");
     const generated = writeFile(
       root,
@@ -37,7 +37,7 @@ describe("TypeScript file discovery", () => {
   });
 
   it("skips hidden directories by default", () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-hidden-"));
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-hidden-"));
     const source = writeFile(root, "src/index.ts", "export const value = 1;\n");
     const hidden = writeFile(root, ".devenv/generated.ts", "export const generated = 1;\n");
 
@@ -48,7 +48,7 @@ describe("TypeScript file discovery", () => {
   });
 
   it("allows configured hidden directories from asp.toml", () => {
-    const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-asp-config-"));
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-asp-config-"));
     fs.writeFileSync(
       path.join(root, "asp.toml"),
       '[discovery]\nincludeHiddenDirNames = [".agent-fixtures"]\n',

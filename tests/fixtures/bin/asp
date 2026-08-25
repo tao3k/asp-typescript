@@ -138,6 +138,13 @@ function collectSeeds(packet) {
       synthesisOthers.push(seed);
     }
   }
+  if (synthesisTests.length === 0) {
+    for (const edge of packet.edges ?? []) {
+      if (edge.kind === "test" && edge.to !== undefined) {
+        testSeeds.push({ kind: "tests", target: String(edge.to).replace(/^[^:]+:/u, "") });
+      }
+    }
+  }
   for (const owner of packet.owners ?? []) {
     if (owner.path !== undefined) {
       ownerSeeds.push({ kind: "owner", target: owner.path });

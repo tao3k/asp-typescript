@@ -10,14 +10,16 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import * as ts from "typescript";
 
+import {
+  TYPE_SCRIPT_BINARY,
+  TYPE_SCRIPT_LANGUAGE_ID,
+  TYPE_SCRIPT_PROVIDER_ID,
+  TYPE_SCRIPT_PROVIDER_NAMESPACE,
+} from "../../cli/semantic-language.js";
+
 import { discoverTypeScriptFiles } from "../files.js";
 const SEMANTIC_TREE_SITTER_QUERY_SCHEMA_ID =
   "agent.semantic-protocols.semantic-tree-sitter-query" as const;
-const TYPE_SCRIPT_LANGUAGE_ID = "typescript" as const;
-const TYPE_SCRIPT_PROVIDER_ID = "ts-harness" as const;
-const TYPE_SCRIPT_BINARY = "ts-harness" as const;
-const TYPE_SCRIPT_PROVIDER_NAMESPACE =
-  "agent.semantic-protocols.languages.typescript.ts-harness" as const;
 export const TYPE_SCRIPT_TREE_SITTER_GRAMMAR_ID = "tree-sitter-typescript" as const;
 export const TYPE_SCRIPT_TREE_SITTER_GRAMMAR_PROFILE_VERSION = "2026-06-05.v1" as const;
 export const TYPE_SCRIPT_TREE_SITTER_GRAMMAR_PROFILE_PATH =
@@ -30,7 +32,6 @@ export interface TypeScriptTreeSitterQueryOptions {
   readonly selector?: string | undefined;
   readonly aspSyntaxQueryPlan?: SyntaxQueryPlan | undefined;
   readonly json: boolean;
-  readonly codeOnly: boolean;
 }
 
 export interface SyntaxQueryPlan {
@@ -206,12 +207,6 @@ export function renderTypeScriptTreeSitterQuery(
   const query = resolveQuery(options);
   const rows = collectSyntaxRows(projectRoot, query, options);
   if (options.json) return `${JSON.stringify(packet(projectRoot, query, rows, options))}\n`;
-  if (options.codeOnly) {
-    return rows
-      .map((row) => row.itemCode)
-      .filter((code) => code.trim() !== "")
-      .join("\n\n");
-  }
   if (rows.length === 0) {
     return [
       `|syntax-query inputForm=${query.inputForm} input=${shellToken(query.input)} grammar=${TYPE_SCRIPT_TREE_SITTER_GRAMMAR_ID} grammarProfile=${TYPE_SCRIPT_TREE_SITTER_GRAMMAR_PROFILE_VERSION} dialect=tree-sitter-query mode=native-parser-projection matchStatus=miss rows=0 captures=${query.captures.join(",") || "-"}`,

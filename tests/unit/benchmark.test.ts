@@ -9,7 +9,7 @@ import { parseOrReuse } from "../../src/cache/invalidation.js";
 import { runCliCapture } from "./cli_helpers.js";
 
 function tmpDir(): string {
-  return fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-bench-"));
+  return fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-bench-"));
 }
 
 function writeFile(dir: string, name: string, content: string): string {
@@ -119,7 +119,7 @@ describe("benchmark: small project", () => {
 });
 
 describe("benchmark: CLI query/search stable paths", () => {
-  it("exact selector query stays on the lightweight source-window path", () => {
+  it("embedded declaration catalog stays on the lightweight locator path", () => {
     const dir = tmpDir();
     writeFile(dir, "tsconfig.json", JSON.stringify({ include: ["src/**/*.ts"] }));
     writeFile(
@@ -140,18 +140,17 @@ describe("benchmark: CLI query/search stable paths", () => {
       const result = runCliCapture(
         [
           "query",
+          "--catalog",
+          "declarations",
           "--selector",
-          "src/sample.ts:2-5",
-          "--term",
-          "contentBlocks",
-          "--code",
+          "src/sample.ts:1:7",
           "--workspace",
           ".",
         ],
         dir,
       );
       assert.equal(result.exitCode, 0, result.stderr);
-      assert.match(result.stdout, /contentBlocks\.push/u);
+      assert.match(result.stdout, /src\/sample\.ts:1\nalpha/u);
       assert.doesNotMatch(result.stdout, /\[search-owner\]/u);
     });
 

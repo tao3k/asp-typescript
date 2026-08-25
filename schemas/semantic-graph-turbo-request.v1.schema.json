@@ -12,6 +12,8 @@
     "protocolVersion",
     "packetKind",
     "surface",
+    "sourceSnapshot",
+    "workspaceGeneration",
     "queryTerms",
     "profile",
     "algorithm",
@@ -97,22 +99,7 @@
       }
     },
     "profile": {
-      "enum": [
-        "owner-query",
-        "query-deps",
-        "owner-tests",
-        "prime",
-        "read-frontier",
-        "failure-frontier",
-        "field-impact",
-        "type-impact",
-        "collection-impact",
-        "failure-evidence",
-        "test-selection",
-        "affected",
-        "evidence-quality",
-        "rust-evidence-quality"
-      ]
+      "$ref": "semantic-graph-turbo-definitions.v1.schema.json#/$defs/profile"
     },
     "algorithm": {
       "const": "typed-ppr-diverse"
@@ -137,8 +124,15 @@
         "auto",
         "provider",
         "finder",
+        "search-overlay",
         "ingest"
       ]
+    },
+    "sourceSnapshot": {
+      "$ref": "https://agent-semantic-protocols.dev/schemas/source-snapshot-evidence.v1.schema.json#/$defs/sourceSnapshot"
+    },
+    "workspaceGeneration": {
+      "$ref": "#/$defs/workspaceGenerationEvidence"
     },
     "candidateSources": {
       "type": "array",
@@ -314,6 +308,34 @@
     }
   },
   "$defs": {
+    "workspaceGenerationEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rootDigest",
+        "rootDepth",
+        "leafCount",
+        "ownerCount"
+      ],
+      "properties": {
+        "rootDigest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "rootDepth": {
+          "type": "integer",
+          "enum": [0, 1]
+        },
+        "leafCount": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "ownerCount": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
     "graph": {
       "type": "object",
       "additionalProperties": false,
@@ -719,6 +741,13 @@
             "minLength": 1
           },
           "uniqueItems": true
+        },
+        "reachability": {
+          "description": "Whether the selected owner is proven reachable by the active language build graph. Parsed or ranked ownership alone must remain unknown.",
+          "enum": [
+            "verified",
+            "unknown"
+          ]
         }
       }
     },
@@ -785,6 +814,23 @@
         "query": {
           "type": "string",
           "minLength": 1
+        },
+        "requiredActor": {
+          "description": "Actor that can execute this exact router-produced action without another routing hop.",
+          "enum": [
+            "current-session",
+            "verified-resident-search-agent"
+          ]
+        },
+        "requiredCapability": {
+          "description": "Parser-owned capability required to execute this action.",
+          "enum": [
+            "owner-items"
+          ]
+        },
+        "executable": {
+          "description": "True only when the router has selected an actor that owns requiredCapability.",
+          "type": "boolean"
         }
       }
     },
@@ -808,6 +854,7 @@
         "enum": [
           "item-skeleton",
           "query-code",
+          "lexical-search",
           "fd-query",
           "rg-query",
           "owner-items",
@@ -821,6 +868,7 @@
         "capabilityId": {
           "enum": [
             "query",
+            "lexical-search",
             "fd",
             "rg",
             "owner-items",
@@ -1083,6 +1131,8 @@
             "doc",
             "children",
             "content",
+            "source",
+            "callable-skeleton",
             "code"
           ]
         },

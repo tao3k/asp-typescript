@@ -6,7 +6,7 @@ import test from "node:test";
 
 import { runCliCapture } from "./cli_helpers.js";
 
-test("agent guide keeps workspace independent from query --code", () => {
+test("agent guide keeps workspace independent from exact projections", () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-agent-guide-workspace-"));
 
   const result = runCliCapture(["agent", "guide", "."], root);
@@ -14,11 +14,11 @@ test("agent guide keeps workspace independent from query --code", () => {
   assert.equal(result.exitCode, 0, result.stderr);
   assert.match(
     result.stdout,
-    /--selector <exact-structural-selector> --workspace <workspace-root> --code/u,
+    /--selector <exact-structural-selector> --projection source --workspace <workspace-root>/u,
   );
   assert.match(
     result.stdout,
-    /query <owner-path> --term <symbol> --workspace <workspace-root> --code/u,
+    /--selector <exact-structural-selector> --projection callable-skeleton --workspace <workspace-root>/u,
   );
   assert.match(
     result.stdout,
@@ -26,6 +26,5 @@ test("agent guide keeps workspace independent from query --code", () => {
   );
   assert.doesNotMatch(result.stdout, /trailing \. is the project root/u);
   assert.doesNotMatch(result.stdout, /<path\[:line\|:start-end\]>/u);
-  assert.doesNotMatch(result.stdout, /--code \./u);
-  assert.doesNotMatch(result.stdout, /--code --workspace/u);
+  assert.doesNotMatch(result.stdout, /--code/u);
 });

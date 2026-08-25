@@ -4,6 +4,11 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
+import {
+  TYPE_SCRIPT_LANGUAGE_ID,
+  TYPE_SCRIPT_PROVIDER_ID,
+} from "../../src/cli/semantic-language.js";
+
 import { runCliCapture } from "./cli_helpers.js";
 
 type JsonObject = Record<string, unknown>;
@@ -26,8 +31,8 @@ test("query --treesitter-query --json emits semantic tree-sitter query packet", 
   const packet = JSON.parse(result.stdout) as JsonObject;
   assert.equal(packet.schemaId, "agent.semantic-protocols.semantic-tree-sitter-query");
   assert.equal(packet.method, "query");
-  assert.equal(packet.languageId, "typescript");
-  assert.equal(packet.providerId, "ts-harness");
+  assert.equal(packet.languageId, TYPE_SCRIPT_LANGUAGE_ID);
+  assert.equal(packet.providerId, TYPE_SCRIPT_PROVIDER_ID);
   assert.equal(packet.grammarId, "tree-sitter-typescript");
   assert.equal(packet.grammarProfileVersion, "2026-06-05.v1");
   assert.equal(packet.sourceAuthority, "native-parser-adapter");
@@ -229,19 +234,14 @@ test("query --treesitter-query --json reports ASP typed predicates", () => {
   ]);
 });
 
-test("query --treesitter-query --selector --code prints pure code", () => {
+test("query --treesitter-query rejects removed direct code output", () => {
   const root = treeSitterQueryFixture();
   const result = runCliCapture(
     functionNameTreeSitterQueryArgs(["--selector", "src/demo.ts:1:3", "--code"]),
     root,
   );
-  assert.equal(result.exitCode, 0, result.stderr);
-  assert.equal(
-    result.stdout,
-    ["export function alpha(input: string): string {", "  return input.toUpperCase();", "}"].join(
-      "\n",
-    ),
-  );
+  assert.equal(result.exitCode, 2);
+  assert.match(result.stderr, /unknown tree-sitter query option: --code/u);
 });
 
 test("query --treesitter-query exact selector scans outside default source roots", () => {
@@ -253,41 +253,39 @@ test("query --treesitter-query exact selector scans outside default source roots
   );
 
   const result = runCliCapture(
-    functionNameTreeSitterQueryArgs(["--selector", "dist/member.ts:1:3", "--code"]),
+    functionNameTreeSitterQueryArgs(["--selector", "dist/member.ts:1:3", "--json"]),
     root,
   );
 
   assert.equal(result.exitCode, 0, result.stderr);
-  assert.equal(
-    result.stdout,
-    ["export function fromDist(): string {", "  return 'dist';", "}"].join("\n"),
-  );
+  assert.equal(array(record(JSON.parse(result.stdout), "packet").matches, "matches").length, 1);
 });
 
 test("query --treesitter-query selector uses canonical paths instead of suffix matching", () => {
   const root = treeSitterQueryFixture();
 
   const suffixSelector = runCliCapture(
-    functionNameTreeSitterQueryArgs(["--selector", "demo.ts:1:3", "--code"]),
+    functionNameTreeSitterQueryArgs(["--selector", "demo.ts:1:3", "--json"]),
     root,
   );
   assert.equal(suffixSelector.exitCode, 0, suffixSelector.stderr);
-  assert.equal(suffixSelector.stdout, "");
+  assert.equal(
+    array(record(JSON.parse(suffixSelector.stdout), "packet").matches, "matches").length,
+    0,
+  );
 
   const absoluteSelector = runCliCapture(
     functionNameTreeSitterQueryArgs([
       "--selector",
       `${path.join(root, "src", "demo.ts")}:1:3`,
-      "--code",
+      "--json",
     ]),
     root,
   );
   assert.equal(absoluteSelector.exitCode, 0, absoluteSelector.stderr);
   assert.equal(
-    absoluteSelector.stdout,
-    ["export function alpha(input: string): string {", "  return input.toUpperCase();", "}"].join(
-      "\n",
-    ),
+    array(record(JSON.parse(absoluteSelector.stdout), "packet").matches, "matches").length,
+    1,
   );
 });
 
@@ -346,8 +344,8 @@ test("query --catalog flow-lite --json emits semantic flow-lite bounded packet",
   assert.equal(result.exitCode, 0, result.stderr);
   const packet = JSON.parse(result.stdout) as JsonObject;
   assert.equal(packet.schemaId, "agent.semantic-protocols.semantic-flow-lite");
-  assert.equal(packet.languageId, "typescript");
-  assert.equal(packet.providerId, "ts-harness");
+  assert.equal(packet.languageId, TYPE_SCRIPT_LANGUAGE_ID);
+  assert.equal(packet.providerId, TYPE_SCRIPT_PROVIDER_ID);
   assert.equal(packet.flowKind, "local-source-sink");
   assert.equal(packet.sourceAuthority, "native-parser");
   assert.equal(packet.executionBackend, "native-parser");
@@ -369,7 +367,7 @@ test("query --catalog flow-lite rejects code output and open where keys", () => 
 
   const codeOutput = runCliCapture(flowLiteQueryArgs(["--code"]), root);
   assert.equal(codeOutput.exitCode, 2);
-  assert.match(codeOutput.stderr, /locator\/provenance surface/u);
+  assert.match(codeOutput.stderr, /unsupported flow-lite query option: --code/u);
 
   const openWhere = runCliCapture(
     [

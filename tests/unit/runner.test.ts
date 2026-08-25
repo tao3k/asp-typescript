@@ -15,7 +15,7 @@ import {
 import { relativePath } from "./path_helpers.js";
 
 test("project runner uses tsconfig native file selection", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-project-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-project-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.mkdirSync(path.join(root, "ignored"));
   fs.writeFileSync(
@@ -38,7 +38,7 @@ test("project runner uses tsconfig native file selection", () => {
 });
 
 test("project runner anchors project scope at nearest package json", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-package-anchor-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-package-anchor-"));
   fs.mkdirSync(path.join(root, "src", "feature"), { recursive: true });
   fs.writeFileSync(
     path.join(root, "package.json"),
@@ -50,7 +50,7 @@ test("project runner anchors project scope at nearest package json", () => {
   const report = runTypeScriptProjectHarness(path.join(root, "src", "feature"));
   const snapshot = renderTypeScriptReasoningTree(report);
 
-  assert.equal(report.projectScope?.projectRoot, root);
+  assert.equal(report.projectResolution?.projectRoot, root);
   assert.deepEqual(report.rootPaths, [root]);
   assert.deepEqual(
     report.modules.map((moduleReport) => relativePath(root, moduleReport.path)),
@@ -61,7 +61,7 @@ test("project runner anchors project scope at nearest package json", () => {
 });
 
 test("project runner does not inherit parent tsconfig across a package json anchor", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-package-local-config-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-package-local-config-"));
   const packageRoot = path.join(root, "packages", "util");
   fs.mkdirSync(path.join(root, "src"), { recursive: true });
   fs.mkdirSync(path.join(packageRoot, "src"), { recursive: true });
@@ -88,7 +88,7 @@ test("project runner does not inherit parent tsconfig across a package json anch
 });
 
 test("project runner routes missing tsconfig policy through reasoning facts", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-project-no-config-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-project-no-config-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(path.join(root, "src", "index.ts"), "export const ok = 1;\n");
 
@@ -113,7 +113,7 @@ test("project runner routes missing tsconfig policy through reasoning facts", ()
 });
 
 test("project runner renders native syntax findings", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-project-bad-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-project-bad-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(path.join(root, "tsconfig.json"), JSON.stringify({ include: ["src/**/*.ts"] }));
   fs.writeFileSync(path.join(root, "src", "index.ts"), "export const broken = ;\n");
@@ -142,7 +142,7 @@ test("project runner renders native syntax findings", () => {
 });
 
 test("project runner routes tsconfig diagnostics through reasoning facts", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-project-config-bad-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-project-config-bad-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(path.join(root, "tsconfig.json"), '{ "compilerOptions": }\n');
   fs.writeFileSync(path.join(root, "src", "index.ts"), "export const ok = 1;\n");
@@ -170,7 +170,7 @@ test("project runner routes tsconfig diagnostics through reasoning facts", () =>
 });
 
 test("explicit-path runner routes syntax diagnostics through reasoning facts", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-explicit-bad-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-explicit-bad-"));
   const filePath = path.join(root, "broken.ts");
   fs.writeFileSync(filePath, "export const broken = ;\n");
 
@@ -180,7 +180,7 @@ test("explicit-path runner routes syntax diagnostics through reasoning facts", (
 
   assert.equal(report.runMode, "explicit");
   assert.equal(report.reasoningTree.runMode, report.runMode);
-  assert.equal(report.projectScope, undefined);
+  assert.equal(report.projectResolution, undefined);
   assert.deepEqual(
     report.reasoningTree.diagnostics.map((diagnostic) => ({
       phase: diagnostic.phase,

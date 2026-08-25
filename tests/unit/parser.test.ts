@@ -8,12 +8,12 @@ import {
   defaultTypeScriptHarnessConfig,
   parseTypeScriptProjectFiles,
   parseTypeScriptSourceFile,
-  readProjectScope,
+  readProjectResolution,
 } from "../../src/index.js";
 import { relativePath } from "./path_helpers.js";
 
 test("parser extracts native import and export facts", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-parser-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-parser-"));
   const sourcePath = path.join(root, "module.ts");
   fs.writeFileSync(
     sourcePath,
@@ -80,7 +80,7 @@ test("parser extracts native import and export facts", () => {
 });
 
 test("parser extracts declaration-only export assignment facts", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-parser-dts-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-parser-dts-"));
   const sourcePath = path.join(root, "module.d.ts");
   fs.writeFileSync(
     sourcePath,
@@ -101,7 +101,7 @@ test("parser extracts declaration-only export assignment facts", () => {
 });
 
 test("parser reports parser Debug Failure as invalid module", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-parser-debug-failure-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-parser-debug-failure-"));
   const sourcePath = path.join(root, "decoratorOnAwait.ts");
   fs.writeFileSync(
     sourcePath,
@@ -116,7 +116,7 @@ test("parser reports parser Debug Failure as invalid module", () => {
 });
 
 test("project parser falls back when compiler program hits parser Debug Failure", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-project-debug-failure-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-project-debug-failure-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(path.join(root, "package.json"), JSON.stringify({ name: "@example/debug" }));
   fs.writeFileSync(path.join(root, "tsconfig.json"), JSON.stringify({ include: ["src/**/*.ts"] }));
@@ -130,7 +130,7 @@ test("project parser falls back when compiler program hits parser Debug Failure"
   fs.writeFileSync(okPath, "export const ok = 1;\n");
   fs.writeFileSync(consumerPath, 'import { ok } from "./ok.js";\nexport const value = ok;\n');
 
-  const scope = readProjectScope(root, defaultTypeScriptHarnessConfig());
+  const scope = readProjectResolution(root, defaultTypeScriptHarnessConfig());
   const reports = parseTypeScriptProjectFiles(scope, [sourcePath, okPath, consumerPath]);
 
   assert.equal(reports.length, 3);
@@ -143,7 +143,7 @@ test("project parser falls back when compiler program hits parser Debug Failure"
 });
 
 test("parser handles deeply nested binary expressions without recursive visitor overflow", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-parser-deep-binary-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-parser-deep-binary-"));
   const sourcePath = path.join(root, "deep.ts");
   const expression = Array.from({ length: 5000 }, (_, index) => `value${index}`).join(" + ");
   fs.writeFileSync(sourcePath, `export const value = ${expression};\n`);
@@ -155,7 +155,7 @@ test("parser handles deeply nested binary expressions without recursive visitor 
 });
 
 test("parser extracts native public API and control-flow facts", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-parser-native-api-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-parser-native-api-"));
   const sourcePath = path.join(root, "api.ts");
   fs.writeFileSync(
     sourcePath,
@@ -449,7 +449,7 @@ test("parser extracts native public API and control-flow facts", () => {
 });
 
 test("parser marks Effect runtime calls inside React Query callbacks", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-parser-react-query-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-parser-react-query-"));
   const sourcePath = path.join(root, "component.tsx");
   fs.writeFileSync(
     sourcePath,
@@ -507,7 +507,7 @@ test("parser marks Effect runtime calls inside React Query callbacks", () => {
 });
 
 test("parser reports TypeScript syntax diagnostics", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-parser-bad-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-parser-bad-"));
   const sourcePath = path.join(root, "bad.ts");
   fs.writeFileSync(sourcePath, "export const broken = ;\n");
 
@@ -520,7 +520,7 @@ test("parser reports TypeScript syntax diagnostics", () => {
 });
 
 test("parser classifies TSX script kind and module intent docs", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-parser-tsx-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-parser-tsx-"));
   const sourcePath = path.join(root, "view.tsx");
   fs.writeFileSync(
     sourcePath,
@@ -535,7 +535,7 @@ test("parser classifies TSX script kind and module intent docs", () => {
 });
 
 test("project parser reads tsconfig compiler and package metadata facts", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-project-facts-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-project-facts-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.mkdirSync(path.join(root, "generated"));
   fs.mkdirSync(path.join(root, "packages", "app"), { recursive: true });
@@ -605,7 +605,7 @@ test("project parser reads tsconfig compiler and package metadata facts", () => 
     }),
   );
 
-  const scope = readProjectScope(root, defaultTypeScriptHarnessConfig());
+  const scope = readProjectResolution(root, defaultTypeScriptHarnessConfig());
 
   assert.equal(scope.packageJson.name, "@example/facts");
   assert.deepEqual(

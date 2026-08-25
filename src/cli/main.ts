@@ -5,34 +5,34 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { tryRunFastSearchCli } from "./fast-search-cli.js";
-import { tryRunExactSourceQueryCli } from "../queries/exact-source-query-cli.js";
 
 export interface CliStreams {
   readonly stdout: { write(chunk: string): unknown };
   readonly stderr: { write(chunk: string): unknown };
   readonly stdin?: string;
+  readonly stdinBytes?: Uint8Array;
 }
 
-export const HELP_TEXT = `ts-harness — TypeScript semantic search and project harness
+export const HELP_TEXT = `asp-typescript — TypeScript semantic search and project harness
 
 Usage:
-  ts-harness search <view> ... [--json] [--code] [--package <path>] [--workspace <workspace-root>]
-  ts-harness query <owner-path> --term <symbol> [--term <symbol>] [--workspace <workspace-root>] [--names-only | --code]
-  ts-harness query (--catalog <id> | --treesitter-query <s-expression>) [<workspace-root>] [--workspace <workspace-root>] [--selector <path[:start[:end]]>] [--code] [--json]
-  ts-harness query --catalog flow-lite --where 'source.call=NAME sink.constructs=TYPE scope.fn=FUNCTION' [<workspace-root>] [--json] [--workspace <workspace-root>]
-  ts-harness ast-patch dry-run --packet <semantic-ast-patch.json|->
-  ts-harness check [--changed | --full] [--json]
-  ts-harness evidence graph [--json] [PROJECT_ROOT]
-  ts-harness evidence analyze [--json] [PROJECT_ROOT]
-  ts-harness agent doctor [--json]
-  ts-harness agent guide
+  asp-typescript search <view> ... [--json] [--package <path>] [--workspace <workspace-root>]
+  asp typescript query --selector <exact-structural-selector> --projection <source|callable-skeleton> --workspace <workspace-root>
+  asp-typescript query (--catalog <id> | --treesitter-query <s-expression>) [<workspace-root>] [--workspace <workspace-root>] [--selector <structural-selector>] [--json]
+  asp-typescript query --catalog flow-lite --where 'source.call=NAME sink.constructs=TYPE scope.fn=FUNCTION' [<workspace-root>] [--json] [--workspace <workspace-root>]
+  asp-typescript ast-patch dry-run --packet <semantic-ast-patch.json|->
+  asp-typescript check [--changed | --full] [--json]
+  asp-typescript evidence graph [--json] [PROJECT_ROOT]
+  asp-typescript evidence analyze [--json] [PROJECT_ROOT]
+  asp-typescript agent doctor [--json]
+  asp-typescript agent guide
 
 SEARCH VIEWS
   search workspace          Workspace package/router index
   search prime              Project semantic-search map
   search owner <path>       Owner graph slice
-  search owner <path> items --query <symbol> [--names-only | --code]
-                             Parser-owned item query and compact code extraction
+  search owner <path> items --query <symbol>
+                             Parser-owned structural selector discovery
   search dependency <pkg>   NPM/external dependency usage
   search deps <pkg[/subpath][@ver][::api]>
                              Versioned dependency API usage
@@ -56,16 +56,12 @@ SEARCH VIEWS
   --package <path>          Run the selected search in a workspace package scope
 
 QUERY
-  query <owner-path> --term <symbol>
-                             Parser-owned owner item query
-  query <owner-path> --term <a> --term <b> --names-only
-                             Owner-local item discovery without code windows
-  query <owner-path> --term <symbol> --code
-                              Pure compact parser-owned code output
-  query --treesitter-query <s-expression> [--selector <selector>] [--code]
-                             Tree-sitter-compatible syntax locate, capture, and pure code extraction
-  query --from-hook direct-source-read --workspace <workspace-root> --selector <workspace-path:start:end> --code
-                             Source-preserved direct read for workspace-relative selectors
+  asp typescript query --selector <exact-structural-selector> --projection source --workspace <workspace-root>
+                             Exact source materialization through ASP authority
+  asp typescript query --selector <exact-structural-selector> --projection callable-skeleton --workspace <workspace-root>
+                             Typed callable skeleton materialization through ASP authority
+  query --treesitter-query <s-expression> [--selector <structural-selector>]
+                             Tree-sitter-compatible syntax locate and capture
   query --catalog declarations
                              Provider-embedded canonical tree-sitter query catalog
   query --catalog flow-lite --where 'source.call=NAME sink.constructs=TYPE scope.fn=FUNCTION'
@@ -95,31 +91,30 @@ GENERAL
   --help             This help
 
 EXAMPLES
-  ts-harness search workspace --workspace .
-  ts-harness search prime --package packages/core --workspace .
-  ts-harness search prime --workspace .
-  ts-harness search dependency react --workspace .
-  ts-harness search deps react/jsx-runtime@19.0.0::jsx --workspace .
-  ts-harness search api OrderStatus --workspace .
-  ts-harness search public-external-types react --workspace .
-  ts-harness search policy TS-AGENT-POLICY-001 owner tests --workspace .
-  ts-harness search symbol OrderStatus --workspace .
-  ts-harness search callsite OrderStatus --workspace .
-  ts-harness search import ./order --workspace .
-  ts-harness search tests src/domain/order.ts --workspace .
-  ts-harness search lexical OrderStatus --workspace .
-  ts-harness search lexical --query-set OrderStatus --query-set findOrderStatus owner tests --workspace .
-  ts-harness query src/domain/order.ts --term findOrderStatus --workspace . --names-only
-  ts-harness query src/domain/order.ts --term findOrderStatus --workspace . --code
-  ts-harness query --treesitter-query '(function_declaration name: (identifier) @function.name)' --workspace .
-  ts-harness query --catalog declarations --selector src/domain/order.ts --workspace . --code
-  ts-harness query --catalog flow-lite --where 'source.call=payload sink.constructs=Action scope.fn=collect' --workspace .
-  ts-harness ast-patch dry-run --packet semantic-ast-patch.json
-  ts-harness evidence graph --json .
-  ts-harness evidence analyze --json .
-  rg -n "OrderStatus" src tests | ts-harness search ingest --workspace .
-  ts-harness check --changed
-  ts-harness agent guide
+  asp-typescript search workspace --workspace .
+  asp-typescript search prime --package packages/core --workspace .
+  asp-typescript search prime --workspace .
+  asp-typescript search dependency react --workspace .
+  asp-typescript search deps react/jsx-runtime@19.0.0::jsx --workspace .
+  asp-typescript search api OrderStatus --workspace .
+  asp-typescript search public-external-types react --workspace .
+  asp-typescript search policy TS-AGENT-POLICY-001 owner tests --workspace .
+  asp-typescript search symbol OrderStatus --workspace .
+  asp-typescript search callsite OrderStatus --workspace .
+  asp-typescript search import ./order --workspace .
+  asp-typescript search tests src/domain/order.ts --workspace .
+  asp-typescript search lexical OrderStatus --workspace .
+  asp-typescript search lexical --query-set OrderStatus --query-set findOrderStatus owner tests --workspace .
+  asp typescript query --selector 'typescript://src/domain/order.ts#item/function/findOrderStatus' --projection source --workspace .
+  asp-typescript query --treesitter-query '(function_declaration name: (identifier) @function.name)' --workspace .
+  asp-typescript query --catalog declarations --selector src/domain/order.ts --workspace .
+  asp-typescript query --catalog flow-lite --where 'source.call=payload sink.constructs=Action scope.fn=collect' --workspace .
+  asp-typescript ast-patch dry-run --packet semantic-ast-patch.json
+  asp-typescript evidence graph --json .
+  asp-typescript evidence analyze --json .
+  rg -n "OrderStatus" src tests | asp-typescript search ingest --workspace .
+  asp-typescript check --changed
+  asp-typescript agent guide
 
 `;
 
@@ -128,12 +123,20 @@ export async function runCliFromEnv(): Promise<number> {
   const cwd = process.cwd();
   const log = startDevCommandLog(argv, cwd);
   try {
+    if (argv.length === 1 && argv[0] === "serve") {
+      const { serveProviderRuntime } = await import("./provider-runtime.js");
+      const exitCode = await serveProviderRuntime(process.stdout, cwd);
+      finishDevCommandLog(log, exitCode);
+      return exitCode;
+    }
+    const stdinBytes = await readStdin();
     const exitCode = await runCli(
       argv,
       {
         stdout: process.stdout,
         stderr: process.stderr,
-        stdin: await readStdin(),
+        stdin: Buffer.from(stdinBytes).toString("utf8"),
+        stdinBytes,
       },
       cwd,
     );
@@ -145,14 +148,13 @@ export async function runCliFromEnv(): Promise<number> {
   }
 }
 
-async function readStdin(): Promise<string> {
-  if (process.stdin.isTTY) return "";
-  process.stdin.setEncoding("utf8");
-  let text = "";
+async function readStdin(): Promise<Uint8Array> {
+  if (process.stdin.isTTY) return new Uint8Array();
+  const chunks: Buffer[] = [];
   for await (const chunk of process.stdin) {
-    text += chunk;
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
   }
-  return text;
+  return Buffer.concat(chunks);
 }
 
 export async function runCli(
@@ -160,8 +162,14 @@ export async function runCli(
   streams: CliStreams,
   cwd: string,
 ): Promise<number> {
-  const exactSourceStatus = tryRunExactSourceQueryCli(argv, streams, cwd);
-  if (exactSourceStatus !== undefined) return exactSourceStatus;
+  if (argv[0] === "project-resolution") {
+    const { runProjectResolutionCommand } = await import("./project-resolution.js");
+    return runProjectResolutionCommand(argv.slice(1), streams, cwd);
+  }
+  if (argv[0] === "search" && argv[1] === "dependency-topology") {
+    const { runDependencyTopologyCommand } = await import("./dependency-topology.js");
+    return runDependencyTopologyCommand(argv.slice(2), streams, cwd);
+  }
   const fastSearchStatus = tryRunFastSearchCli(argv, streams, cwd);
   if (fastSearchStatus !== undefined) return fastSearchStatus;
   if (argv.length === 0 || argv[0] === "--help" || argv[0] === "-h") {

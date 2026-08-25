@@ -45,7 +45,7 @@ test("React dependency activates render purity advice from parser-native facts",
 
   assert.equal(isTypeScriptHarnessClean(report), true);
   assert.deepEqual(
-    report.projectScope?.packageJson.packageExtensions.map((extension) => ({
+    report.projectResolution?.packageJson.packageExtensions.map((extension) => ({
       name: extension.name,
       activation: extension.activation,
       coverage: extension.coverage,
@@ -230,7 +230,7 @@ function reactProject(
     readonly source: Readonly<Record<string, string | readonly string[]>>;
   },
 ): string {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), `ts-harness-react-${name}-`));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), `asp-typescript-react-${name}-`));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(
     path.join(root, "package.json"),

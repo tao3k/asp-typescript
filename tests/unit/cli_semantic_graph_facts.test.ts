@@ -5,6 +5,8 @@ import path from "node:path";
 import test from "node:test";
 
 import {
+  TYPE_SCRIPT_LANGUAGE_ID,
+  TYPE_SCRIPT_PROVIDER_ID,
   TYPE_SCRIPT_SEARCH_VIEW_DESCRIPTORS,
   typeScriptSemanticLanguageRegistration,
 } from "../../src/cli/semantic-language.js";
@@ -97,16 +99,16 @@ test("semantic graph facts renders field type and collection graph facts", () =>
     }[];
   };
   assert.equal(payload.schemaId, "agent.semantic-protocols.semantic-fact-graph");
-  assert.equal(payload.languageId, "typescript");
-  assert.equal(payload.providerId, "ts-harness");
+  assert.equal(payload.languageId, TYPE_SCRIPT_LANGUAGE_ID);
+  assert.equal(payload.providerId, TYPE_SCRIPT_PROVIDER_ID);
   const fieldNode = payload.nodes.find(
     (node) => node.kind === "field" && node.value === "names: string[]",
   );
   assert.ok(fieldNode, "expected interface field node");
   assert.equal(fieldNode.role, "interface-field");
   assert.deepEqual(fieldNode.fields, {
-    languageId: "typescript",
-    providerId: "ts-harness",
+    languageId: TYPE_SCRIPT_LANGUAGE_ID,
+    providerId: TYPE_SCRIPT_PROVIDER_ID,
     semanticFactKind: "field",
     provenance: "parser",
     confidence: "exact",
@@ -133,8 +135,8 @@ test("semantic graph facts renders field type and collection graph facts", () =>
   const typeNode = payload.nodes.find((node) => node.kind === "type" && node.value === "string[]");
   assert.ok(typeNode, "expected field type node");
   assert.deepEqual(typeNode.fields, {
-    languageId: "typescript",
-    providerId: "ts-harness",
+    languageId: TYPE_SCRIPT_LANGUAGE_ID,
+    providerId: TYPE_SCRIPT_PROVIDER_ID,
     semanticFactKind: "type",
     provenance: "parser",
     confidence: "exact",
@@ -167,8 +169,8 @@ test("semantic graph facts renders field type and collection graph facts", () =>
   );
   assert.ok(collectionNode, "expected array collection node");
   assert.deepEqual(collectionNode.fields, {
-    languageId: "typescript",
-    providerId: "ts-harness",
+    languageId: TYPE_SCRIPT_LANGUAGE_ID,
+    providerId: TYPE_SCRIPT_PROVIDER_ID,
     semanticFactKind: "collection",
     provenance: "parser",
     confidence: "exact",

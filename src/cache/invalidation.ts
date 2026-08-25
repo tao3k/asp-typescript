@@ -11,11 +11,11 @@ import { loadModuleCache, saveModuleCache } from "./module-cache.js";
 import { parseModule } from "../syntax/parse-module.js";
 
 export interface CachePaths {
-  /** Directory for all cache files: default .cache/ts-harness/ */
+  /** Directory for all cache files: default .cache/asp-typescript/ */
   readonly cacheDir: string;
 }
 
-const DEFAULT_CACHE_DIR = ".cache/ts-harness";
+const DEFAULT_CACHE_DIR = ".cache/asp-typescript";
 
 export function defaultCachePaths(root: string): CachePaths {
   return { cacheDir: path.resolve(root, DEFAULT_CACHE_DIR) };

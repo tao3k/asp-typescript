@@ -38,7 +38,7 @@ test("owner item query falls back to bounded top-level items on miss", () => {
 });
 
 test("owner item query fallback emits JSON packet evidence", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-item-query-json-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-item-query-json-"));
   fs.mkdirSync(path.join(root, "src"), { recursive: true });
   fs.writeFileSync(
     path.join(root, "src", "types.ts"),

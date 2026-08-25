@@ -13,7 +13,7 @@ import {
 import { relativePath } from "./path_helpers.js";
 
 test("project parser exposes native TypeScript semantic diagnostics as non-blocking advice", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-semantic-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-semantic-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(
     path.join(root, "tsconfig.json"),
@@ -74,7 +74,7 @@ test("project parser exposes native TypeScript semantic diagnostics as non-block
 });
 
 test("project parser preserves native TypeScript related diagnostic information", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-related-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-related-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(
     path.join(root, "tsconfig.json"),

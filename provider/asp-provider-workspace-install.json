@@ -1,0 +1,35 @@
+{
+  "$schema": "../schemas/provider-workspace-install.schema.json",
+  "schemaId": "agent.semantic-protocols.provider-workspace-install",
+  "schemaVersion": "1",
+  "schemaAuthority": "https://tao3k.github.io/agent-semantic-protocols/schemas/",
+  "languageId": "typescript",
+  "providerId": "asp-typescript",
+  "binary": "asp-typescript",
+  "providerRegistration": "asp-provider-registration.json",
+  "schemaBundleReceipt": "../schemas/.asp-schema-manager-receipt.json",
+  "workspaceArtifact": {
+    "root": "languages/typescript-lang-project-harness/dist",
+    "entrypoint": "src/cli/main.js",
+    "launch": {
+      "program": "node",
+      "args": ["src/cli/main.js"],
+      "programRelativeToArtifact": false,
+      "argsRelativeToArtifact": true
+    }
+  },
+  "workspaceBuild": {
+    "program": "npm",
+    "args": ["run", "build"],
+    "workingDirectory": "languages/typescript-lang-project-harness",
+    "sourceSnapshotAnchors": [
+      "languages/typescript-lang-project-harness/package.json",
+      "languages/typescript-lang-project-harness/package-lock.json"
+    ],
+    "derivedPaths": [
+      "languages/typescript-lang-project-harness/dist",
+      "languages/typescript-lang-project-harness/node_modules"
+    ],
+    "env": {}
+  }
+}

@@ -55,8 +55,7 @@ export function structuralItemSelectorFromQuerySelector(
   if (selector === undefined) return undefined;
   const normalized = selector.replace(/\\/gu, "/");
   const prefix = "typescript://";
-  if (!normalized.startsWith(prefix)) return undefined;
-  const rest = normalized.slice(prefix.length);
+  const rest = normalized.startsWith(prefix) ? normalized.slice(prefix.length) : normalized;
   const [ownerPath, itemFragment] = rest.split("#item/");
   if (ownerPath === undefined || itemFragment === undefined || ownerPath.length === 0) {
     return undefined;

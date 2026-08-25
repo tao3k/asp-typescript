@@ -32,6 +32,16 @@ export interface SemanticQueryPacket {
   readonly providerId: typeof TYPE_SCRIPT_PROVIDER_ID;
   readonly binary: typeof TYPE_SCRIPT_BINARY;
   readonly namespace: typeof TYPE_SCRIPT_PROVIDER_NAMESPACE;
+  readonly digestAlgorithm: "typescript-source-fingerprint-v1";
+  readonly parserIdentityDigest: string;
+  readonly sourceSnapshotEnvelope?: string;
+  readonly queryPackDigest: string;
+  readonly sourceBlobDigest: string;
+  readonly parserFactDigest: string;
+  readonly structuralSelector: string;
+  readonly projectionMode: "code" | "names";
+  readonly projectionEncoding: "base64";
+  readonly projectionPayloadBase64: string;
   readonly method: "query/owner-items";
   readonly projectRoot: string;
   readonly ownerPath: string;
@@ -629,7 +639,66 @@ function projectionNodeId(value: string): string {
   return value.replace(/[^a-zA-Z0-9_.:-]+/gu, "_");
 }
 
+const EXACT_SELECTOR_PROJECTION_PACKET_V1 = {
+  schemaId: "agent.semantic-protocols.exact-selector-projection-packet",
+  schemaVersion: "1",
+  digestAlgorithm: "blake3-256",
+} as const;
+
+interface ProviderSourceSnapshotEnvelopeV1 {
+  readonly providerId: string;
+  readonly casRoot: string;
+  readonly owners: readonly {
+    readonly path: string;
+    readonly blobDigest: string;
+    readonly sourceContentDigest: string;
+    readonly casPath: string;
+  }[];
+}
+
+function exactProjectionSourceBlobDigest(packet: SemanticQueryPacket): string | undefined {
+  if (
+    packet.sourceSnapshotEnvelope === undefined ||
+    !packet.structuralSelector.includes("#item/")
+  ) {
+    return undefined;
+  }
+  const envelope = JSON.parse(
+    readFileSync(packet.sourceSnapshotEnvelope, "utf8"),
+  ) as ProviderSourceSnapshotEnvelopeV1;
+  if (envelope.providerId !== packet.providerId) {
+    throw new Error("exact-selector source snapshot provider identity mismatch");
+  }
+  const owner = envelope.owners.find((candidate) => candidate.path === packet.ownerPath);
+  if (owner === undefined) {
+    throw new Error(`exact-selector owner is absent from source snapshot: ${packet.ownerPath}`);
+  }
+  const liveSource = readFileSync(resolve(packet.projectRoot, packet.ownerPath));
+  const snapshotSource = readFileSync(resolve(envelope.casRoot, owner.casPath));
+  if (!liveSource.equals(snapshotSource)) {
+    throw new Error(`exact-selector owner differs from source snapshot: ${packet.ownerPath}`);
+  }
+  return owner.sourceContentDigest;
+}
+
 export function renderOwnerItemSemanticQueryPacketJson(packet: SemanticQueryPacket): string {
+  const sourceBlobDigest = exactProjectionSourceBlobDigest(packet);
+  if (sourceBlobDigest !== undefined) {
+    return JSON.stringify({
+      ...EXACT_SELECTOR_PROJECTION_PACKET_V1,
+      languageId: packet.languageId,
+      providerId: packet.providerId,
+      parserIdentityDigest: packet.parserIdentityDigest,
+      queryPackDigest: packet.queryPackDigest,
+      ownerPath: packet.ownerPath,
+      sourceBlobDigest,
+      parserFactDigest: packet.parserFactDigest,
+      structuralSelector: packet.structuralSelector,
+      projectionMode: packet.projectionMode,
+      projectionEncoding: packet.projectionEncoding,
+      projectionPayloadBase64: packet.projectionPayloadBase64,
+    });
+  }
   return JSON.stringify(packet);
 }
 
@@ -639,6 +708,11 @@ export function buildOwnerItemSemanticQueryPacket(
   itemQuery: string,
   outputMode: OwnerItemQueryOutputMode,
   selector?: string,
+  metadata: {
+    readonly parserIdentityDigest?: string | undefined;
+    readonly queryPackDigest: string | undefined;
+    readonly sourceSnapshotEnvelope?: string | undefined;
+  } = { queryPackDigest: undefined },
 ): SemanticQueryPacket {
   const result = queryTypeScriptOwnerItems(projectRoot, ownerPath, itemQuery);
   const structuralSelector = selector?.startsWith("typescript://") ? selector : undefined;
@@ -656,6 +730,12 @@ export function buildOwnerItemSemanticQueryPacket(
       ? "unknown"
       : ownerItemQueryMatchMode(matches, result.queryTerms, fallback);
   const syntaxRefs = ownerItemSyntaxRefs(result.ownerPath, result.queryTerms, matches);
+  const queryPackDigest = hashString(
+    `${TYPE_SCRIPT_PROVIDER_ID}:${TYPE_SCRIPT_LANGUAGE_ID}:${result.ownerPath}:${result.queryTerms.join("|")}:${outputMode}:${matches.length}`,
+  );
+  const projectionPayload = matches
+    .map((item) => (outputMode === "names" ? item.name : semanticOutlineCode(item)))
+    .join("\n");
   return {
     schemaId: SEMANTIC_QUERY_PACKET_SCHEMA_ID,
     schemaVersion: "1",
@@ -665,6 +745,26 @@ export function buildOwnerItemSemanticQueryPacket(
     providerId: TYPE_SCRIPT_PROVIDER_ID,
     binary: TYPE_SCRIPT_BINARY,
     namespace: TYPE_SCRIPT_PROVIDER_NAMESPACE,
+    digestAlgorithm: "typescript-source-fingerprint-v1",
+    parserIdentityDigest:
+      metadata.parserIdentityDigest ??
+      hashString(
+        `${TYPE_SCRIPT_PROVIDER_ID}:${TYPE_SCRIPT_LANGUAGE_ID}:${result.ownerPath}:${result.queryTerms.join("|")}`,
+      ),
+    ...(metadata.sourceSnapshotEnvelope === undefined
+      ? {}
+      : { sourceSnapshotEnvelope: metadata.sourceSnapshotEnvelope }),
+    queryPackDigest: metadata.queryPackDigest ?? queryPackDigest,
+    sourceBlobDigest: hashString(
+      `${result.ownerPath}:${matches.map((item) => `${item.name}:${item.lineStart}:${item.lineEnd}`).join("|")}`,
+    ),
+    parserFactDigest: hashString(
+      `${result.ownerPath}:${matches.map((item) => `${item.kind}:${item.name}:${item.column}`).join("|")}`,
+    ),
+    structuralSelector: selector ?? result.ownerPath,
+    projectionMode: outputMode === "names" ? "names" : "code",
+    projectionEncoding: "base64",
+    projectionPayloadBase64: Buffer.from(projectionPayload, "utf8").toString("base64"),
     method: "query/owner-items",
     projectRoot,
     ownerPath: result.ownerPath,
@@ -879,3 +979,5 @@ function semanticSearchItemKind(kind: string): SemanticSearchItem["kind"] {
       return "symbol";
   }
 }
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";

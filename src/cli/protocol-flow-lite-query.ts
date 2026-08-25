@@ -1,5 +1,5 @@
 /**
- * Flow-lite query catalog compatibility for the ts-harness CLI.
+ * Flow-lite query catalog compatibility for the asp-typescript CLI.
  */
 
 import path from "node:path";
@@ -10,6 +10,7 @@ import {
   type FlowLiteResult,
   type FlowLiteWhere,
 } from "../parser/flow-lite.js";
+import { TYPE_SCRIPT_LANGUAGE_ID, TYPE_SCRIPT_PROVIDER_ID } from "./semantic-language.js";
 
 export type { FlowLiteWhere } from "../parser/flow-lite.js";
 
@@ -161,13 +162,6 @@ function consumeFlowLiteArg(
     state.workspaceRoot = value;
     return { kind: "ok", nextIndex: index + 1 };
   }
-  if (arg === "--code") {
-    return {
-      kind: "error",
-      message:
-        "query --catalog flow-lite is a locator/provenance surface; select an exact frontier locator and run query --selector <path-or-range> --code",
-    };
-  }
   if (arg.startsWith("-")) {
     return { kind: "error", message: `unsupported flow-lite query option: ${arg}` };
   }
@@ -318,8 +312,8 @@ function flowLitePacket(
     schemaVersion: "1",
     protocolId: "agent.semantic-protocols.semantic-language",
     protocolVersion: "1",
-    languageId: "typescript",
-    providerId: "ts-harness",
+    languageId: TYPE_SCRIPT_LANGUAGE_ID,
+    providerId: TYPE_SCRIPT_PROVIDER_ID,
     projectRoot,
     packageName: path.basename(projectRoot),
     flowId: `flow-lite:${result.ownerPath}:${args.where.scopeFn}:${args.where.sourceCall}:${args.where.sinkConstructs}`,

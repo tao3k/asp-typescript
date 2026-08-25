@@ -5,16 +5,25 @@ import path from "node:path";
 import test from "node:test";
 
 import { finishDevCommandLog, startDevCommandLog } from "../../src/cli/dev-command-log.js";
+import {
+  TYPE_SCRIPT_LANGUAGE_ID,
+  TYPE_SCRIPT_PROVIDER_ID,
+} from "../../src/cli/semantic-language.js";
 
 test("dev command log records ordered active-context events", () => {
-  const project = mkdtempSync(path.join(tmpdir(), "ts-harness-dev-log-project-"));
-  const trace = mkdtempSync(path.join(tmpdir(), "ts-harness-dev-log-trace-"));
+  const project = mkdtempSync(path.join(tmpdir(), `${TYPE_SCRIPT_PROVIDER_ID}-dev-log-project-`));
+  const trace = mkdtempSync(path.join(tmpdir(), `${TYPE_SCRIPT_PROVIDER_ID}-dev-log-trace-`));
   const previousEnv = {
     parent: process.env.SEMANTIC_PROTOCOL_PARENT_EVENT_ID,
     session: process.env.SEMANTIC_PROTOCOL_SESSION_ID,
     hook: process.env.SEMANTIC_PROTOCOL_HOOK_RUN_ID,
     trace: process.env.SEMANTIC_PROTOCOL_TRACE_DIR,
     mode: process.env.SEMANTIC_PROTOCOL_DEV_MODE,
+    codexSession: process.env.CODEX_SESSION_ID,
+    claudeSession: process.env.CLAUDE_SESSION_ID,
+    terminalSession: process.env.TERM_SESSION_ID,
+    codexHook: process.env.CODEX_HOOK_RUN_ID,
+    agentHook: process.env.AGENT_HOOK_RUN_ID,
   };
 
   try {
@@ -37,19 +46,32 @@ test("dev command log records ordered active-context events", () => {
     delete process.env.SEMANTIC_PROTOCOL_PARENT_EVENT_ID;
     delete process.env.SEMANTIC_PROTOCOL_SESSION_ID;
     delete process.env.SEMANTIC_PROTOCOL_HOOK_RUN_ID;
+    delete process.env.CODEX_SESSION_ID;
+    delete process.env.CLAUDE_SESSION_ID;
+    delete process.env.TERM_SESSION_ID;
+    delete process.env.CODEX_HOOK_RUN_ID;
+    delete process.env.AGENT_HOOK_RUN_ID;
 
     const log = startDevCommandLog(["search", "lexical", "metadata", project], project);
     finishDevCommandLog(log, 0);
 
-    const commandDir = path.join(trace, "typescript", "ts-harness", "commands");
+    const commandDir = path.join(
+      trace,
+      TYPE_SCRIPT_LANGUAGE_ID,
+      TYPE_SCRIPT_PROVIDER_ID,
+      "commands",
+    );
     const entries = readdirSync(commandDir).filter((entry) => entry.endsWith(".jsonl"));
     assert.equal(entries.length, 1);
-    assert.match(entries[0]!, /^20.*T.*Z-000001-ts-harness-.*\.jsonl$/);
+    assert.match(
+      entries[0]!,
+      new RegExp(`^20.*T.*Z-000001-${TYPE_SCRIPT_PROVIDER_ID}-.*\\.jsonl$`, "u"),
+    );
 
     const event = JSON.parse(readFileSync(path.join(commandDir, entries[0]!), "utf8"));
     assert.equal(event.schemaId, "agent.semantic-protocols.dev-command-log");
     assert.equal(event.languageId, "typescript");
-    assert.equal(event.providerId, "ts-harness");
+    assert.equal(event.providerId, TYPE_SCRIPT_PROVIDER_ID);
     assert.equal(event.sessionId, "session-ts");
     assert.equal(event.sessionOrdinal, 1);
     assert.equal(event.parentEventId, "hook-parent-ts");
@@ -63,6 +85,11 @@ test("dev command log records ordered active-context events", () => {
     restoreEnv("SEMANTIC_PROTOCOL_HOOK_RUN_ID", previousEnv.hook);
     restoreEnv("SEMANTIC_PROTOCOL_TRACE_DIR", previousEnv.trace);
     restoreEnv("SEMANTIC_PROTOCOL_DEV_MODE", previousEnv.mode);
+    restoreEnv("CODEX_SESSION_ID", previousEnv.codexSession);
+    restoreEnv("CLAUDE_SESSION_ID", previousEnv.claudeSession);
+    restoreEnv("TERM_SESSION_ID", previousEnv.terminalSession);
+    restoreEnv("CODEX_HOOK_RUN_ID", previousEnv.codexHook);
+    restoreEnv("AGENT_HOOK_RUN_ID", previousEnv.agentHook);
     rmSync(project, { recursive: true, force: true });
     rmSync(trace, { recursive: true, force: true });
   }

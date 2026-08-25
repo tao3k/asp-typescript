@@ -42,7 +42,7 @@ test("CLI advertises TypeScript reasoning search", () => {
 
   const doctor = runCliCapture(["agent", "doctor", "--json", root], root);
   assert.equal(doctor.exitCode, 0, doctor.stderr);
-  const registration = JSON.parse(doctor.stdout).languages[0];
+  const registration = JSON.parse(doctor.stdout).registry.languages[0];
   assert.ok(registration.methods.includes("search/reasoning"));
   assert.ok(
     registration.methodDescriptors.some(

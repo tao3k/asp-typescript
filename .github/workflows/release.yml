@@ -29,7 +29,7 @@ jobs:
           - os: ubuntu-latest
             target: aarch64-apple-darwin
     env:
-      BINARY: ts-harness
+      BINARY: asp-typescript
       GH_TOKEN: ${{ github.token }}
       RELEASE_TAG: ${{ github.event.release.tag_name || inputs.tag || github.ref_name }}
       TARGET: ${{ matrix.target }}

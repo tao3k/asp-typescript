@@ -40,7 +40,7 @@ export {
   pathFromInput,
 };
 
-export function readProjectScope(
+export function readProjectResolution(
   projectRootInput: string | URL,
   config: Pick<
     TypeScriptHarnessConfig,

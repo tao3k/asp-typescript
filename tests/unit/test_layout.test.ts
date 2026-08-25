@@ -11,7 +11,7 @@ import {
 } from "../../src/index.js";
 
 test("test layout pack reports test modules outside configured test roots without blocking", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-test-layout-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-test-layout-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.mkdirSync(path.join(root, "tests"));
   fs.writeFileSync(

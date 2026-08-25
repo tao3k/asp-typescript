@@ -1,5 +1,5 @@
 /**
- * Protocol command parsing and dispatch for the ts-harness CLI.
+ * Protocol command parsing and dispatch for the asp-typescript CLI.
  */
 
 import fs from "node:fs";
@@ -37,7 +37,11 @@ import {
   renderTypeScriptEvidenceGraphJson,
 } from "./evidence-graph.js";
 import { buildOwnerItemQueryPacket, renderOwnerItemQuery } from "./semantic-search/item-query.js";
-import { renderOwnerItemQueryCode } from "./semantic-search/item-read.js";
+import {
+  buildOwnerItemSemanticReadPacket,
+  renderOwnerItemSemanticReadPacket,
+  renderOwnerItemSemanticReadPacketJson,
+} from "./semantic-search/item-read.js";
 import { renderTypeScriptTreeSitterQuery } from "../parser/native_syntax/tree-sitter-query.js";
 import { renderTypeScriptAstPatchDryRunReceiptJson } from "./ast-patch.js";
 import {
@@ -57,8 +61,6 @@ import {
   SEARCH_VIEWS_REQUIRING_FULL_NATIVE_SYNTAX_FACTS,
   SEARCH_VIEWS_REQUIRING_RULE_EVALUATION,
 } from "./protocol-runtime.js";
-import { runTypeScriptQueryCommand } from "../queries/query-command.js";
-import { ownerPathFromQuerySelector, selectorHasLineRange } from "../queries/source-selector.js";
 
 export interface CliStreams {
   readonly stdout: { write(chunk: string): unknown };
@@ -68,7 +70,7 @@ export interface CliStreams {
 
 export type ProtocolArgs =
   | SearchArgs
-  | QueryArgs
+  | DirectSourceReadArgs
   | TreeSitterQueryArgs
   | FlowLiteQueryArgs
   | CheckArgs
@@ -94,23 +96,15 @@ export interface SearchArgs {
   readonly pipes: readonly TypeScriptSemanticSearchPipe[];
   readonly querySet: readonly string[];
   readonly json: boolean;
-  readonly codeOnly?: boolean;
-  readonly namesOnly?: boolean;
   readonly renderMode: SemanticSearchRenderMode | undefined;
 }
 
-export interface QueryArgs {
-  readonly kind: "query";
-  readonly ownerPath: string;
-  readonly selector: string | undefined;
-  readonly terms: readonly string[];
+interface DirectSourceReadArgs {
+  readonly kind: "direct-source-read";
   readonly projectRoot: string | undefined;
   readonly packagePath: string | undefined;
-  readonly workspace: boolean;
+  readonly selector: string;
   readonly json: boolean;
-  readonly codeOnly: boolean;
-  readonly namesOnly: boolean;
-  readonly renderMode: "read-packet" | undefined;
 }
 
 export interface CheckArgs {
@@ -199,6 +193,17 @@ export function runProtocolCli(
       streams.stdout.write(renderTypeScriptAstPatchDryRunReceiptJson(projectRoot, packetText));
       return 0;
     }
+    if (args.kind === "direct-source-read") {
+      const projectRoot = path.resolve(cwd, args.projectRoot ?? ".");
+      const ownerPath = args.selector.replace(/^owner:/u, "").replace(/:\d+(?::\d+)?$/u, "");
+      const packet = buildOwnerItemSemanticReadPacket(projectRoot, ownerPath, "", args.selector);
+      streams.stdout.write(
+        args.json
+          ? renderOwnerItemSemanticReadPacketJson(packet)
+          : renderOwnerItemSemanticReadPacket(packet),
+      );
+      return 0;
+    }
     if (args.kind === "tree-sitter-query") {
       const projectRoot = resolveProviderProjectRoot(cwd, args);
       streams.stdout.write(renderTypeScriptTreeSitterQuery(projectRoot, args));
@@ -208,9 +213,6 @@ export function runProtocolCli(
       const projectRoot = path.resolve(cwd, args.projectRoot ?? ".");
       streams.stdout.write(renderTypeScriptFlowLiteQuery(projectRoot, args));
       return 0;
-    }
-    if (args.kind === "query") {
-      return runTypeScriptQueryCommand(args, streams, cwd);
     }
     if (args.kind === "check") {
       const projectRoot = path.resolve(cwd, args.projectRoot ?? ".");
@@ -294,13 +296,9 @@ export function runProtocolCli(
           ? renderSemanticSearchPacketJson(
               buildOwnerItemQueryPacket(searchPlan.projectRoot, args.query, args.itemQuery),
             )
-          : `${
-              args.codeOnly === true
-                ? renderOwnerItemQueryCode(searchPlan.projectRoot, args.query, args.itemQuery)
-                : renderOwnerItemQuery(searchPlan.projectRoot, args.query, args.itemQuery, {
-                    namesOnly: args.namesOnly === true,
-                  })
-            }\n`,
+          : `${renderOwnerItemQuery(searchPlan.projectRoot, args.query, args.itemQuery, {
+              namesOnly: true,
+            })}\n`,
       );
       return 0;
     }
@@ -340,13 +338,13 @@ function parseAstPatchArgs(argv: readonly string[]): ProtocolArgs {
   if (mode === "apply") {
     return {
       kind: "error",
-      message: "ts-harness ast-patch apply is unavailable; use dry-run and Codex apply_patch",
+      message: "asp-typescript ast-patch apply is unavailable; use dry-run and Codex apply_patch",
     };
   }
   if (mode !== "dry-run") {
     return {
       kind: "error",
-      message: "usage: ts-harness ast-patch dry-run --packet <path-or-> [PROJECT_ROOT]",
+      message: "usage: asp-typescript ast-patch dry-run --packet <path-or-> [PROJECT_ROOT]",
     };
   }
   let packetPath: string | undefined;
@@ -381,149 +379,50 @@ function parseAstPatchArgs(argv: readonly string[]): ProtocolArgs {
 }
 
 function parseQueryArgs(argv: readonly string[]): ProtocolArgs {
-  if (argv[0] === "--help" || argv[0] === "-h") return { kind: "help" };
-  let json = false;
-  let codeOnly = false;
-  let namesOnly = false;
-  let renderMode: "read-packet" | undefined;
-  let packagePath: string | undefined;
-  let workspace = false;
-  let workspaceRoot: string | undefined;
   let fromHook: string | undefined;
+  let projectRoot: string | undefined;
+  let packagePath: string | undefined;
   let selector: string | undefined;
-  const terms: string[] = [];
-  const positionals: string[] = [];
-  for (let index = 0; index < argv.length; index++) {
+  let json = false;
+  for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index]!;
-    if (arg === "--term" || arg === "--query") {
-      const value = argv[index + 1];
-      if (value === undefined) return { kind: "error", message: `${arg} requires a value` };
-      if (arg === "--query") {
-        terms.push(
-          ...value
-            .split("|")
-            .map((term) => term.trim())
-            .filter((term) => term.length > 0),
-        );
-      } else {
-        terms.push(value);
-      }
-      index += 1;
-    } else if (arg === "--names-only") {
-      namesOnly = true;
-    } else if (arg === "--code") {
-      codeOnly = true;
-    } else if (arg === "--json") {
+    if (arg === "--json") {
       json = true;
-    } else if (arg === "--view") {
-      const value = argv[index + 1];
-      if (value === undefined || value.startsWith("-")) {
-        return { kind: "error", message: "--view requires a query output mode" };
-      }
-      if (value !== "read-packet") {
-        return { kind: "error", message: `unknown query --view mode: ${value}` };
-      }
-      renderMode = value;
-      index += 1;
-    } else if (arg === "--from-hook") {
-      const value = argv[index + 1];
-      if (value === undefined || value.startsWith("-")) {
-        return { kind: "error", message: "--from-hook requires a hook reason" };
-      }
-      fromHook = value;
-      index += 1;
-    } else if (arg === "--selector") {
-      const value = argv[index + 1];
-      if (value === undefined || value.startsWith("-")) {
-        return { kind: "error", message: "--selector requires an owner path" };
-      }
-      selector = value;
-      index += 1;
-    } else if (arg === "--package") {
-      const value = argv[index + 1];
-      if (value === undefined || value.startsWith("-")) {
-        return { kind: "error", message: "--package requires a package path" };
-      }
-      packagePath = value;
-      index += 1;
-    } else if (arg === "--workspace") {
-      const value = argv[index + 1];
-      if (value === undefined || value.startsWith("-")) {
-        return { kind: "error", message: "--workspace requires a workspace root" };
-      }
-      workspace = true;
-      workspaceRoot = value;
-      index += 1;
-    } else if (arg === "--help" || arg === "-h") {
-      return { kind: "help" };
-    } else if (arg.startsWith("-")) {
-      return { kind: "error", message: `unknown query option: ${arg}` };
-    } else {
-      positionals.push(arg);
+      continue;
     }
-  }
-  if (fromHook !== undefined && fromHook !== "direct-source-read") {
-    return { kind: "error", message: `unsupported query hook route: ${fromHook}` };
-  }
-  if (fromHook === "direct-source-read" && json && renderMode === undefined) {
-    renderMode = "read-packet";
-  }
-  if (renderMode === "read-packet" && fromHook !== "direct-source-read") {
+    if (
+      arg === "--from-hook" ||
+      arg === "--workspace" ||
+      arg === "--package" ||
+      arg === "--selector"
+    ) {
+      const value = argv[index + 1];
+      if (value === undefined || value.startsWith("-")) {
+        return { kind: "error", message: `${arg} requires a value` };
+      }
+      if (arg === "--from-hook") fromHook = value;
+      if (arg === "--workspace") projectRoot = value;
+      if (arg === "--package") packagePath = value;
+      if (arg === "--selector") selector = value;
+      index += 1;
+      continue;
+    }
     return {
       kind: "error",
-      message: "--view read-packet requires --from-hook direct-source-read",
+      message:
+        "exact source projection is ASP-owned; use `asp typescript query --selector <exact-structural-selector> --projection source|callable-skeleton --workspace <workspace-root>`",
     };
   }
-  if (renderMode === "read-packet" && !json) {
-    return { kind: "error", message: "--view read-packet requires --json" };
-  }
-  const ownerPath = selector === undefined ? positionals[0] : ownerPathFromQuerySelector(selector);
-  if (positionals.length > (selector === undefined ? 1 : 0)) {
-    return {
-      kind: "error",
-      message: "query does not accept positional WORKSPACE; use --workspace <workspace-root>",
-    };
-  }
-  if (ownerPath === undefined) {
-    if (namesOnly && terms.length > 0) {
-      return {
-        kind: "error",
-        message:
-          "query --names-only requires an owner selector; use search owner <path> items --query <term>",
-      };
+  if (fromHook === "direct-source-read") {
+    if (selector === undefined) {
+      return { kind: "error", message: "--from-hook requires --selector" };
     }
-    return { kind: "error", message: "query requires an owner path" };
-  }
-  if (terms.length === 0 && fromHook !== "direct-source-read") {
-    return { kind: "error", message: "query requires at least one --term" };
-  }
-  if (
-    terms.length === 0 &&
-    fromHook === "direct-source-read" &&
-    !codeOnly &&
-    !json &&
-    !selectorHasLineRange(selector, ownerPath)
-  ) {
-    namesOnly = true;
-  }
-  if (json && codeOnly && renderMode !== "read-packet") {
-    return { kind: "error", message: "--code cannot be combined with --json" };
-  }
-  if (namesOnly && codeOnly) {
-    return { kind: "error", message: "--code cannot be combined with --names-only" };
+    return { kind: "direct-source-read", projectRoot, packagePath, selector, json };
   }
   return {
-    kind: "query",
-    ownerPath,
-    selector,
-    terms,
-    projectRoot: workspaceRoot,
-    packagePath,
-    workspace,
-    json,
-    codeOnly,
-    namesOnly,
-    renderMode,
+    kind: "error",
+    message:
+      "exact source projection is ASP-owned; use `asp typescript query --selector <exact-structural-selector> --projection source|callable-skeleton --workspace <workspace-root>`",
   };
 }
 
@@ -534,7 +433,7 @@ function parseSearchArgs(argv: readonly string[]): ProtocolArgs {
     return {
       kind: "error",
       message:
-        "usage: ts-harness search <workspace|prime|owner|dependency|deps|docs|api|public-external-types|policy|symbol|callsite|import|tests|reasoning|env|runtime-source|lang|std|capability|extension|pattern|compare|ingest> ... [--json] [--code] [--package PATH] [--workspace <workspace-root>]",
+        "usage: asp-typescript search <workspace|prime|owner|dependency|deps|docs|api|public-external-types|policy|symbol|callsite|import|tests|reasoning|env|runtime-source|lang|std|capability|extension|pattern|compare|ingest> ... [--json] [--package PATH] [--workspace <workspace-root>]",
     };
   }
   const searchView = typeScriptSemanticSearchViewDescriptor(viewValue);
@@ -557,8 +456,6 @@ function parseSearchArgs(argv: readonly string[]): ProtocolArgs {
   const terms: string[] = [];
   const positionals: string[] = [];
   let itemQuery: string | undefined;
-  let codeOnly = false;
-  let namesOnly = false;
   for (let index = 1; index < argv.length; index++) {
     const arg = argv[index]!;
     if (arg === "--json") {
@@ -643,10 +540,6 @@ function parseSearchArgs(argv: readonly string[]): ProtocolArgs {
       if (value === undefined) return { kind: "error", message: "--query requires a value" };
       itemQuery = value;
       index++;
-    } else if (arg === "--code") {
-      codeOnly = true;
-    } else if (arg === "--names-only") {
-      namesOnly = true;
     } else if (arg === "--query-set") {
       const value = argv[index + 1];
       if (value === undefined) {
@@ -688,8 +581,6 @@ function parseSearchArgs(argv: readonly string[]): ProtocolArgs {
       pipes: surfacePipes ?? [],
       querySet: terms,
       json,
-      ...(codeOnly ? { codeOnly } : {}),
-      ...(namesOnly ? { namesOnly } : {}),
       renderMode,
     };
   }
@@ -703,18 +594,6 @@ function parseSearchArgs(argv: readonly string[]): ProtocolArgs {
     return { kind: "error", message: "--dependency is only supported by search reasoning" };
   }
 
-  if (codeOnly && json) {
-    return { kind: "error", message: "--code cannot be combined with --json" };
-  }
-  if (codeOnly && namesOnly) {
-    return { kind: "error", message: "--names-only cannot be combined with --code" };
-  }
-  if (codeOnly && !(searchView.view === "owner" && itemQuery !== undefined)) {
-    return { kind: "error", message: "--code requires search owner <path> --query <symbol>" };
-  }
-  if (namesOnly && !(searchView.view === "owner" && itemQuery !== undefined)) {
-    return { kind: "error", message: "--names-only requires search owner <path> --query <symbol>" };
-  }
   if (searchViewAcceptsOptionalTerms(searchView.view)) {
     if (searchView.requiresQuery && positionals.length === 0) {
       return { kind: "error", message: `search ${viewValue} requires a query` };
@@ -730,8 +609,6 @@ function parseSearchArgs(argv: readonly string[]): ProtocolArgs {
       pipes: [],
       querySet: [],
       json,
-      ...(codeOnly ? { codeOnly } : {}),
-      ...(namesOnly ? { namesOnly } : {}),
       renderMode,
     };
   }
@@ -766,8 +643,6 @@ function parseSearchArgs(argv: readonly string[]): ProtocolArgs {
       pipes,
       querySet,
       json,
-      ...(codeOnly ? { codeOnly } : {}),
-      ...(namesOnly ? { namesOnly } : {}),
       renderMode,
     };
   }
@@ -796,18 +671,13 @@ function parseSearchArgs(argv: readonly string[]): ProtocolArgs {
     pipes,
     querySet: [],
     json,
-    ...(codeOnly ? { codeOnly } : {}),
-    ...(namesOnly ? { namesOnly } : {}),
     renderMode,
   };
 }
 
 function resolveProviderProjectRoot(
   cwd: string,
-  args: Pick<
-    QueryArgs | TreeSitterQueryArgs | SearchArgs,
-    "projectRoot" | "packagePath" | "workspace"
-  >,
+  args: Pick<TreeSitterQueryArgs | SearchArgs, "projectRoot" | "packagePath" | "workspace">,
 ): string {
   const projectRoot = path.resolve(cwd, args.projectRoot ?? ".");
   if (args.packagePath !== undefined) {
@@ -1038,124 +908,6 @@ function isPathWithin(pathToCheck: string, root: string): boolean {
   return relativePath === "" || (!relativePath.startsWith("..") && !path.isAbsolute(relativePath));
 }
 
-function collectTextSearchOwners(
-  packageRoot: string,
-  workspaceRoot: string,
-  terms: readonly string[],
-  limit: number,
-): { readonly path: string; readonly score: number }[] {
-  const files: { readonly path: string; readonly size: number }[] = [];
-  collectTypeScriptFiles(packageRoot, files);
-  const filenameMatches = collectFilenameSearchOwners(files, workspaceRoot, terms, limit);
-  if (filenameMatches.length > 0) return filenameMatches;
-  const loweredTerms = terms.map((term) => term.toLowerCase());
-  const scored: { readonly path: string; readonly score: number; readonly size: number }[] = [];
-  for (const file of files) {
-    let text: string;
-    try {
-      text = fs.readFileSync(file.path, "utf8");
-    } catch {
-      continue;
-    }
-    const lowerText = text.toLowerCase();
-    const lowerName = path.basename(file.path).toLowerCase();
-    let score = 0;
-    for (let index = 0; index < terms.length; index++) {
-      const term = terms[index]!;
-      const lowerTerm = loweredTerms[index]!;
-      if (lowerName.includes(lowerTerm)) score += 40;
-      score += countOccurrences(lowerText, lowerTerm, 8) * 10;
-      if (text.includes(`function ${term}`) || text.includes(`const ${term}`)) score += 30;
-      if (text.includes(`export ${term}`) || text.includes(`export function ${term}`)) score += 20;
-    }
-    if (score > 0) {
-      scored.push({
-        path: path.relative(workspaceRoot, file.path).split(path.sep).join("/"),
-        score,
-        size: text.length,
-      });
-    }
-  }
-  return scored
-    .sort(
-      (left, right) =>
-        right.score - left.score || right.size - left.size || left.path.localeCompare(right.path),
-    )
-    .slice(0, limit)
-    .map(({ path: ownerPath, score }) => ({ path: ownerPath, score }));
-}
-
-function collectFilenameSearchOwners(
-  files: readonly { readonly path: string; readonly size: number }[],
-  workspaceRoot: string,
-  terms: readonly string[],
-  limit: number,
-): { readonly path: string; readonly score: number }[] {
-  const termTokens = terms.map(queryTokens);
-  const primaryTokens = queryTokens(selectSymbolTerm(terms) ?? "");
-  const scored: { readonly path: string; readonly score: number; readonly size: number }[] = [];
-  for (const file of files) {
-    const lowerName = path.basename(file.path).toLowerCase();
-    let score = 0;
-    for (let index = 0; index < terms.length; index++) {
-      const lowerTerm = terms[index]!.toLowerCase();
-      if (lowerName.includes(lowerTerm)) score += 80;
-      for (const token of termTokens[index]!) {
-        if (lowerName.includes(token)) score += 25;
-      }
-    }
-    for (const token of primaryTokens) {
-      if (lowerName.includes(token)) score += 70;
-    }
-    if (score > 0) {
-      scored.push({
-        path: path.relative(workspaceRoot, file.path).split(path.sep).join("/"),
-        score,
-        size: file.size,
-      });
-    }
-  }
-  return scored
-    .sort(
-      (left, right) =>
-        right.score - left.score || right.size - left.size || left.path.localeCompare(right.path),
-    )
-    .slice(0, limit)
-    .map(({ path: ownerPath, score }) => ({ path: ownerPath, score }));
-}
-
-function queryTokens(term: string): string[] {
-  return term
-    .replace(/([a-z0-9])([A-Z])/gu, "$1 $2")
-    .split(/[^A-Za-z0-9_$]+/u)
-    .map((token) => token.toLowerCase())
-    .filter((token) => token.length > 2);
-}
-
-function countOccurrences(text: string, term: string, limit: number): number {
-  if (term.length === 0) return 0;
-  let count = 0;
-  let offset = 0;
-  while (count < limit) {
-    const index = text.indexOf(term, offset);
-    if (index === -1) return count;
-    count += 1;
-    offset = index + term.length;
-  }
-  return count;
-}
-
-function selectSymbolTerm(terms: readonly string[]): string | undefined {
-  return (
-    terms.find((term) => queryTokens(term).some((token) => token === "program")) ??
-    terms.find(isIdentifierTerm)
-  );
-}
-
-function isIdentifierTerm(term: string): boolean {
-  return /^[A-Za-z_$][\w$]*$/u.test(term);
-}
-
 function parseSearchQuerySurfaces(value: string): TypeScriptSemanticSearchPipe[] | string {
   const surfaces = value
     .split(",")
@@ -1232,7 +984,7 @@ function parseCheckArgs(argv: readonly string[]): ProtocolArgs {
     } else if (arg === "--help" || arg === "-h") {
       return {
         kind: "error",
-        message: "usage: ts-harness check [--changed | --full] [--json] [PROJECT_ROOT]",
+        message: "usage: asp-typescript check [--changed | --full] [--json] [PROJECT_ROOT]",
       };
     } else if (arg.startsWith("-")) {
       return { kind: "error", message: `unknown check option: ${arg}` };

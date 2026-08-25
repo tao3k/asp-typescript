@@ -91,7 +91,7 @@ test("rule catalog keeps deterministic pack order and agent advice severity", ()
 });
 
 test("agent policy reports unresolved project imports without blocking", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-agent-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-agent-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(
     path.join(root, "tsconfig.json"),
@@ -148,7 +148,7 @@ test("agent policy reports unresolved project imports without blocking", () => {
 });
 
 test("agent policy reports unresolved package entries without blocking", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-package-agent-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-package-agent-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(
     path.join(root, "package.json"),
@@ -185,7 +185,7 @@ test("agent policy reports unresolved package entries without blocking", () => {
 });
 
 test("agent policy reports multi-owner facades without intent docs", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-facade-agent-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-facade-agent-"));
   fs.mkdirSync(path.join(root, "src", "domain"), { recursive: true });
   fs.mkdirSync(path.join(root, "src", "transport"), { recursive: true });
   fs.writeFileSync(path.join(root, "tsconfig.json"), JSON.stringify({ include: ["src/**/*.ts"] }));
@@ -211,7 +211,7 @@ test("agent policy reports multi-owner facades without intent docs", () => {
 });
 
 test("agent policy reports missing module docs for broad public surfaces only", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-module-doc-agent-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-module-doc-agent-"));
   fs.mkdirSync(path.join(root, "src", "domain"), { recursive: true });
   fs.writeFileSync(path.join(root, "tsconfig.json"), JSON.stringify({ include: ["src/**/*.ts"] }));
   fs.writeFileSync(
@@ -253,7 +253,7 @@ test("agent policy reports missing module docs for broad public surfaces only", 
 });
 
 test("agent policy reports parser-native public API shape advice without blocking", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-api-shape-agent-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-api-shape-agent-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(path.join(root, "tsconfig.json"), JSON.stringify({ include: ["src/**/*.ts"] }));
   fs.writeFileSync(
@@ -286,7 +286,7 @@ test("agent policy reports parser-native public API shape advice without blockin
 });
 
 test("agent policy reports parser-native algorithm shape advice without blocking", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-algorithm-agent-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-algorithm-agent-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(path.join(root, "tsconfig.json"), JSON.stringify({ include: ["src/**/*.ts"] }));
   fs.writeFileSync(
@@ -338,7 +338,7 @@ test("agent policy reports parser-native algorithm shape advice without blocking
 });
 
 test("agent policy labels parser-native traversal knot advice", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-traversal-agent-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-traversal-agent-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(path.join(root, "tsconfig.json"), JSON.stringify({ include: ["src/**/*.ts"] }));
   fs.writeFileSync(
@@ -377,7 +377,7 @@ test("agent policy labels parser-native traversal knot advice", () => {
 });
 
 test("agent policy labels parser-native literal dispatch advice", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-literal-dispatch-agent-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-literal-dispatch-agent-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(path.join(root, "tsconfig.json"), JSON.stringify({ include: ["src/**/*.ts"] }));
   fs.writeFileSync(
@@ -409,7 +409,7 @@ test("agent policy labels parser-native literal dispatch advice", () => {
 });
 
 test("agent policy reports parser-native public data shape advice without blocking", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-data-shape-agent-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-data-shape-agent-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(path.join(root, "tsconfig.json"), JSON.stringify({ include: ["src/**/*.ts"] }));
   fs.writeFileSync(
@@ -442,7 +442,7 @@ test("agent policy reports parser-native public data shape advice without blocki
 });
 
 test("agent policy keeps model schema modules out of public data shape advice", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-data-shape-model-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-data-shape-model-"));
   fs.mkdirSync(path.join(root, "src", "verification"), { recursive: true });
   fs.writeFileSync(path.join(root, "tsconfig.json"), JSON.stringify({ include: ["src/**/*.ts"] }));
   fs.writeFileSync(
@@ -464,7 +464,7 @@ test("agent policy keeps model schema modules out of public data shape advice", 
 });
 
 test("agent policy reports parser-native public type boundary advice without blocking", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-type-boundary-agent-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-type-boundary-agent-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(path.join(root, "tsconfig.json"), JSON.stringify({ include: ["src/**/*.ts"] }));
   fs.writeFileSync(
@@ -501,7 +501,7 @@ test("agent policy reports parser-native public type boundary advice without blo
 });
 
 test("agent policy keeps model schema modules out of public type boundary advice", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-type-boundary-model-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-type-boundary-model-"));
   fs.mkdirSync(path.join(root, "src", "verification"), { recursive: true });
   fs.writeFileSync(path.join(root, "tsconfig.json"), JSON.stringify({ include: ["src/**/*.ts"] }));
   fs.writeFileSync(

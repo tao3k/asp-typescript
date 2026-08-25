@@ -1,5 +1,12 @@
 import assert from "node:assert/strict";
 
+import {
+  TYPE_SCRIPT_BINARY,
+  TYPE_SCRIPT_LANGUAGE_ID,
+  TYPE_SCRIPT_PROVIDER_ID,
+  TYPE_SCRIPT_PROVIDER_NAMESPACE,
+} from "../../src/cli/semantic-language.js";
+
 type JsonObject = Record<string, unknown>;
 
 export function assertTypeSurfaces(
@@ -42,10 +49,10 @@ export function assertSemanticSearchPacket(
     packet.protocolVersion,
     record(properties.protocolVersion, "protocolVersion schema").const,
   );
-  assert.equal(packet.languageId, "typescript");
-  assert.equal(packet.providerId, "ts-harness");
-  assert.equal(packet.binary, "ts-harness");
-  assert.equal(packet.namespace, "agent.semantic-protocols.languages.typescript.ts-harness");
+  assert.equal(packet.languageId, TYPE_SCRIPT_LANGUAGE_ID);
+  assert.equal(packet.providerId, TYPE_SCRIPT_PROVIDER_ID);
+  assert.equal(packet.binary, TYPE_SCRIPT_BINARY);
+  assert.equal(packet.namespace, TYPE_SCRIPT_PROVIDER_NAMESPACE);
   assertString(packet.projectRoot, "packet.projectRoot");
   assertString(packet.view, "packet.view");
   assertString(packet.method, "packet.method");

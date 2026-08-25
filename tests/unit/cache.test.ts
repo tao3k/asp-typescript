@@ -17,7 +17,7 @@ import { parseModule } from "../../src/syntax/parse-module.js";
 // ── Helpers ────────────────────────────────────────────────
 
 function tmpDir(): string {
-  return fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-cache-"));
+  return fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-cache-"));
 }
 
 function writeFile(dir: string, name: string, content: string): string {
@@ -129,7 +129,7 @@ describe("module-cache", () => {
 describe("cache invalidation", () => {
   it("first run parses all files (cache miss)", () => {
     const dir = tmpDir();
-    const cacheDir = path.join(dir, ".cache", "ts-harness");
+    const cacheDir = path.join(dir, ".cache", "asp-typescript");
     const f1 = writeFile(dir, "src/a.ts", "export const a = 1;\n");
     const f2 = writeFile(dir, "src/b.ts", "export const b = 2;\n");
 
@@ -147,7 +147,7 @@ describe("cache invalidation", () => {
 
   it("second run reuses all (cache hit)", () => {
     const dir = tmpDir();
-    const cacheDir = path.join(dir, ".cache", "ts-harness");
+    const cacheDir = path.join(dir, ".cache", "asp-typescript");
     const f1 = writeFile(dir, "src/a.ts", "export const a = 1;\n");
     const f2 = writeFile(dir, "src/b.ts", "export const b = 2;\n");
 
@@ -166,7 +166,7 @@ describe("cache invalidation", () => {
 
   it("changed file triggers re-parse only for that file", () => {
     const dir = tmpDir();
-    const cacheDir = path.join(dir, ".cache", "ts-harness");
+    const cacheDir = path.join(dir, ".cache", "asp-typescript");
     const f1 = writeFile(dir, "src/a.ts", "export const a = 1;\n");
     const f2 = writeFile(dir, "src/b.ts", "export const b = 2;\n");
 
@@ -193,7 +193,7 @@ describe("cache invalidation", () => {
 
   it("added file is parsed, existing reused", () => {
     const dir = tmpDir();
-    const cacheDir = path.join(dir, ".cache", "ts-harness");
+    const cacheDir = path.join(dir, ".cache", "asp-typescript");
     const f1 = writeFile(dir, "src/a.ts", "export const a = 1;\n");
 
     parseOrReuse([f1], dir, { cacheDir });
@@ -210,7 +210,7 @@ describe("cache invalidation", () => {
 
   it("file with syntax error is not cached", () => {
     const dir = tmpDir();
-    const cacheDir = path.join(dir, ".cache", "ts-harness");
+    const cacheDir = path.join(dir, ".cache", "asp-typescript");
     const bad = writeFile(dir, "src/broken.ts", "export function broken( { }\n");
 
     const result = parseOrReuse([bad], dir, { cacheDir });

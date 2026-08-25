@@ -4,6 +4,14 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
+import {
+  TYPE_SCRIPT_BINARY,
+  TYPE_SCRIPT_LANGUAGE_ID,
+  TYPE_SCRIPT_PROVIDER_ID,
+  TYPE_SCRIPT_PROVIDER_NAMESPACE,
+} from "../../src/cli/semantic-language.js";
+import { TYPE_SCRIPT_PROVIDER_REGISTRATION } from "../../src/cli/provider-descriptor.js";
+
 import { runCliCapture } from "./cli_helpers.js";
 
 test("CLI exposes semantic-search protocol commands", () => {
@@ -151,7 +159,11 @@ test("CLI exposes semantic-search protocol commands", () => {
   assert.doesNotMatch(workspace.stdout, /\|edge /u);
 
   const workspaceJson = runCliCapture(["search", "workspace", "--json", "--workspace", "."], root);
-  assert.equal(workspaceJson.exitCode, 0);
+  assert.equal(
+    workspaceJson.exitCode,
+    0,
+    `workspace JSON failed: ${JSON.stringify(workspaceJson)}`,
+  );
   const workspacePacket = JSON.parse(workspaceJson.stdout) as {
     readonly method: string;
     readonly view: string;
@@ -251,18 +263,26 @@ test("CLI exposes semantic-search protocol commands", () => {
       "packages/core",
       "--selector",
       "packages/core/src/index.ts:1:1",
-      "--code",
+      "--json",
     ],
     root,
   );
-  assert.equal(workspaceDirectRead.exitCode, 0);
-  assert.equal(workspaceDirectRead.stdout, "export interface Core { readonly ok: true; }\n");
+  assert.equal(workspaceDirectRead.exitCode, 0, workspaceDirectRead.stderr);
+  const workspaceReadPacket = JSON.parse(workspaceDirectRead.stdout) as {
+    readonly method: string;
+    readonly ownerPath: string;
+    readonly sourceWindows: readonly { readonly text: string }[];
+  };
+  assert.equal(workspaceReadPacket.method, "query/direct-source-read");
+  assert.equal(workspaceReadPacket.ownerPath, "packages/core/src/index.ts");
+  assert.match(workspaceReadPacket.sourceWindows[0]?.text ?? "", /export interface Core/u);
 
   const primeJson = runCliCapture(["search", "prime", "--json", "--workspace", "."], root);
   assert.equal(primeJson.exitCode, 0);
   const packet = JSON.parse(primeJson.stdout) as {
     readonly schemaId: string;
     readonly schemaVersion: string;
+    readonly schemaAuthority: string;
     readonly protocolId: string;
     readonly protocolVersion: string;
     readonly languageId: string;
@@ -295,10 +315,10 @@ test("CLI exposes semantic-search protocol commands", () => {
   assert.equal(packet.schemaVersion, "1");
   assert.equal(packet.protocolId, "agent.semantic-protocols.semantic-language");
   assert.equal(packet.protocolVersion, "1");
-  assert.equal(packet.languageId, "typescript");
-  assert.equal(packet.providerId, "ts-harness");
-  assert.equal(packet.binary, "ts-harness");
-  assert.equal(packet.namespace, "agent.semantic-protocols.languages.typescript.ts-harness");
+  assert.equal(packet.languageId, TYPE_SCRIPT_LANGUAGE_ID);
+  assert.equal(packet.providerId, TYPE_SCRIPT_PROVIDER_ID);
+  assert.equal(packet.binary, TYPE_SCRIPT_BINARY);
+  assert.equal(packet.namespace, TYPE_SCRIPT_PROVIDER_NAMESPACE);
   assert.equal(packet.method, "search/prime");
   assert.equal(packet.view, "prime");
   assert.equal(packet.header.fields.extensions, 1);
@@ -377,11 +397,9 @@ test("CLI exposes semantic-search protocol commands", () => {
   assert.match(textOwnerTestsPipeSeeds.stdout, /^\[search-lexical\] /u);
   assert.match(textOwnerTestsPipeSeeds.stdout, /O\d*=owner:path\(src\/index\.ts\)!owner/u);
   assert.match(textOwnerTestsPipeSeeds.stdout, /O\d*=owner:path\(tests\/index\.test\.ts\)!owner/u);
-  assert.doesNotMatch(
-    textOwnerTestsPipeSeeds.stdout,
-    /T=test:path\(tests\/index\.test\.ts\)!tests/u,
-  );
+  assert.match(textOwnerTestsPipeSeeds.stdout, /T=test:path\(tests\/index\.test\.ts\)!tests/u);
   assert.match(textOwnerTestsPipeSeeds.stdout, /frontier=.*O\d*\.owner/u);
+  assert.match(textOwnerTestsPipeSeeds.stdout, /frontier=.*T\.tests/u);
   assert.doesNotMatch(textOwnerTestsPipeSeeds.stdout, /\|seed /u);
   assert.doesNotMatch(textOwnerTestsPipeSeeds.stdout, /\|hit /u);
 
@@ -701,7 +719,11 @@ test("CLI exposes semantic-search protocol commands", () => {
       readonly name: string;
       readonly kind: string;
       readonly ownerPath: string;
-      readonly fields: { readonly exported?: boolean; readonly exportKind?: string };
+      readonly fields: {
+        readonly exported?: boolean;
+        readonly exportKind?: string;
+        readonly structuralSelector?: string;
+      };
     }[];
   };
   assert.deepEqual(
@@ -715,6 +737,10 @@ test("CLI exposes semantic-search protocol commands", () => {
   );
   assert.equal(ownerItemsPacket.items?.[0]?.ownerPath, "src/protocol-types.ts");
   assert.equal(ownerItemsPacket.items?.[0]?.fields.exported, true);
+  assert.equal(
+    ownerItemsPacket.items?.[0]?.fields.structuralSelector,
+    "typescript://src/protocol-types.ts#item/interface/SearchPacket",
+  );
 
   const parserVisibleTestOwner = runCliCapture(
     ["search", "owner", "tests/index.test.ts", "--workspace", "."],
@@ -821,52 +847,83 @@ test("CLI exposes semantic-search protocol commands", () => {
     doctor.stdout,
     /^\[agent-doctor\] status=ok protocol=agent\.semantic-protocols\.semantic-language/u,
   );
-  assert.match(doctor.stdout, /\|language id=typescript provider=ts-harness binary=ts-harness/u);
+  assert.ok(
+    doctor.stdout.includes(
+      `|language id=${TYPE_SCRIPT_LANGUAGE_ID} provider=${TYPE_SCRIPT_PROVIDER_ID} binary=${TYPE_SCRIPT_BINARY}`,
+    ),
+  );
   assert.match(
     doctor.stdout,
-    /\|namespace agent\.semantic-protocols\.languages\.typescript\.ts-harness/u,
+    new RegExp(`\\|namespace ${TYPE_SCRIPT_PROVIDER_NAMESPACE.replaceAll(".", "\\.")}`, "u"),
   );
   assert.match(doctor.stdout, /\|method search\/workspace,search\/prime,/u);
 
   const doctorJson = runCliCapture(["agent", "doctor", "--json", "."], root);
   assert.equal(doctorJson.exitCode, 0);
-  const registry = JSON.parse(doctorJson.stdout) as {
-    readonly registryId: string;
+  const doctorPayload = JSON.parse(doctorJson.stdout) as {
+    readonly schemaId: string;
+    readonly schemaVersion: string;
+    readonly schemaAuthority: string;
     readonly protocolId: string;
-    readonly languages: readonly {
-      readonly languageId: string;
-      readonly providerId: string;
-      readonly binary: string;
-      readonly namespace: string;
-      readonly methods: readonly string[];
-      readonly methodDescriptors: readonly {
-        readonly method: string;
-        readonly command: string;
-        readonly view?: string;
-        readonly outputSchemaIds?: readonly string[];
-        readonly requiresQuery?: boolean;
-        readonly acceptsStdin?: boolean;
-        readonly supportsPackageScope?: boolean;
-        readonly acceptedPipes?: readonly string[];
-        readonly capabilities?: readonly {
-          readonly languageId: string;
-          readonly namespace: string;
-          readonly name: string;
+    readonly protocolVersion: string;
+    readonly languageId: string;
+    readonly providerId: string;
+    readonly binary: string;
+    readonly execution: string;
+    readonly registrySchemaId: string;
+    readonly registrySchemaVersion: string;
+    readonly registryDigest: string;
+    readonly registry: {
+      readonly registryId: string;
+      readonly protocolId: string;
+      readonly languages: readonly {
+        readonly languageId: string;
+        readonly providerId: string;
+        readonly binary: string;
+        readonly namespace: string;
+        readonly methods: readonly string[];
+        readonly methodDescriptors: readonly {
+          readonly method: string;
+          readonly command: string;
+          readonly view?: string;
+          readonly outputSchemaIds?: readonly string[];
+          readonly requiresQuery?: boolean;
+          readonly acceptsStdin?: boolean;
+          readonly supportsPackageScope?: boolean;
+          readonly acceptedPipes?: readonly string[];
+          readonly capabilities?: readonly {
+            readonly languageId: string;
+            readonly namespace: string;
+            readonly name: string;
+          }[];
+          readonly ingestRequiredFor?: readonly {
+            readonly languageId: string;
+            readonly namespace: string;
+            readonly name: string;
+          }[];
+          readonly clients?: readonly string[];
+          readonly requiredOptions?: readonly string[];
+          readonly input?: string;
+          readonly outputModes?: readonly string[];
+          readonly supportsJson: boolean;
+          readonly supportsCompact: boolean;
         }[];
-        readonly ingestRequiredFor?: readonly {
-          readonly languageId: string;
-          readonly namespace: string;
-          readonly name: string;
-        }[];
-        readonly clients?: readonly string[];
-        readonly requiredOptions?: readonly string[];
-        readonly input?: string;
-        readonly outputModes?: readonly string[];
-        readonly supportsJson: boolean;
-        readonly supportsCompact: boolean;
       }[];
-    }[];
+    };
   };
+  const registry = doctorPayload.registry;
+  assert.equal(doctorPayload.schemaId, "agent.semantic-protocols.semantic-provider-doctor");
+  assert.equal(doctorPayload.schemaVersion, "1");
+  assert.equal(
+    doctorPayload.schemaAuthority,
+    "https://tao3k.github.io/agent-semantic-protocols/schemas/",
+  );
+  assert.equal(
+    doctorPayload.registrySchemaId,
+    "agent.semantic-protocols.semantic-language-registry",
+  );
+  assert.equal(doctorPayload.registrySchemaVersion, "1");
+  assert.match(doctorPayload.registryDigest, /^sha256:[0-9a-f]{64}$/u);
   assert.equal(registry.registryId, "agent.semantic-protocols.semantic-language-registry");
   assert.equal(registry.protocolId, "agent.semantic-protocols.semantic-language");
   const expectedMethods = [
@@ -896,8 +953,6 @@ test("CLI exposes semantic-search protocol commands", () => {
     "search/semantic-facts",
     "search/ingest",
     "query",
-    "query/owner-items",
-    "query/direct-source-read",
     "check/changed",
     "check/full",
     "ast-patch/dry-run",
@@ -906,447 +961,294 @@ test("CLI exposes semantic-search protocol commands", () => {
     "agent/doctor",
     "agent/guide",
   ];
-  assert.deepEqual(registry.languages[0], {
-    languageId: "typescript",
-    providerId: "ts-harness",
-    binary: "ts-harness",
-    namespace: "agent.semantic-protocols.languages.typescript.ts-harness",
-    displayName: "TypeScript",
-    methods: expectedMethods,
-    methodDescriptors: [
-      ...expectedMethods
-        .filter((method) => method.startsWith("search/"))
-        .map((method) => ({
-          method,
-          command: "search",
-          view: method.slice("search/".length),
-          outputSchemaIds:
-            method === "search/public-external-types"
-              ? [
-                  "agent.semantic-protocols.semantic-search-packet",
-                  "agent.semantic-protocols.semantic-type-surface",
-                ]
-              : method === "search/policy"
+  const providerRegistration = registry.languages[0] as unknown as Record<string, unknown> & {
+    readonly methodDescriptors: readonly (Record<string, unknown> & {
+      readonly invocation?: { readonly argv: readonly string[] };
+    })[];
+    readonly queryPackDescriptor: {
+      readonly descriptorId: string;
+      readonly descriptorVersion: string;
+      readonly languageId: string;
+      readonly recipes: readonly unknown[];
+    };
+  };
+  assert.equal(providerRegistration.methodDescriptors.length, expectedMethods.length);
+  assert.equal(
+    providerRegistration.methodDescriptors.every(
+      (descriptor) => descriptor.invocation?.argv[0] === TYPE_SCRIPT_BINARY,
+    ),
+    true,
+  );
+  assert.deepEqual(
+    {
+      descriptorId: providerRegistration.queryPackDescriptor.descriptorId,
+      descriptorVersion: providerRegistration.queryPackDescriptor.descriptorVersion,
+      languageId: providerRegistration.queryPackDescriptor.languageId,
+      recipeCount: providerRegistration.queryPackDescriptor.recipes.length,
+    },
+    {
+      descriptorId: "typescript.query-pack",
+      descriptorVersion: "1",
+      languageId: "typescript",
+      recipeCount: 3,
+    },
+  );
+  const { queryPackDescriptor: _queryPackDescriptor, ...providerWithoutQueryPack } =
+    providerRegistration;
+  assert.deepEqual(
+    {
+      ...providerWithoutQueryPack,
+      methodDescriptors: providerRegistration.methodDescriptors.map(
+        ({ invocation: _invocation, ...descriptor }) => descriptor,
+      ),
+    },
+    {
+      languageId: TYPE_SCRIPT_LANGUAGE_ID,
+      providerId: TYPE_SCRIPT_PROVIDER_ID,
+      binary: TYPE_SCRIPT_BINARY,
+      namespace: TYPE_SCRIPT_PROVIDER_NAMESPACE,
+      displayName: "TypeScript",
+      methods: expectedMethods,
+      methodDescriptors: [
+        ...expectedMethods
+          .filter((method) => method.startsWith("search/"))
+          .map((method) => ({
+            method,
+            command: "search",
+            view: method.slice("search/".length),
+            outputSchemaIds:
+              method === "search/public-external-types"
                 ? [
                     "agent.semantic-protocols.semantic-search-packet",
-                    "agent.semantic-protocols.semantic-handle",
+                    "agent.semantic-protocols.semantic-type-surface",
                   ]
-                : method === "search/semantic-facts"
-                  ? ["agent.semantic-protocols.semantic-fact-graph"]
-                  : ["agent.semantic-protocols.semantic-search-packet"],
-          requiresQuery: [
-            "search/owner",
-            "search/dependency",
-            "search/deps",
-            "search/docs",
-            "search/api",
-            "search/public-external-types",
-            "search/policy",
-            "search/symbol",
-            "search/callsite",
-            "search/import",
-            "search/tests",
-            "search/lexical",
-            "search/reasoning",
-            "search/extension",
-            "search/pattern",
-            "search/compare",
-            "search/semantic-facts",
-          ].includes(method),
-          acceptsStdin: method === "search/ingest" || method === "search/semantic-facts",
-          supportsPackageScope: true,
-          benchmarkInvocation: expectedSearchBenchmarkInvocation(method.slice("search/".length)),
-          ...(method === "search/lexical" || method === "search/policy"
-            ? { acceptedPipes: ["owner", "tests"] }
-            : method === "search/owner"
-              ? { acceptedPipes: ["items"] }
-              : method === "search/ingest"
-                ? { acceptedPipes: ["items", "tests"] }
-                : {}),
-          ...(method === "search/owner"
-            ? {
-                fallbacks: [
-                  {
-                    name: "owner-top-items",
-                    trigger: "item-query-miss",
-                    appliesToPipes: ["items"],
-                    maxItems: 4,
-                  },
-                ],
-                packetSchemas: ["semantic-search-packet.v1", "semantic-tree-sitter-query.v1"],
-                grammarId: "tree-sitter-typescript",
-                input: "search owner <path> [items] [--query <symbol-or-a|b|c>] [--code]",
-                outputModes: ["frontier", "json", "code"],
-              }
-            : {}),
-          ...(method === "search/lexical"
-            ? {
-                supportsQuerySet: true,
-                acceptedQuerySetSelectors: [
-                  method === "search/lexical" ? "lexical-set" : "exact-set",
-                ],
-                querySetScopes: ["project", "owner"],
-                clients: ["semantic-agent-hook"],
-                input:
-                  method === "search/lexical"
-                    ? "search lexical <query> [owner|tests...] or --query-set TERM [--query-set TERM...]"
-                    : "search lexical <query> [owner|tests...] or hook query with --from-hook, --selector, --term, and --surface",
-              }
-            : {}),
-          ...(method === "search/policy"
-            ? { input: "search policy <rule-id-or-alias> [owner tests]" }
-            : {}),
-          ...(method === "search/semantic-facts"
-            ? {
-                clients: ["asp-graph-turbo"],
-                input: "search semantic-facts <query>",
-                packetSchemas: ["semantic-fact-graph.v1", "semantic-fact-ontology.v1"],
-                outputModes: ["json"],
-              }
-            : {}),
-          capabilities: expectedSearchCapabilities(method),
-          ...(expectedSearchIngestRequiredFor(method).length === 0
-            ? {}
-            : { ingestRequiredFor: expectedSearchIngestRequiredFor(method) }),
-          supportsJson: true,
-          supportsCompact: method === "search/semantic-facts" ? false : true,
-        })),
-      {
-        method: "query",
-        command: "query",
-        input: "tree-sitter-compatible syntax query",
-        requiredOptions: ["--catalog|--treesitter-query"],
-        outputSchemaIds: ["agent.semantic-protocols.semantic-tree-sitter-query"],
-        packetSchemas: ["semantic-tree-sitter-query.v1"],
-        queryInputForms: ["catalog-id", "s-expression"],
-        executionBackends: ["native-parser"],
-        sourceAuthorities: ["native-parser-adapter", "native-parser"],
-        adapterModes: ["native-projection"],
-        codeOutput: {
-          mode: "pure-code",
-          requires: ["exact-selector", "unique-predicate"],
-          multiMatch: "deny",
-        },
-        renderProfiles: ["corpus-locator"],
-        queryCatalogs: [
-          {
-            id: "declarations",
-            path: "tree-sitter/tree-sitter-typescript/queries/declarations.scm",
-            sourceDelivery: "provider-binary-embedded",
-            captures: [
-              "function.definition",
-              "function.name",
-              "class.definition",
-              "class.name",
-              "interface.definition",
-              "interface.name",
-              "type.definition",
-              "type.name",
-              "enum.definition",
-              "enum.name",
-              "variable.definition",
-              "variable.name",
-              "import.declaration",
-              "import.source",
-              "export.declaration",
-            ],
-            nodeTypes: [
-              "function_declaration",
-              "class_declaration",
-              "interface_declaration",
-              "type_alias_declaration",
-              "enum_declaration",
-              "lexical_declaration",
-              "variable_declarator",
-              "import_statement",
-              "export_statement",
-            ],
-            fields: ["name", "source"],
-          },
-          {
-            id: "imports",
-            path: "tree-sitter/tree-sitter-typescript/queries/imports.scm",
-            sourceDelivery: "provider-binary-embedded",
-            captures: [
-              "import.declaration",
-              "import.source",
-              "export.declaration",
-              "export.source",
-            ],
-            nodeTypes: ["import_statement", "export_statement"],
-            fields: ["source"],
-          },
-          {
-            id: "calls",
-            path: "tree-sitter/tree-sitter-typescript/queries/calls.scm",
-            sourceDelivery: "provider-binary-embedded",
-            captures: ["call.expression", "call.target"],
-            nodeTypes: ["call_expression"],
-            fields: ["function"],
-          },
-        ],
-        grammarId: "tree-sitter-typescript",
-        grammarProfileVersion: "2026-06-05.v1",
-        grammarProfileSchema: "semantic-tree-sitter-grammar-profile.v1",
-        grammarProfilePath: "tree-sitter/tree-sitter-typescript/grammar-profile.json",
-        supportedPredicates: [
-          "#eq?",
-          "#any-eq?",
-          "#any-of?",
-          "#match?",
-          "#any-match?",
-          "#not-eq?",
-          "#not-match?",
-        ],
-        unsupportedPredicates: [],
-        cacheReplay: true,
-        supportsJson: true,
-        supportsCompact: true,
-        outputModes: ["frontier", "json", "code"],
-        unsupportedPatternBehavior: "diagnostic",
-      },
-      {
-        method: "query/owner-items",
-        command: "query",
-        input: "owner-path",
-        requiredOptions: ["--term"],
-        outputSchemaIds: ["agent.semantic-protocols.semantic-query-packet"],
-        packetSchemas: ["semantic-query-packet.v1", "semantic-tree-sitter-query.v1"],
-        grammarId: "tree-sitter-typescript",
-        grammarProfileVersion: "2026-06-05.v1",
-        grammarProfileSchema: "semantic-tree-sitter-grammar-profile.v1",
-        grammarProfilePath: "tree-sitter/tree-sitter-typescript/grammar-profile.json",
-        executionBackends: ["native-parser"],
-        sourceAuthorities: ["native-parser"],
-        adapterModes: ["native-projection"],
-        codeOutput: {
-          mode: "pure-code",
-          requires: ["exact-selector", "unique-match"],
-          multiMatch: "deny",
-        },
-        supportsJson: true,
-        supportsCompact: true,
-        supportsQuerySet: true,
-        acceptedQuerySetSelectors: ["exact-set"],
-        queryInputForms: ["selector", "code-shaped"],
-        querySetScopes: ["owner"],
-        renderProfiles: ["compact-graph-frontier"],
-        outputModes: ["frontier", "json", "code", "names"],
-        cacheReplay: true,
-        unsupportedPatternBehavior: "diagnostic",
-      },
-      {
-        method: "query/direct-source-read",
-        command: "query",
-        input: "owner-path",
-        requiredOptions: ["--from-hook", "--selector"],
-        outputSchemaIds: [
-          "agent.semantic-protocols.semantic-query-packet",
-          "agent.semantic-protocols.semantic-read-packet",
-        ],
-        packetSchemas: [
-          "semantic-query-packet.v1",
-          "semantic-read-packet.v1",
-          "semantic-tree-sitter-query.v1",
-        ],
-        queryInputForms: ["selector"],
-        grammarId: "tree-sitter-typescript",
-        grammarProfileVersion: "2026-06-05.v1",
-        grammarProfileSchema: "semantic-tree-sitter-grammar-profile.v1",
-        grammarProfilePath: "tree-sitter/tree-sitter-typescript/grammar-profile.json",
-        executionBackends: ["native-parser"],
-        sourceAuthorities: ["native-parser"],
-        adapterModes: ["native-projection"],
-        codeOutput: {
-          mode: "pure-code",
-          requires: ["exact-selector"],
-          multiMatch: "deny",
-        },
-        supportsJson: true,
-        supportsCompact: true,
-        outputModes: ["frontier", "json", "code", "names", "read-packet"],
-        renderProfiles: ["corpus-locator"],
-        cacheReplay: true,
-        unsupportedPatternBehavior: "diagnostic",
-      },
-      ...expectedMethods
-        .filter((method) => method.startsWith("check/"))
-        .map((method) => ({
-          method,
-          command: "check",
+                : method === "search/policy"
+                  ? [
+                      "agent.semantic-protocols.semantic-search-packet",
+                      "agent.semantic-protocols.semantic-handle",
+                    ]
+                  : method === "search/semantic-facts"
+                    ? ["agent.semantic-protocols.semantic-fact-graph"]
+                    : ["agent.semantic-protocols.semantic-search-packet"],
+            requiresQuery: [
+              "search/owner",
+              "search/dependency",
+              "search/deps",
+              "search/docs",
+              "search/api",
+              "search/public-external-types",
+              "search/policy",
+              "search/symbol",
+              "search/callsite",
+              "search/import",
+              "search/tests",
+              "search/lexical",
+              "search/reasoning",
+              "search/extension",
+              "search/pattern",
+              "search/compare",
+              "search/semantic-facts",
+            ].includes(method),
+            acceptsStdin: method === "search/ingest" || method === "search/semantic-facts",
+            supportsPackageScope: true,
+            benchmarkInvocation: expectedSearchBenchmarkInvocation(method.slice("search/".length)),
+            ...(method === "search/lexical" || method === "search/policy"
+              ? { acceptedPipes: ["owner", "tests"] }
+              : method === "search/owner"
+                ? { acceptedPipes: ["items"] }
+                : method === "search/ingest"
+                  ? { acceptedPipes: ["items", "tests"] }
+                  : {}),
+            ...(method === "search/owner"
+              ? {
+                  fallbacks: [
+                    {
+                      name: "owner-top-items",
+                      trigger: "item-query-miss",
+                      appliesToPipes: ["items"],
+                      maxItems: 4,
+                    },
+                  ],
+                  packetSchemas: ["semantic-search-packet.v1", "semantic-tree-sitter-query.v1"],
+                  grammarId: "tree-sitter-typescript",
+                  input: "search owner <path> [items] [--query <symbol-or-a|b|c>]",
+                  outputModes: ["frontier", "json"],
+                }
+              : {}),
+            ...(method === "search/lexical"
+              ? {
+                  supportsQuerySet: true,
+                  acceptedQuerySetSelectors: [
+                    method === "search/lexical" ? "lexical-set" : "exact-set",
+                  ],
+                  querySetScopes: ["project", "owner"],
+                  clients: ["semantic-agent-hook"],
+                  input:
+                    method === "search/lexical"
+                      ? "search lexical <query> [owner|tests...] or --query-set TERM [--query-set TERM...]"
+                      : "search lexical <query> [owner|tests...] or hook query with --from-hook, --selector, --term, and --surface",
+                }
+              : {}),
+            ...(method === "search/policy"
+              ? { input: "search policy <rule-id-or-alias> [owner tests]" }
+              : {}),
+            ...(method === "search/semantic-facts"
+              ? {
+                  clients: ["asp-graph-turbo"],
+                  input: "search semantic-facts <query>",
+                  packetSchemas: ["semantic-fact-graph.v1", "semantic-fact-ontology.v1"],
+                  outputModes: ["json"],
+                }
+              : {}),
+            capabilities: expectedSearchCapabilities(method),
+            ...(expectedSearchIngestRequiredFor(method).length === 0
+              ? {}
+              : { ingestRequiredFor: expectedSearchIngestRequiredFor(method) }),
+            supportsJson: true,
+            supportsCompact: method === "search/semantic-facts" ? false : true,
+          })),
+        {
+          method: "query",
+          command: "query",
+          input: "tree-sitter-compatible syntax query",
+          requiredOptions: ["--catalog|--treesitter-query"],
+          outputSchemaIds: ["agent.semantic-protocols.semantic-tree-sitter-query"],
+          packetSchemas: ["semantic-tree-sitter-query.v1"],
+          queryInputForms: ["catalog-id", "s-expression"],
+          executionBackends: ["native-parser"],
+          sourceAuthorities: ["native-parser-adapter", "native-parser"],
+          adapterModes: ["native-projection"],
+          renderProfiles: ["corpus-locator"],
+          queryCatalogs: [
+            {
+              id: "declarations",
+              path: "tree-sitter/tree-sitter-typescript/queries/declarations.scm",
+              sourceDelivery: "provider-binary-embedded",
+              captures: [
+                "function.definition",
+                "function.name",
+                "class.definition",
+                "class.name",
+                "interface.definition",
+                "interface.name",
+                "type.definition",
+                "type.name",
+                "enum.definition",
+                "enum.name",
+                "variable.definition",
+                "variable.name",
+                "import.declaration",
+                "import.source",
+                "export.declaration",
+              ],
+              nodeTypes: [
+                "function_declaration",
+                "class_declaration",
+                "interface_declaration",
+                "type_alias_declaration",
+                "enum_declaration",
+                "lexical_declaration",
+                "variable_declarator",
+                "import_statement",
+                "export_statement",
+              ],
+              fields: ["name", "source"],
+            },
+            {
+              id: "imports",
+              path: "tree-sitter/tree-sitter-typescript/queries/imports.scm",
+              sourceDelivery: "provider-binary-embedded",
+              captures: [
+                "import.declaration",
+                "import.source",
+                "export.declaration",
+                "export.source",
+              ],
+              nodeTypes: ["import_statement", "export_statement"],
+              fields: ["source"],
+            },
+            {
+              id: "calls",
+              path: "tree-sitter/tree-sitter-typescript/queries/calls.scm",
+              sourceDelivery: "provider-binary-embedded",
+              captures: ["call.expression", "call.target"],
+              nodeTypes: ["call_expression"],
+              fields: ["function"],
+            },
+          ],
+          grammarId: "tree-sitter-typescript",
+          grammarProfileVersion: "2026-06-05.v1",
+          grammarProfileSchema: "semantic-tree-sitter-grammar-profile.v1",
+          grammarProfilePath: "tree-sitter/tree-sitter-typescript/grammar-profile.json",
+          supportedPredicates: [
+            "#eq?",
+            "#any-eq?",
+            "#any-of?",
+            "#match?",
+            "#any-match?",
+            "#not-eq?",
+            "#not-match?",
+          ],
+          unsupportedPredicates: [],
+          cacheReplay: true,
           supportsJson: true,
           supportsCompact: true,
-        })),
-      {
-        method: "ast-patch/dry-run",
-        command: "ast-patch",
-        input: "semantic-ast-patch packet",
-        requiredOptions: ["--packet"],
-        outputSchemaIds: ["agent.semantic-protocols.semantic-ast-patch-receipt"],
-        mutationAvailable: false,
-        supportsJson: true,
-        supportsCompact: false,
-      },
-      {
-        method: "evidence/graph",
-        command: "evidence",
-        input: "provider project root",
-        outputSchemaIds: ["agent.semantic-protocols.semantic-evidence-graph"],
-        supportsJson: true,
-        supportsCompact: true,
-      },
-      {
-        method: "evidence/analyze",
-        command: "evidence",
-        input: "provider project root",
-        outputSchemaIds: ["agent.semantic-protocols.semantic-graph-turbo-request"],
-        packetSchemas: ["semantic-graph-turbo-request.v1"],
-        clients: ["asp-graph-turbo"],
-        supportsJson: true,
-        supportsCompact: true,
-      },
-      {
-        method: "agent/doctor",
-        command: "agent",
-        outputSchemaIds: ["agent.semantic-protocols.semantic-language-registry"],
-        supportsJson: true,
-        supportsCompact: true,
-      },
-      {
-        method: "agent/guide",
-        command: "agent",
-        supportsJson: false,
-        supportsCompact: true,
-      },
-    ],
-    schemas: [
-      {
-        schemaId: "agent.semantic-protocols.semantic-search-packet",
-        schemaVersion: "1",
-        path: "schemas/semantic-search-packet.v1.schema.json",
-      },
-      {
-        schemaId: "agent.semantic-protocols.semantic-query-packet",
-        schemaVersion: "1",
-        path: "schemas/semantic-query-packet.v1.schema.json",
-      },
-      {
-        schemaId: "agent.semantic-protocols.semantic-read-packet",
-        schemaVersion: "1",
-        path: "schemas/semantic-read-packet.v1.schema.json",
-      },
-      {
-        schemaId: "agent.semantic-protocols.semantic-source-location",
-        schemaVersion: "1",
-        path: "schemas/semantic-source-location.v1.schema.json",
-      },
-      {
-        schemaId: "agent.semantic-protocols.semantic-tree-sitter-provenance",
-        schemaVersion: "1",
-        path: "schemas/semantic-tree-sitter-provenance.v1.schema.json",
-      },
-      {
-        schemaId: "agent.semantic-protocols.semantic-tree-sitter-query",
-        schemaVersion: "1",
-        path: "schemas/semantic-tree-sitter-query.v1.schema.json",
-      },
-      {
-        schemaId: "agent.semantic-protocols.semantic-tree-sitter-grammar-profile",
-        schemaVersion: "1",
-        path: "schemas/semantic-tree-sitter-grammar-profile.v1.schema.json",
-      },
-      {
-        schemaId: "agent.semantic-protocols.semantic-graph",
-        schemaVersion: "1",
-        path: "schemas/semantic-graph.v1.schema.json",
-      },
-      {
-        schemaId: "agent.semantic-protocols.semantic-graph-turbo-request",
-        schemaVersion: "1",
-        path: "schemas/semantic-graph-turbo-request.v1.schema.json",
-      },
-      {
-        schemaId: "agent.semantic-protocols.semantic-fact-graph",
-        schemaVersion: "1",
-        path: "schemas/semantic-fact-graph.v1.schema.json",
-      },
-      {
-        schemaId: "agent.semantic-protocols.semantic-fact-ontology",
-        schemaVersion: "1",
-        path: "schemas/semantic-fact-ontology.v1.schema.json",
-      },
-      {
-        schemaId: "agent.semantic-protocols.semantic-verification-receipt",
-        schemaVersion: "1",
-        path: "schemas/semantic-verification-receipt.v1.schema.json",
-      },
-      {
-        schemaId: "agent.semantic-protocols.semantic-behavior-snapshot",
-        schemaVersion: "1",
-        path: "schemas/semantic-behavior-snapshot.v1.schema.json",
-      },
-      {
-        schemaId: "agent.semantic-protocols.semantic-determinism-readiness",
-        schemaVersion: "1",
-        path: "schemas/semantic-determinism-readiness.v1.schema.json",
-      },
-      {
-        schemaId: "agent.semantic-protocols.dev-command-log",
-        schemaVersion: "1",
-        path: "schemas/semantic-dev-command-log.v1.schema.json",
-      },
-      {
-        schemaId: "agent.semantic-protocols.semantic-formal-proof-pilot",
-        schemaVersion: "1",
-        path: "schemas/semantic-formal-proof-pilot.v1.schema.json",
-      },
-      {
-        schemaId: "agent.semantic-protocols.semantic-review-packet",
-        schemaVersion: "1",
-        path: "schemas/semantic-review-packet.v1.schema.json",
-      },
-      {
-        schemaId: "agent.semantic-protocols.semantic-evidence-graph",
-        schemaVersion: "1",
-        path: "schemas/semantic-evidence-graph.v1.schema.json",
-      },
-      {
-        schemaId: "agent.semantic-protocols.semantic-assurance-case",
-        schemaVersion: "1",
-        path: "schemas/semantic-assurance-case.v1.schema.json",
-      },
-      {
-        schemaId: "agent.semantic-protocols.semantic-ast-patch",
-        schemaVersion: "1",
-        path: "schemas/semantic-ast-patch.v1.schema.json",
-      },
-      {
-        schemaId: "agent.semantic-protocols.semantic-ast-patch-receipt",
-        schemaVersion: "1",
-        path: "schemas/semantic-ast-patch-receipt.v1.schema.json",
-      },
-      {
-        schemaId: "agent.semantic-protocols.semantic-type-surface",
-        schemaVersion: "1",
-        path: "schemas/semantic-type-surface.v1.schema.json",
-      },
-      {
-        schemaId: "agent.semantic-protocols.semantic-handle",
-        schemaVersion: "1",
-        path: "schemas/semantic-handle.v1.schema.json",
-      },
-      {
-        schemaId: "agent.semantic-protocols.semantic-language-registry",
-        schemaVersion: "1",
-        path: "schemas/semantic-language-registry.v1.schema.json",
-      },
-      {
-        schemaId: "agent.semantic-protocols.languages.typescript.ts-harness.capabilities",
-        schemaVersion: "1",
-        path: "schemas/typescript-semantic-capabilities.v1.schema.json",
-      },
-    ],
-  });
+          outputModes: ["frontier", "json"],
+          unsupportedPatternBehavior: "diagnostic",
+        },
+        ...expectedMethods
+          .filter((method) => method.startsWith("check/"))
+          .map((method) => ({
+            method,
+            command: "check",
+            supportsJson: true,
+            supportsCompact: true,
+          })),
+        {
+          method: "ast-patch/dry-run",
+          command: "ast-patch",
+          input: "semantic-ast-patch packet",
+          requiredOptions: ["--packet"],
+          outputSchemaIds: ["agent.semantic-protocols.semantic-ast-patch-receipt"],
+          mutationAvailable: false,
+          supportsJson: true,
+          supportsCompact: false,
+        },
+        {
+          method: "evidence/graph",
+          command: "evidence",
+          input: "provider project root",
+          outputSchemaIds: ["agent.semantic-protocols.semantic-evidence-graph"],
+          supportsJson: true,
+          supportsCompact: true,
+        },
+        {
+          method: "evidence/analyze",
+          command: "evidence",
+          input: "provider project root",
+          outputSchemaIds: ["agent.semantic-protocols.semantic-graph-turbo-request"],
+          packetSchemas: ["semantic-graph-turbo-request.v1"],
+          clients: ["asp-graph-turbo"],
+          supportsJson: true,
+          supportsCompact: true,
+        },
+        {
+          method: "agent/doctor",
+          command: "agent",
+          outputSchemaIds: ["agent.semantic-protocols.semantic-provider-doctor"],
+          supportsJson: true,
+          supportsCompact: true,
+        },
+        {
+          method: "agent/guide",
+          command: "agent",
+          supportsJson: false,
+          supportsCompact: true,
+        },
+      ],
+      schemas: TYPE_SCRIPT_PROVIDER_REGISTRATION.schemas,
+    },
+  );
 
   const unknownProtocolCommand = runCliCapture(["agent-client", "doctor", "."], root);
   assert.equal(unknownProtocolCommand.exitCode, 2);
@@ -1368,7 +1270,6 @@ function expectedSearchCapabilities(
         typeScriptCapability("test-owner-search"),
         semanticCapability("path-owner-fallback"),
         typeScriptCapability("owner-item-query"),
-        typeScriptCapability("owner-item-code-projection"),
         typeScriptCapability("owner-top-items-fallback"),
       ];
     case "search/dependency":

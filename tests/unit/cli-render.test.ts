@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import { HELP_TEXT, runCli } from "../../src/cli/main.js";
+import { TYPE_SCRIPT_BINARY } from "../../src/cli/semantic-language.js";
 
 function captureStd() {
   const out: string[] = [];
@@ -24,10 +25,12 @@ function captureStd() {
 
 describe("CLI protocol help", () => {
   it("documents only search, check, and agent entrypoints", () => {
-    assert.ok(HELP_TEXT.includes("ts-harness search <view>"));
-    assert.ok(HELP_TEXT.includes("ts-harness query (--catalog <id> | --treesitter-query"));
-    assert.ok(HELP_TEXT.includes("ts-harness check"));
-    assert.ok(HELP_TEXT.includes("ts-harness agent doctor"));
+    assert.ok(HELP_TEXT.includes(`${TYPE_SCRIPT_BINARY} search <view>`));
+    assert.ok(
+      HELP_TEXT.includes(`${TYPE_SCRIPT_BINARY} query (--catalog <id> | --treesitter-query`),
+    );
+    assert.ok(HELP_TEXT.includes(`${TYPE_SCRIPT_BINARY} check`));
+    assert.ok(HELP_TEXT.includes(`${TYPE_SCRIPT_BINARY} agent doctor`));
     assert.doesNotMatch(HELP_TEXT, /--tree(?:\s|$)/u);
     assert.equal(HELP_TEXT.includes("--stats"), false);
     assert.equal(HELP_TEXT.includes("--harness"), false);
@@ -39,7 +42,7 @@ describe("CLI protocol help", () => {
     const { stdout, stderr, out, err } = captureStd();
     const code = await runCli(["--help"], { stdout, stderr }, "/");
     assert.equal(code, 0);
-    assert.match(out.join(""), /^ts-harness/u);
+    assert.ok(out.join("").startsWith(TYPE_SCRIPT_BINARY));
     assert.equal(err.join(""), "");
   });
 });

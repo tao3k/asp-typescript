@@ -4,6 +4,8 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import test from "node:test";
 
+import { TYPE_SCRIPT_BINARY } from "../../src/cli/semantic-language.js";
+
 function packageRoot(): string {
   let current = path.dirname(fileURLToPath(import.meta.url));
   while (current !== path.dirname(current)) {
@@ -18,7 +20,7 @@ function packageRoot(): string {
   throw new Error("package root not found");
 }
 
-test("package lock keeps ts-harness bin on compiled CLI entrypoint", () => {
+test("package lock keeps the descriptor binary on the compiled CLI entrypoint", () => {
   const root = packageRoot();
   const packageJson = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8")) as {
     readonly bin?: Record<string, string>;
@@ -27,9 +29,12 @@ test("package lock keeps ts-harness bin on compiled CLI entrypoint", () => {
     readonly packages?: Record<string, { readonly bin?: Record<string, string> }>;
   };
 
-  assert.equal(packageJson.bin?.["ts-harness"]?.replace(/^\.\//u, ""), "dist/src/cli/main.js");
   assert.equal(
-    packageLock.packages?.[""]?.bin?.["ts-harness"]?.replace(/^\.\//u, ""),
+    packageJson.bin?.[TYPE_SCRIPT_BINARY]?.replace(/^\.\//u, ""),
+    "dist/src/cli/main.js",
+  );
+  assert.equal(
+    packageLock.packages?.[""]?.bin?.[TYPE_SCRIPT_BINARY]?.replace(/^\.\//u, ""),
     "dist/src/cli/main.js",
   );
 });

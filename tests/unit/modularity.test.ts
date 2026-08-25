@@ -11,7 +11,7 @@ import {
 } from "../../src/index.js";
 
 test("modularity pack reports production modules depending on tests without blocking", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-modularity-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-modularity-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.mkdirSync(path.join(root, "tests"));
   fs.writeFileSync(
@@ -43,7 +43,7 @@ test("modularity pack reports production modules depending on tests without bloc
 });
 
 test("modularity pack reports broad project modules without blocking", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-parser-modularity-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-parser-modularity-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(
     path.join(root, "package.json"),
@@ -76,7 +76,7 @@ test("modularity pack reports broad project modules without blocking", () => {
 });
 
 test("modularity pack reports broad test modules from parser-visible coverage", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-harness-test-modularity-"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-test-modularity-"));
   fs.mkdirSync(path.join(root, "tests"));
   fs.writeFileSync(
     path.join(root, "tsconfig.json"),

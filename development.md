@@ -16,15 +16,15 @@ direnv exec . git diff --check
 
 ## Global CLI Install
 
-Install the local checkout as the global `ts-harness` binary before testing
+Install the local checkout as the global `asp-typescript` binary before testing
 agent hook flows from other repositories:
 
 ```shell
 direnv exec . npm install -g --prefix /opt/homebrew .
-ts-harness agent doctor .
-ts-harness search prime --workspace . --view seeds
-ts-harness agent install --client codex .
-ts-harness agent guide --client codex .
+asp-typescript agent doctor .
+asp-typescript search prime --workspace . --view seeds
+asp-typescript agent install --client codex .
+asp-typescript agent guide --client codex .
 ```
 
 The explicit prefix avoids the devenv/Nix global npm prefix, which may be
@@ -32,7 +32,7 @@ read-only. On Linux, use the writable global prefix that is already on
 `PATH`, for example `--prefix ~/.local`.
 Run the install command from the repository that should own the active Codex
 session; it writes `.codex/config.toml` delegating hook events to the global
-`ts-harness` binary. Existing config is merged, not overwritten, so
+`asp-typescript` binary. Existing config is merged, not overwritten, so
 Rust+TypeScript repositories can keep both harness hook blocks. For a Codex
 session rooted at a Rust harness repo while editing a TypeScript harness repo,
 install into the Rust session root as well; that root config is the one Codex
@@ -71,7 +71,7 @@ required so new output modes cannot bypass the reasoning surface. Compact file
 and parsed counts should come from reasoning-tree module validity, not from raw
 parser module reports. Compact finding locations should be relative to
 `TypeScriptHarnessReport.reasoningTree.projectRoot`. Compact renderers should
-not read `report.modules`, `report.projectScope`, or `report.rootPaths`; those
+not read `report.modules`, `report.projectResolution`, or `report.rootPaths`; those
 remain structured report fields rather than the agent output authority surface.
 Project runs resolve the nearest parent `package.json` first and treat that
 directory as the package project anchor; `tsconfig`, package metadata, roots,

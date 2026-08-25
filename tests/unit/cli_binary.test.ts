@@ -12,10 +12,9 @@ import {
   typeScriptSemanticLanguageRegistration,
 } from "../../src/cli/semantic-language.js";
 
-test("CLI documents ts-harness as the primary binary", () => {
-  assert.match(HELP_TEXT, /^ts-harness — TypeScript semantic search/u);
-  assert.match(HELP_TEXT, /ts-harness search prime --workspace \./u);
-  assert.doesNotMatch(HELP_TEXT, /ts-harnesss/u);
+test("CLI documents the descriptor binary as the primary binary", () => {
+  assert.ok(HELP_TEXT.startsWith(`${TYPE_SCRIPT_BINARY} — TypeScript semantic search`));
+  assert.ok(HELP_TEXT.includes(`${TYPE_SCRIPT_BINARY} search prime --workspace .`));
   assert.doesNotMatch(HELP_TEXT, new RegExp(["typescript", "project", "harness"].join("-"), "u"));
 });
 
@@ -27,19 +26,13 @@ test("CLI package bin and semantic registry use the same canonical binary", () =
   };
   const registration = typeScriptSemanticLanguageRegistration();
 
-  assert.equal(TYPE_SCRIPT_BINARY, "ts-harness");
-  assert.equal(TYPE_SCRIPT_PROVIDER_ID, "ts-harness");
-  assert.equal(
-    TYPE_SCRIPT_PROVIDER_NAMESPACE,
-    "agent.semantic-protocols.languages.typescript.ts-harness",
-  );
   assert.deepEqual(Object.keys(pkg.bin ?? {}), [TYPE_SCRIPT_BINARY]);
   assert.equal(pkg.bin?.[TYPE_SCRIPT_BINARY], "./dist/src/cli/main.js");
   assert.equal(registration.providerId, TYPE_SCRIPT_PROVIDER_ID);
   assert.equal(registration.binary, TYPE_SCRIPT_BINARY);
   assert.equal(registration.namespace, TYPE_SCRIPT_PROVIDER_NAMESPACE);
-  assert.notEqual(TYPE_SCRIPT_BINARY, "ts-harnesss");
-  assert.doesNotMatch(JSON.stringify(pkg.bin), /ts-harnesss/u);
+  assert.notEqual(TYPE_SCRIPT_BINARY, "asp-typescripts");
+  assert.doesNotMatch(JSON.stringify(pkg.bin), /asp-typescripts/u);
   assert.doesNotMatch(
     JSON.stringify(pkg.bin),
     new RegExp(["typescript", "project", "harness"].join("-"), "u"),

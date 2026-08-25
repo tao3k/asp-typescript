@@ -1,15 +1,15 @@
 #+TITLE: TypeScript Project Harness Agent Skill
 
-Use =ts-harness= as a semantic-language provider for TypeScript projects.  The
+Use =asp-typescript= as a semantic-language provider for TypeScript projects.  The
 public CLI protocol has three top-level entrypoints:
 
 #+begin_src shell
-ts-harness search <view> ... [--json] [--package PATH] [PROJECT_ROOT]
-ts-harness check [--changed | --full] [--json] [PROJECT_ROOT]
-ts-harness agent doctor [--json] [PROJECT_ROOT]
-ts-harness agent install --client codex [PROJECT_ROOT]
-ts-harness agent guide --client codex [PROJECT_ROOT]
-ts-harness agent hook --client codex <event> [PROJECT_ROOT]
+asp-typescript search <view> ... [--json] [--package PATH] [PROJECT_ROOT]
+asp-typescript check [--changed | --full] [--json] [PROJECT_ROOT]
+asp-typescript agent doctor [--json] [PROJECT_ROOT]
+asp-typescript agent install --client codex [PROJECT_ROOT]
+asp-typescript agent guide --client codex [PROJECT_ROOT]
+asp-typescript agent hook --client codex <event> [PROJECT_ROOT]
 #+end_src
 
 Do not use direct renderer flags.  =--tree=, =--stats=, =--harness=,
@@ -20,41 +20,41 @@ Do not use direct renderer flags.  =--tree=, =--stats=, =--harness=,
 For a multi-package workspace:
 
 #+begin_src shell
-ts-harness search workspace .
-ts-harness search prime --package packages/core .
+asp-typescript search workspace .
+asp-typescript search prime --package packages/core .
 #+end_src
 
 For a single package:
 
 #+begin_src shell
-ts-harness search prime .
+asp-typescript search prime .
 #+end_src
 
 Use =agent doctor --json= when an integration needs the provider registry:
 
 #+begin_src shell
-ts-harness agent doctor --json .
+asp-typescript agent doctor --json .
 #+end_src
 
 Use =agent install --client codex= when Codex should enforce search-first
 source access in a repository:
 
 #+begin_src shell
-ts-harness agent install --client codex .
+asp-typescript agent install --client codex .
 #+end_src
 
 The installed hooks deny raw TypeScript/JavaScript source reads and broad
-source searches unless the candidates flow into =ts-harness search ingest=.
+source searches unless the candidates flow into =asp-typescript search ingest=.
 The denial message includes a compact command-line guide.  Every actionable
-line starts with =|cmd= or =|pipe= and uses only the installed =ts-harness=
+line starts with =|cmd= or =|pipe= and uses only the installed =asp-typescript=
 binary:
 
 #+begin_src shell
-ts-harness agent guide --client codex .
+asp-typescript agent guide --client codex .
 #+end_src
 
 If =.codex/config.toml= already exists, installation preserves other language
-harness blocks and updates or appends only the marked =ts-harness= block.
+harness blocks and updates or appends only the marked =asp-typescript= block.
 Run installation from the Codex session root that owns the conversation.  If the
 session is rooted at a Rust harness repo while work touches a TypeScript repo,
 install into that Rust root too, so Codex loads a concatenated root config.
@@ -84,22 +84,22 @@ query/stdin requirements, and package-scope support.
 ** Understand A Workspace
 
 #+begin_src shell
-ts-harness search workspace .
-ts-harness search prime --package <package-path> .
+asp-typescript search workspace .
+asp-typescript search prime --package <package-path> .
 #+end_src
 
 Read package routing, owner summaries, finding groups, and =next= actions
 before opening files. =search= is a fast syntax/reasoning lane; high-fanout
 lookup views keep core owner/import/export facts, while =prime=, =owner=,
 =api=, and =public-external-types= keep full native parser facts. Use
-=ts-harness check --changed .= or =check --full= when semantic diagnostics are
+=asp-typescript check --changed .= or =check --full= when semantic diagnostics are
 the evidence.
 
 ** Inspect A Dependency
 
 #+begin_src shell
-ts-harness search dependency react .
-ts-harness search deps react/jsx-runtime@19.0.0::jsx .
+asp-typescript search dependency react .
+asp-typescript search deps react/jsx-runtime@19.0.0::jsx .
 #+end_src
 
 =search deps= distinguishes the current workspace version from an external
@@ -110,10 +110,10 @@ local imports are not evidence for that external version.
 ** Trace A Symbol Or Import
 
 #+begin_src shell
-ts-harness search symbol OrderStatus .
-ts-harness search callsite OrderStatus .
-ts-harness search import ./order .
-ts-harness search tests src/domain/order.ts .
+asp-typescript search symbol OrderStatus .
+asp-typescript search callsite OrderStatus .
+asp-typescript search import ./order .
+asp-typescript search tests src/domain/order.ts .
 #+end_src
 
 Use owner-grouped output to identify blast radius before editing.
@@ -121,8 +121,8 @@ Use owner-grouped output to identify blast radius before editing.
 ** Normalize External Candidate Streams
 
 #+begin_src shell
-rg -n "OrderStatus" src tests | ts-harness search ingest .
-git diff --name-only | ts-harness search ingest .
+rg -n "OrderStatus" src tests | asp-typescript search ingest .
+git diff --name-only | asp-typescript search ingest .
 #+end_src
 
 Do not paste raw =rg=, =fd=, or diff output into the prompt directly.  Pipe it
@@ -134,20 +134,20 @@ semantic-search packet.
 After edits:
 
 #+begin_src shell
-ts-harness check --changed .
+asp-typescript check --changed .
 #+end_src
 
 Before closeout:
 
 #+begin_src shell
-ts-harness check --full .
+asp-typescript check --full .
 #+end_src
 
 For tools that need structured output:
 
 #+begin_src shell
-ts-harness search prime --json .
-ts-harness check --json .
+asp-typescript search prime --json .
+asp-typescript check --json .
 #+end_src
 
 Compact text remains the default agent-facing surface.  JSON is the validation,

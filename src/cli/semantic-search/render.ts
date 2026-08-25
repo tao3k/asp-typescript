@@ -12,7 +12,7 @@ import type {
   SemanticSearchQueryCoverage,
 } from "./types.js";
 import { isTestOwnerPath } from "./test-path.js";
-import { ownerId, stripNodePrefix } from "./utils.js";
+import { ownerId } from "./utils.js";
 
 const MAX_RENDERED_ITEMS = 16;
 
@@ -143,57 +143,6 @@ function renderSemanticSearchItemPacket(packet: SemanticSearchPacket): string {
   const runtimeLine = renderRuntimeCostLine(packet);
   if (runtimeLine !== undefined) lines.push(runtimeLine);
   return `${lines.join("\n")}\n`;
-}
-
-function seedGroups(packet: SemanticSearchPacket): Map<string, string[]> {
-  const groups = new Map<string, string[]>();
-  const hasItemPipe = (packet.items?.length ?? 0) > 0;
-  for (const owner of packet.owners) {
-    addSeed(groups, "owner", owner.path);
-  }
-  for (const item of packet.items ?? []) {
-    addSeed(groups, "item", `${item.kind}:${item.name}`);
-    addSeed(groups, "symbol", item.name);
-  }
-  for (const owner of packet.owners) {
-    for (const exportName of owner.exports ?? []) {
-      addSeed(groups, "symbol", exportName);
-    }
-    for (const action of owner.nextActions ?? []) {
-      if (hasItemPipe && action.kind === "lexical") continue;
-      addSeed(groups, action.kind, action.target);
-    }
-  }
-  for (const hit of packet.hits) {
-    addSeed(groups, "owner", hit.ownerPath);
-    if (hit.symbol !== undefined) {
-      addSeed(groups, "symbol", hit.symbol);
-    }
-    if (hit.kind === "api") {
-      addSeed(groups, "api", hit.symbol ?? hit.ownerPath);
-    }
-  }
-  for (const action of packet.nextActions) {
-    addSeed(groups, action.kind, action.target);
-  }
-  for (const action of packet.searchSynthesis?.seeds ?? []) {
-    addSeed(groups, action.kind, action.target);
-  }
-  for (const edge of packet.edges) {
-    if (edge.kind === "test") {
-      addSeed(groups, "tests", stripNodePrefix(edge.to));
-    } else if (edge.kind === "dependency" && edge.to.startsWith("C:")) {
-      addSeed(groups, "deps", stripNodePrefix(edge.to));
-    }
-  }
-  return groups;
-}
-
-function addSeed(groups: Map<string, string[]>, kind: string, target: string): void {
-  const values = groups.get(kind) ?? [];
-  if (values.length >= 8 || values.includes(target)) return;
-  values.push(target);
-  groups.set(kind, values);
 }
 
 function hitEvidenceFields(

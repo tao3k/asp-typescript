@@ -146,7 +146,7 @@ test("verification profile dependency signals enrich responsibility inference wi
 });
 
 function writeProfileProject(label: string, source: string): string {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), `ts-harness-profile-index-${label}-`));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), `asp-typescript-profile-index-${label}-`));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(path.join(root, "package.json"), JSON.stringify({ type: "module" }));
   fs.writeFileSync(

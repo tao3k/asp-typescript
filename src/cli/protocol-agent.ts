@@ -1,5 +1,5 @@
 /**
- * Agent subcommand parsing and doctor rendering for the ts-harness protocol CLI.
+ * Agent subcommand parsing and doctor rendering for the asp-typescript protocol CLI.
  *
  * This module keeps agent-specific argument handling out of the main protocol
  * dispatcher while preserving the CLI response shape consumed by Codex hooks.
@@ -11,9 +11,9 @@ import {
   TYPE_SCRIPT_LANGUAGE_ID,
   TYPE_SCRIPT_PROVIDER_ID,
   TYPE_SCRIPT_PROVIDER_NAMESPACE,
-  semanticLanguageRegistryDocument,
   typeScriptSemanticLanguageRegistration,
 } from "./semantic-language.js";
+import { semanticProviderDoctorDocument } from "./semantic-provider-doctor.js";
 
 export type AgentArgs = AgentDoctorArgs | AgentGuideArgs;
 
@@ -37,7 +37,7 @@ export function parseAgentArgs(argv: readonly string[]): AgentArgs | ProtocolAge
       action === "install" ? "asp hook install --client codex" : "asp hook <event> --client codex";
     return {
       kind: "error",
-      message: `ts-harness agent ${action} moved to asp; use ${replacement}`,
+      message: `asp-typescript agent ${action} moved to asp; use ${replacement}`,
     };
   }
   if (action === "guide") return parseAgentGuideArgs(argv.slice(1));
@@ -76,7 +76,8 @@ export function renderAgentDoctor(projectRoot: string): string {
 }
 
 export function renderAgentDoctorJson(projectRoot: string): string {
-  return `${JSON.stringify(semanticLanguageRegistryDocument(projectRoot))}\n`;
+  void projectRoot;
+  return `${JSON.stringify(semanticProviderDoctorDocument())}\n`;
 }
 
 interface ProtocolAgentErrorArgs {
