@@ -4,13 +4,6 @@
   "title": "ASP Client Cancellation Probe Request",
   "type": "object",
   "additionalProperties": false,
-  "required": ["schemaId", "schemaVersion"],
-  "properties": {
-    "schemaId": {
-      "const": "agent.semantic-protocols.asp-client-cancellation-probe-request"
-    },
-    "schemaVersion": {
-      "const": "1"
-    }
-  }
+  "required": [],
+  "properties": {}
 }

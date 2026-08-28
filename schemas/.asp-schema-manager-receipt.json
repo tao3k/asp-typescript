@@ -3,11 +3,11 @@
   "schemaVersion": "1",
   "languageId": "typescript",
   "profileDigest": "blake3-256:bbca467bf44b0fbb162e29a806df714b07f3a955b9df23e334f0a7b8de8f88da",
-  "bundleDigest": "blake3-256:1aef2b560c8c30da8b7b0731f00d5bac91edd0247a33ac8f6e2874bfbdbe5f1e",
+  "bundleDigest": "blake3-256:eeb548457c5b19e837de9e5c1125c14f4ef763ed64b59315a2d95fe8be762af6",
   "schemas": [
     {
       "name": "asp-client-cancellation-probe-request.schema.json",
-      "digest": "blake3-256:9a5c1addcf17ee0a317722438c5fb2c9c7b3088acc5add96324553a74ac9c286"
+      "digest": "blake3-256:b34c40da202136d5377f5584f095319a7d4877837cb7c57275bd8a1ab177bf92"
     },
     {
       "name": "asp-client-cancellation-probe-response.schema.json",
@@ -18,16 +18,20 @@
       "digest": "blake3-256:bc12a1065c633e47a848f42a89975206c0538e5b66b0b54085468481b44145c9"
     },
     {
+      "name": "asp-client-exact-query-failure.schema.json",
+      "digest": "blake3-256:fc451bd39e772ed3a2ba24a2b45da38e161b9b61915f698b1afb1253a051d386"
+    },
+    {
       "name": "asp-client-exact-query-request.schema.json",
       "digest": "blake3-256:e412c1f02d08d1632e7104487d6b08d60dde6736d59254c6c2f5f45b702d4aa4"
     },
     {
       "name": "asp-client-exact-query-response.schema.json",
-      "digest": "blake3-256:65d9e3c624b301c6b8c103c8ec739237559e8e59ebc5d832847ffdf3ff85e4cd"
+      "digest": "blake3-256:feb1d24eaba02eaf53c7e5e7ba4f11dea436ebee99380d221f796007fee4625c"
     },
     {
       "name": "asp-client-frame.schema.json",
-      "digest": "blake3-256:d546eb0bc0bc4539e0542526094255e25f51d2c28ac7f6089d42ecba4187c15b"
+      "digest": "blake3-256:f16667311475fd65f4b849611e3df4ca2f7fe847a4730d6fa9d025753fb7cf7c"
     },
     {
       "name": "asp-client-owner-search-request.schema.json",
@@ -35,7 +39,15 @@
     },
     {
       "name": "asp-client-protocol-catalog.schema.json",
-      "digest": "blake3-256:7faec1ae7dadc5ee28b57faadc8dedea58f320cd04aa34d9f6ffe78a5159382c"
+      "digest": "blake3-256:8b3f99ee2cb424d3ccf994f4c77f37dd6a71078b463cb256dbb65aea02b2d443"
+    },
+    {
+      "name": "asp-client-schema-bundle-request.schema.json",
+      "digest": "blake3-256:b04fed590c0e023686f28cd77c045726c851abd960b5aa1f9734f45a4daacf1c"
+    },
+    {
+      "name": "asp-client-schema-bundle-response.schema.json",
+      "digest": "blake3-256:3b9b48d31828c7365420423d8d092f5dc5dd9cc1e9c9faf992145d1f785ea764"
     },
     {
       "name": "asp-client-search-request.schema.json",
@@ -46,8 +58,16 @@
       "digest": "blake3-256:d4e432eacba544a5eb504c1e6d1161d9599a14cfb85d62d2d5da0e1d47f6cdde"
     },
     {
+      "name": "asp-client-work-counters.schema.json",
+      "digest": "blake3-256:aba81ca4e8f518bb515cb7b014b5c535cab3d1634dfd9ae6ccdf24d553ba3133"
+    },
+    {
       "name": "asp-client-workspace-source-mutation.schema.json",
       "digest": "blake3-256:74b0baf814e96b3f2f47eefcc537ae53c5ac740315cdbc8c4f1079dcc2f484a8"
+    },
+    {
+      "name": "asp-semantic-extension-envelope.schema.json",
+      "digest": "blake3-256:70690d0b93dab725daa845a12fb750dc8ce3039c7f1895b2660b160b3744fda9"
     },
     {
       "name": "callable-skeleton.schema.json",
@@ -75,7 +95,7 @@
     },
     {
       "name": "language-schema-bundle-receipt.schema.json",
-      "digest": "blake3-256:43b7cb204c9d74ba05f3420940f1028555527bf82b6e010b3daf5986039ace03"
+      "digest": "blake3-256:d69b7aa4dcaff194739c64d0847b3f7c97f9230808ec0319de34bf61666dd4bc"
     },
     {
       "name": "project-resolution.schema.json",

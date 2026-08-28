@@ -47,18 +47,18 @@
     "operations": [
       {
         "operation": "projection-batch",
-        "requestSchemaId": "https://schemas.agent-semantic-protocols.dev/provider-language-projection-batch-request.schema.json",
-        "responseSchemaId": "https://schemas.agent-semantic-protocols.dev/provider-language-projection-batch-response.schema.json"
+        "requestSchema": {"schemaId": "https://schemas.agent-semantic-protocols.dev/provider-language-projection-batch-request.schema.json", "schemaVersion": "1"},
+        "responseSchema": {"schemaId": "https://schemas.agent-semantic-protocols.dev/provider-language-projection-batch-response.schema.json", "schemaVersion": "1"}
       },
       {
         "operation": "project-resolution",
-        "requestSchemaId": "https://schemas.agent-semantic-protocols.dev/provider-project-resolution-request.schema.json",
-        "responseSchemaId": "https://schemas.agent-semantic-protocols.dev/provider-project-resolution-response.schema.json"
+        "requestSchema": {"schemaId": "https://schemas.agent-semantic-protocols.dev/provider-project-resolution-request.schema.json", "schemaVersion": "1"},
+        "responseSchema": {"schemaId": "https://schemas.agent-semantic-protocols.dev/provider-project-resolution-response.schema.json", "schemaVersion": "1"}
       },
       {
         "operation": "query",
-        "requestSchemaId": "https://agent-semantic-protocols.dev/schemas/provider-native-exact-request.v1.schema.json",
-        "responseSchemaId": "https://agent-semantic-protocols.dev/schemas/provider-native-exact-response.v1.schema.json"
+        "requestSchema": {"schemaId": "https://agent-semantic-protocols.dev/schemas/provider-native-exact-request.v1.schema.json", "schemaVersion": "1"},
+        "responseSchema": {"schemaId": "https://agent-semantic-protocols.dev/schemas/provider-native-exact-response.v1.schema.json", "schemaVersion": "1"}
       }
     ]
   },
