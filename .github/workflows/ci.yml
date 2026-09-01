@@ -53,8 +53,8 @@ jobs:
       - name: Test
         run: npm test
 
-      - name: Self-apply harness
-        run: npm run harness
+      - name: Self-apply ASP policy
+        run: npm run test:policy
 
       - name: Whitespace check
         run: git diff --check
