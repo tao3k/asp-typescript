@@ -6,8 +6,7 @@
   "additionalProperties": false,
   "required": ["rootSelector", "rootNodeId", "callable", "nodes", "relations", "cost"],
   "properties": {
-    "projectionKind": {"const": "callable-skeleton"},
-    "rootSelector": {},
+    "rootSelector": {"type": "string", "minLength": 1},
     "rootNodeId": {"type": "string", "minLength": 1},
     "callable": {"type": "object"},
     "nodes": {"type": "array"},

@@ -25,10 +25,7 @@ test("repository self-applies the default advice surface with minimal findings",
   );
   assert.deepEqual(
     modularityAdvice.map((finding) => `${finding.ruleId}:${finding.location.path}`),
-    [
-      `TS-MOD-R002:${path.join(projectRoot, "src", "cli", "protocol.ts")}`,
-      `TS-MOD-R002:${path.join(projectRoot, "src", "cli", "semantic-language.ts")}`,
-    ],
+    [`TS-MOD-R002:${path.join(projectRoot, "src", "cli", "semantic-language.ts")}`],
     "repository must self-apply the TypeScript modularity policy",
   );
 

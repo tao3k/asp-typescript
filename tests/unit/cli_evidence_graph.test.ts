@@ -45,7 +45,7 @@ test("evidence graph renders semantic evidence graph JSON", () => {
   });
   assert.ok(payload.nodes.some((node) => node.kind === "owner"));
   assert.ok(payload.edges.some((edge) => edge.kind === "requires-evidence"));
-  assert.equal(payload.gaps[0]?.fields?.nextCommand, `${TYPE_SCRIPT_BINARY} check --full .`);
+  assert.deepEqual(payload.gaps[0]?.fields, { requiredReceiptId: "typescript.policy.api" });
 });
 
 test("evidence analyze renders graph-turbo request JSON", () => {

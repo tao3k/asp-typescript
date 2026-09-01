@@ -11,7 +11,7 @@ import {
   typeScriptSearchScopeFileNames,
   type TypeScriptSearchPrefilterResult,
 } from "./search-prefilter.js";
-import type { CheckArgs, SearchArgs } from "./protocol.js";
+import type { SearchArgs } from "./protocol.js";
 import type { TypeScriptSemanticSearchView } from "./semantic-language.js";
 
 interface SearchRunPlan {
@@ -27,20 +27,6 @@ export const SEARCH_VIEWS_REQUIRING_RULE_EVALUATION = new Set<TypeScriptSemantic
   "owner",
   "policy",
 ]);
-
-export function checkConfig(projectRoot: string, mode: CheckArgs["mode"]) {
-  const config = typeScriptHarnessConfigForProject(projectRoot);
-  if (mode === "changed") {
-    return {
-      ...config,
-      ruleSeverityOverrides: {
-        ...config.ruleSeverityOverrides,
-        "TS-AGENT-PROJECT-001": "info" as const,
-      },
-    };
-  }
-  return config;
-}
 
 export function searchRunPlan(cwd: string, args: SearchArgs): SearchRunPlan {
   const root = path.resolve(cwd, args.projectRoot ?? ".");

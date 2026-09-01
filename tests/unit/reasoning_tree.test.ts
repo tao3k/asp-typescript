@@ -39,7 +39,7 @@ test("reasoning tree renders tsconfig paths, package entries, roles, and import 
       },
       scripts: {
         build: "tsc -p tsconfig.json",
-        harness: "asp-typescript check --full .",
+        harness: "npm run test:policy",
       },
       workspaces: ["packages/*"],
     }),
@@ -134,7 +134,7 @@ test("reasoning tree renders tsconfig paths, package entries, roles, and import 
   );
   assert.deepEqual(
     tree.packageScripts.map((script) => `${script.name}:${script.command}`),
-    ["build:tsc -p tsconfig.json", "harness:asp-typescript check --full ."],
+    ["build:tsc -p tsconfig.json", "harness:npm run test:policy"],
   );
   assert.deepEqual(
     tree.packageWorkspaces.map((workspace) => workspace.pattern),
