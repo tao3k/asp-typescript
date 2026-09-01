@@ -310,7 +310,7 @@ export const TYPE_SCRIPT_SEARCH_VIEW_DESCRIPTORS = [
   searchView("semantic-facts", {
     requiresQuery: true,
     acceptsStdin: true,
-    clients: ["asp-graph-turbo"],
+    clients: ["asp-python-graphs"],
     input: "search semantic-facts <query>",
     packetSchemas: ["semantic-fact-graph.v1", "semantic-fact-ontology.v1"],
     outputModes: ["json"],
@@ -334,7 +334,6 @@ export const TYPE_SCRIPT_SEARCH_METHODS = TYPE_SCRIPT_SEARCH_VIEW_DESCRIPTORS.ma
   (descriptor) => descriptor.method,
 );
 
-export const TYPE_SCRIPT_CHECK_METHODS = ["check/changed", "check/full"] as const;
 export const TYPE_SCRIPT_QUERY_METHODS = [
   "query",
   "query/owner-items",
@@ -347,17 +346,10 @@ export const TYPE_SCRIPT_AGENT_METHODS = ["agent/doctor", "agent/guide"] as cons
 export type TypeScriptSemanticLanguageMethod =
   | TypeScriptSemanticSearchMethod
   | TypeScriptSemanticQueryMethod
-  | (typeof TYPE_SCRIPT_CHECK_METHODS)[number]
   | (typeof TYPE_SCRIPT_AST_PATCH_METHODS)[number]
   | (typeof TYPE_SCRIPT_EVIDENCE_METHODS)[number]
   | (typeof TYPE_SCRIPT_AGENT_METHODS)[number];
-export type SemanticLanguageCommand =
-  | "search"
-  | "query"
-  | "check"
-  | "ast-patch"
-  | "evidence"
-  | "agent";
+export type SemanticLanguageCommand = "search" | "query" | "ast-patch" | "evidence" | "agent";
 export type SemanticLanguageOutputMode = "frontier" | "json" | "code" | "names" | "read-packet";
 export type SemanticLanguageCapabilityNamespace = "semantic" | typeof TYPE_SCRIPT_LANGUAGE_ID;
 
@@ -641,7 +633,6 @@ function typeScriptSemanticLanguageRegistrationWithLegacyQueryDescriptors(): Sem
     methods: [
       ...TYPE_SCRIPT_SEARCH_METHODS,
       ...TYPE_SCRIPT_QUERY_METHODS,
-      ...TYPE_SCRIPT_CHECK_METHODS,
       ...TYPE_SCRIPT_AST_PATCH_METHODS,
       ...TYPE_SCRIPT_EVIDENCE_METHODS,
       ...TYPE_SCRIPT_AGENT_METHODS,
@@ -694,8 +685,6 @@ function invocationForMethodDescriptor(descriptor: {
       "--workspace",
       "{workspace}",
     ],
-    "check/changed": [TYPE_SCRIPT_BINARY, "check", "--changed", "{workspace}"],
-    "check/full": [TYPE_SCRIPT_BINARY, "check", "--full", "{workspace}"],
     "ast-patch/dry-run": [TYPE_SCRIPT_BINARY, "ast-patch", "dry-run", "--packet", "{packet}"],
     "evidence/graph": [TYPE_SCRIPT_BINARY, "evidence", "graph", "--json", "{workspace}"],
     "evidence/analyze": [TYPE_SCRIPT_BINARY, "evidence", "analyze", "--json", "{workspace}"],
@@ -865,12 +854,6 @@ function typeScriptSemanticLanguageMethodDescriptors(): readonly SemanticLanguag
       supportsJson: true,
       outputModes: ["frontier", "json", "code", "names", "read-packet"],
     },
-    ...TYPE_SCRIPT_CHECK_METHODS.map((method) => ({
-      method,
-      command: "check" as const,
-      supportsJson: true,
-      supportsCompact: true,
-    })),
     ...TYPE_SCRIPT_AST_PATCH_METHODS.map((method) => ({
       method,
       command: "ast-patch" as const,
@@ -895,7 +878,7 @@ function typeScriptSemanticLanguageMethodDescriptors(): readonly SemanticLanguag
       input: "provider project root",
       outputSchemaIds: [SEMANTIC_GRAPH_TURBO_REQUEST_SCHEMA_ID],
       packetSchemas: ["semantic-graph-turbo-request.v1"],
-      clients: ["asp-graph-turbo"],
+      clients: ["asp-python-graphs"],
       supportsJson: true,
       supportsCompact: true,
     },

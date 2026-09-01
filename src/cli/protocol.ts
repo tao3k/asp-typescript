@@ -5,9 +5,7 @@
 import fs from "node:fs";
 import path from "node:path";
 
-import { renderTypeScriptProjectHarness, renderTypeScriptProjectHarnessJson } from "../render.js";
 import { runTypeScriptProjectHarness } from "../runner.js";
-import { isTypeScriptHarnessClean } from "../model.js";
 import { renderCodexAgentGuide } from "./agent-guide.js";
 import {
   parseAgentArgs,
@@ -56,7 +54,6 @@ import {
   type FlowLiteQueryArgs,
 } from "./protocol-flow-lite-query.js";
 import {
-  checkConfig,
   searchRunPlan,
   SEARCH_VIEWS_REQUIRING_FULL_NATIVE_SYNTAX_FACTS,
   SEARCH_VIEWS_REQUIRING_RULE_EVALUATION,
@@ -73,7 +70,6 @@ export type ProtocolArgs =
   | DirectSourceReadArgs
   | TreeSitterQueryArgs
   | FlowLiteQueryArgs
-  | CheckArgs
   | EvidenceArgs
   | AgentArgs
   | AstPatchArgs
@@ -104,13 +100,6 @@ interface DirectSourceReadArgs {
   readonly projectRoot: string | undefined;
   readonly packagePath: string | undefined;
   readonly selector: string;
-  readonly json: boolean;
-}
-
-export interface CheckArgs {
-  readonly kind: "check";
-  readonly mode: "changed" | "full";
-  readonly projectRoot: string | undefined;
   readonly json: boolean;
 }
 
@@ -151,7 +140,6 @@ export function parseProtocolArgs(argv: readonly string[]): ProtocolArgs | undef
         : parseQueryArgs(queryArgs);
   }
   if (command === "ast-patch") return parseAstPatchArgs(argv.slice(1));
-  if (command === "check") return parseCheckArgs(argv.slice(1));
   if (command === "evidence") return parseEvidenceArgs(argv.slice(1));
   if (command === "agent") return parseAgentArgs(argv.slice(1));
   return undefined;
@@ -213,19 +201,6 @@ export function runProtocolCli(
       const projectRoot = path.resolve(cwd, args.projectRoot ?? ".");
       streams.stdout.write(renderTypeScriptFlowLiteQuery(projectRoot, args));
       return 0;
-    }
-    if (args.kind === "check") {
-      const projectRoot = path.resolve(cwd, args.projectRoot ?? ".");
-      const report = runTypeScriptProjectHarness(projectRoot, checkConfig(projectRoot, args.mode));
-      if (args.json) {
-        streams.stdout.write(renderTypeScriptProjectHarnessJson(report));
-      } else {
-        const compact = renderTypeScriptProjectHarness(report, {
-          includeAdvice: args.mode !== "changed",
-        });
-        streams.stdout.write(compact === "" ? "[ok] typescript\n" : `${compact}\n`);
-      }
-      return isTypeScriptHarnessClean(report) ? 0 : 1;
     }
     if (args.kind === "evidence") {
       const projectRoot = path.resolve(cwd, args.projectRoot ?? ".");
@@ -968,34 +943,6 @@ function parseSearchPipePositionals(
     };
   }
   return { pipes, projectRoot: remaining[0] };
-}
-
-function parseCheckArgs(argv: readonly string[]): ProtocolArgs {
-  let json = false;
-  let mode: "changed" | "full" = "full";
-  const positionals: string[] = [];
-  for (const arg of argv) {
-    if (arg === "--json") {
-      json = true;
-    } else if (arg === "--changed") {
-      mode = "changed";
-    } else if (arg === "--full") {
-      mode = "full";
-    } else if (arg === "--help" || arg === "-h") {
-      return {
-        kind: "error",
-        message: "usage: asp-typescript check [--changed | --full] [--json] [PROJECT_ROOT]",
-      };
-    } else if (arg.startsWith("-")) {
-      return { kind: "error", message: `unknown check option: ${arg}` };
-    } else {
-      positionals.push(arg);
-    }
-  }
-  if (positionals.length > 1) {
-    return { kind: "error", message: "expected at most one PROJECT_ROOT argument" };
-  }
-  return { kind: "check", mode, projectRoot: positionals[0], json };
 }
 
 function parseEvidenceArgs(argv: readonly string[]): ProtocolArgs {

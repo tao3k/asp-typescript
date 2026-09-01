@@ -7,51 +7,7 @@ import test from "node:test";
 import { TYPE_SCRIPT_BINARY } from "../../src/cli/semantic-language.js";
 
 import { hasCommand, runCliCapture } from "./cli_helpers.js";
-test("CLI exposes only search, check, and agent protocol entrypoints", () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-cli-"));
-  fs.mkdirSync(path.join(root, "src"));
-  fs.writeFileSync(path.join(root, "tsconfig.json"), JSON.stringify({ include: ["src/**/*.ts"] }));
-  fs.writeFileSync(path.join(root, "src", "index.ts"), "export const ok = 1;\n");
-
-  const compact = runCliCapture(["check", "--full", "."], root);
-  assert.equal(compact.exitCode, 0);
-  assert.match(compact.stdout, /^\[ok\] typescript/u);
-
-  const json = runCliCapture(["check", "--json", "."], root);
-  assert.equal(json.exitCode, 0);
-  const jsonReport = JSON.parse(json.stdout) as {
-    readonly modules: readonly unknown[];
-    readonly reasoningTree: { readonly runMode: string };
-    readonly runMode: string;
-  };
-  assert.equal(jsonReport.runMode, "project");
-  assert.equal(jsonReport.reasoningTree.runMode, "project");
-  assert.equal(jsonReport.modules.length, 1);
-
-  const noTsconfig = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-cli-no-config-"));
-  fs.mkdirSync(path.join(noTsconfig, "src"));
-  fs.writeFileSync(path.join(noTsconfig, "src", "index.ts"), "export const ok = 1;\n");
-  const changed = runCliCapture(["check", "--changed", "."], noTsconfig);
-  assert.equal(changed.exitCode, 0);
-  assert.match(changed.stdout, /^\[ok\] typescript/u);
-  assert.doesNotMatch(changed.stdout, /\[TS-AGENT-PROJECT-001\] Info/u);
-
-  for (const retiredArgv of [
-    ["."],
-    ["--json", "."],
-    ["--agent-compact", "."],
-    ["--agent-snapshot", "."],
-    ["--tree", "."],
-    ["--stats", "."],
-    ["--harness", "."],
-  ]) {
-    const invalid = runCliCapture(retiredArgv, root);
-    assert.equal(invalid.exitCode, 2);
-    assert.match(invalid.stderr, /unknown (command|option)/u);
-  }
-});
-
-test("CLI search uses fast syntax reasoning while check keeps semantic diagnostics", () => {
+test("CLI search uses fast syntax reasoning without running policy diagnostics", () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "ts-search-fast-path-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(
@@ -69,15 +25,6 @@ test("CLI search uses fast syntax reasoning while check keeps semantic diagnosti
     packet.findings.every((finding) => finding.ruleId !== "TS-SEM-R001"),
     "search should not spend the fast path collecting semantic diagnostics",
   );
-
-  const check = runCliCapture(["check", "--full", "."], root);
-  assert.equal(check.exitCode, 0);
-  assert.match(check.stdout, /TS-SEM-R001/u);
-
-  const changed = runCliCapture(["check", "--changed", "."], root);
-  assert.equal(changed.exitCode, 0);
-  assert.match(changed.stdout, /^\[ok\] typescript/u);
-  assert.doesNotMatch(changed.stdout, /TS-SEM-R001/u);
 });
 
 test("lexical query-set explains fixture paths and synthesizes real owners", () => {

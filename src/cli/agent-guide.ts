@@ -50,7 +50,7 @@ function commandGuide(input: {
     "|cmd ast-patch=asp typescript ast-patch dry-run --packet <semantic-ast-patch.json>",
     `|cmd evidence-graph=asp typescript evidence graph --json ${root}`,
     `|cmd evidence-analyze=asp typescript evidence analyze --json ${root}`,
-    "|cmd check=asp typescript check --changed",
+    "|policy authority=typescript-lang-project-harness-api trigger=package-test",
     "|rule agent hook install/runtime is owned by asp",
     "|rule selector queries do not need a trailing project root; --workspace <workspace-root> is the independent workspace override",
     "|rule syntax query ABI is compiled by asp; provider projects native parser facts into tree-sitter-compatible captures",

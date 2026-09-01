@@ -23,10 +23,9 @@ export function buildTypeScriptEvidenceGraph(projectRoot: string): JsonObject {
   const ownerPath = selectOwnerPath(root);
   const ownerId = nodeId("typescript:owner", ownerPath);
   const claimId = nodeId("typescript:claim", ownerPath);
-  const receiptId = nodeId("typescript:receipt", "asp-typescript-check-full");
-  const actionId = nodeId("typescript:action", "run-asp-typescript-check-full");
+  const receiptId = nodeId("typescript:receipt", "policy-api");
+  const actionId = nodeId("typescript:action", "attach-policy-api-receipt");
   const gapId = nodeId("typescript:gap", `${ownerPath}:receipt`);
-  const checkCommand = "asp-typescript check --full .";
   const nodes: JsonObject[] = [
     {
       nodeId: ownerId,
@@ -49,24 +48,27 @@ export function buildTypeScriptEvidenceGraph(projectRoot: string): JsonObject {
       location: { path: ownerPath, line: 1, column: 0 },
       fields: {
         sourceRuleId: "TS-EVIDENCE-GRAPH",
-        receiptKind: "harness-check",
+        receiptKind: "policy-evaluation",
       },
     },
     {
       nodeId: receiptId,
       kind: "verification-receipt",
-      label: checkCommand,
-      receiptId: "typescript.asp-typescript.check.full",
+      label: "TypeScript dependency policy API receipt",
+      receiptId: "typescript.policy.api",
       status: "needs-injection",
       summary:
-        "Run the TypeScript harness full check and attach the receipt before treating the claim as verified.",
-      fields: { command: checkCommand },
+        "Attach the receipt emitted by the TypeScript dependency policy API before treating the claim as verified.",
+      fields: {
+        authority: "typescript-lang-project-harness-api",
+        trigger: "package-test",
+      },
     },
     {
       nodeId: actionId,
       kind: "review-action",
-      label: "Run asp-typescript check --full .",
-      actionId: "typescript.run-asp-typescript-check-full",
+      label: "Attach TypeScript dependency policy API receipt",
+      actionId: "typescript.attach-policy-api-receipt",
       status: "missing",
       summary: "run-receipt",
       fields: {
@@ -84,9 +86,9 @@ export function buildTypeScriptEvidenceGraph(projectRoot: string): JsonObject {
     {
       gapId,
       ownerPath,
-      summary: "No attached asp-typescript full-check receipt for this evidence graph.",
+      summary: "No attached TypeScript dependency policy API receipt for this evidence graph.",
       severity: "warning",
-      fields: { nextCommand: checkCommand },
+      fields: { requiredReceiptId: "typescript.policy.api" },
     },
   ];
   return {

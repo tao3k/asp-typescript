@@ -40,8 +40,6 @@ asp-typescript search lexical OrderStatus .
 asp-typescript search lexical --query-set OrderStatus --query-set findOrderStatus owner tests .
 rg -n "OrderStatus" src tests | asp-typescript search ingest .
 
-asp-typescript check --changed .
-asp-typescript check --full .
 asp-typescript agent doctor --json .
 asp-typescript agent install --client codex .
 asp-typescript agent guide --client codex .
@@ -49,6 +47,8 @@ asp-typescript agent guide --client codex .
 
 Compact text is the default agent surface. `--json` emits the shared semantic
 search packet, and `agent doctor --json` emits the semantic language registry.
+Project policy is the exported harness API invoked by package build/test
+ownership; the provider CLI does not duplicate it.
 `agent install --client codex` writes `.codex/config.toml` so Codex hooks route
 raw TypeScript/JavaScript source reads and broad candidate searches back through
 `asp-typescript search` packets. Existing multi-language hook config is preserved:

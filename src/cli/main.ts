@@ -21,7 +21,6 @@ Usage:
   asp-typescript query (--catalog <id> | --treesitter-query <s-expression>) [<workspace-root>] [--workspace <workspace-root>] [--selector <structural-selector>] [--json]
   asp-typescript query --catalog flow-lite --where 'source.call=NAME sink.constructs=TYPE scope.fn=FUNCTION' [<workspace-root>] [--json] [--workspace <workspace-root>]
   asp-typescript ast-patch dry-run --packet <semantic-ast-patch.json|->
-  asp-typescript check [--changed | --full] [--json]
   asp-typescript evidence graph [--json] [PROJECT_ROOT]
   asp-typescript evidence analyze [--json] [PROJECT_ROOT]
   asp-typescript agent doctor [--json]
@@ -71,11 +70,6 @@ AST PATCH
   ast-patch dry-run --packet <path|->
                              Provider-native TypeScript AST dry-run receipt; never mutates files
 
-CHECK
-  check --changed           Fast lane alias; currently delegates to project check
-  check --full              Full project harness check
-  check --json              Structured TypeScriptHarnessReport JSON
-
 EVIDENCE
   evidence graph --json     Portable semantic-evidence-graph packet
   evidence analyze --json   Graph-turbo request for evidence-quality ranking
@@ -113,7 +107,6 @@ EXAMPLES
   asp-typescript evidence graph --json .
   asp-typescript evidence analyze --json .
   rg -n "OrderStatus" src tests | asp-typescript search ingest --workspace .
-  asp-typescript check --changed
   asp-typescript agent guide
 
 `;

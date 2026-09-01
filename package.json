@@ -36,8 +36,7 @@
     "test:implementation": "npm run build && node scripts/run-node-tests.mjs implementation",
     "test:perf": "npm run build && node --test dist/tests/perf/query-search.microbench.js dist/tests/perf/provider-runtime-server.microbench.js",
     "test:perf:provider-runtime": "npm run build && node --test dist/tests/perf/provider-runtime-server.microbench.js",
-    "test:policy": "npm run build && node scripts/run-node-tests.mjs policy",
-    "harness": "npm run build && node dist/src/cli/main.js check --full ."
+    "test:policy": "npm run build && node scripts/run-node-tests.mjs policy"
   },
   "dependencies": {
     "typescript": "^5.9.3"

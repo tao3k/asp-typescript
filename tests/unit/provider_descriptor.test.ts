@@ -54,10 +54,13 @@ test("provider registration schemas are loaded from JSON", () => {
 });
 
 test("SchemaManager bundle owns every registered schema in a standalone checkout", () => {
-  const receipt = JSON.parse(
-    fs.readFileSync(path.join(process.cwd(), "schemas/.asp-schema-manager-receipt.json"), "utf8"),
+  const membership = JSON.parse(
+    fs.readFileSync(
+      path.join(process.cwd(), "schemas/.asp-schema-manager-membership.json"),
+      "utf8",
+    ),
   ) as { readonly schemas: readonly { readonly name: string }[] };
-  const distributedNames = new Set(receipt.schemas.map(({ name }) => name));
+  const distributedNames = new Set(membership.schemas.map(({ name }) => name));
 
   assert.deepEqual(
     TYPE_SCRIPT_PROVIDER_REGISTRATION.schemas

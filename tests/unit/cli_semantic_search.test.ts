@@ -837,10 +837,6 @@ test("CLI exposes semantic-search protocol commands", () => {
     recencyIngest.stdout,
   );
 
-  const check = runCliCapture(["check", "--changed", "."], root);
-  assert.equal(check.exitCode, 0);
-  assert.match(check.stdout, /^\[ok\] typescript/u);
-
   const doctor = runCliCapture(["agent", "doctor", "."], root);
   assert.equal(doctor.exitCode, 0);
   assert.match(
@@ -953,8 +949,6 @@ test("CLI exposes semantic-search protocol commands", () => {
     "search/semantic-facts",
     "search/ingest",
     "query",
-    "check/changed",
-    "check/full",
     "ast-patch/dry-run",
     "evidence/graph",
     "evidence/analyze",
@@ -1094,7 +1088,7 @@ test("CLI exposes semantic-search protocol commands", () => {
               : {}),
             ...(method === "search/semantic-facts"
               ? {
-                  clients: ["asp-graph-turbo"],
+                  clients: ["asp-python-graphs"],
                   input: "search semantic-facts <query>",
                   packetSchemas: ["semantic-fact-graph.v1", "semantic-fact-ontology.v1"],
                   outputModes: ["json"],
@@ -1196,14 +1190,6 @@ test("CLI exposes semantic-search protocol commands", () => {
           outputModes: ["frontier", "json"],
           unsupportedPatternBehavior: "diagnostic",
         },
-        ...expectedMethods
-          .filter((method) => method.startsWith("check/"))
-          .map((method) => ({
-            method,
-            command: "check",
-            supportsJson: true,
-            supportsCompact: true,
-          })),
         {
           method: "ast-patch/dry-run",
           command: "ast-patch",
@@ -1228,7 +1214,7 @@ test("CLI exposes semantic-search protocol commands", () => {
           input: "provider project root",
           outputSchemaIds: ["agent.semantic-protocols.semantic-graph-turbo-request"],
           packetSchemas: ["semantic-graph-turbo-request.v1"],
-          clients: ["asp-graph-turbo"],
+          clients: ["asp-python-graphs"],
           supportsJson: true,
           supportsCompact: true,
         },

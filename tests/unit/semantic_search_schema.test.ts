@@ -218,8 +218,6 @@ test("semantic language registry JSON documents the TypeScript provider identity
     "search/semantic-facts",
     "search/ingest",
     "query",
-    "check/changed",
-    "check/full",
     "ast-patch/dry-run",
     "evidence/graph",
     "evidence/analyze",
@@ -250,9 +248,7 @@ test("semantic language registry JSON documents the TypeScript provider identity
         : true,
     );
     assert.ok(
-      ["search", "query", "check", "ast-patch", "evidence", "agent"].includes(
-        String(descriptor.command),
-      ),
+      ["search", "query", "ast-patch", "evidence", "agent"].includes(String(descriptor.command)),
     );
     if (String(descriptor.method).startsWith("search/")) {
       assert.equal(descriptor.command, "search");
@@ -498,16 +494,6 @@ test("semantic language registry JSON documents the TypeScript provider identity
         descriptor.querySetScopes === undefined ? [] : descriptor.querySetScopes,
         method === "query/owner-items" ? ["owner"] : [],
       );
-    } else if (String(descriptor.method).startsWith("check/")) {
-      assert.equal(descriptor.command, "check");
-      assert.equal(Object.hasOwn(descriptor, "view"), false);
-      assert.equal(Object.hasOwn(descriptor, "outputSchemaIds"), false);
-      assert.equal(Object.hasOwn(descriptor, "requiresQuery"), false);
-      assert.equal(Object.hasOwn(descriptor, "acceptsStdin"), false);
-      assert.equal(Object.hasOwn(descriptor, "supportsPackageScope"), false);
-      assert.equal(Object.hasOwn(descriptor, "acceptedPipes"), false);
-      assert.equal(Object.hasOwn(descriptor, "capabilities"), false);
-      assert.equal(Object.hasOwn(descriptor, "ingestRequiredFor"), false);
     } else if (String(descriptor.method).startsWith("evidence/")) {
       const method = String(descriptor.method);
       assert.equal(descriptor.command, "evidence");
@@ -525,7 +511,7 @@ test("semantic language registry JSON documents the TypeScript provider identity
       );
       assert.deepEqual(
         descriptor.clients === undefined ? [] : descriptor.clients,
-        method === "evidence/analyze" ? ["asp-graph-turbo"] : [],
+        method === "evidence/analyze" ? ["asp-python-graphs"] : [],
       );
       assert.equal(Object.hasOwn(descriptor, "requiresQuery"), false);
       assert.equal(Object.hasOwn(descriptor, "acceptsStdin"), false);

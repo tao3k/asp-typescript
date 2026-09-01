@@ -42,10 +42,19 @@ const registration = JSON.parse(
 const schemaBundleReceipt = JSON.parse(
   await readFile(resolve(packageRoot, "schemas/.asp-schema-manager-receipt.json"), "utf8"),
 );
+const schemaBundleMembership = JSON.parse(
+  await readFile(resolve(packageRoot, "schemas/.asp-schema-manager-membership.json"), "utf8"),
+);
+if (
+  schemaBundleReceipt.schemaDigest !== schemaBundleMembership.bundleDigest ||
+  !Array.isArray(schemaBundleMembership.schemas)
+) {
+  throw new Error("SchemaManager receipt and membership bundle digests diverge");
+}
 const distributedSchemaNames = new Set();
-for (const schema of schemaBundleReceipt.schemas) {
+for (const schema of schemaBundleMembership.schemas) {
   if (typeof schema.name !== "string" || !/^[^/]+\.schema\.json$/u.test(schema.name)) {
-    throw new Error("invalid SchemaManager bundle receipt entry");
+    throw new Error("invalid SchemaManager bundle membership entry");
   }
   distributedSchemaNames.add(schema.name);
 }
@@ -64,7 +73,7 @@ for (const schema of registration.schemas) {
     );
   }
 }
-for (const schema of schemaBundleReceipt.schemas) {
+for (const schema of schemaBundleMembership.schemas) {
   await copyFile(
     resolve(packageRoot, "schemas", schema.name),
     resolve(packageRoot, "dist/schemas", schema.name),
