@@ -1,7 +1,7 @@
 {
   "languageId": "typescript",
   "profileDigest": "blake3-256:bbca467bf44b0fbb162e29a806df714b07f3a955b9df23e334f0a7b8de8f88da",
-  "bundleDigest": "blake3-256:ceb5fb09195c300d5b5a9c882ed8ac6263fbe15c0762907d6d2ab648bf65663d",
+  "bundleDigest": "blake3-256:bb7f9ed31303f1052b45c628b0fa8480b00525bdc370024d9d710d61941f0120",
   "schemas": [
     {
       "name": "asp-client-cancellation-probe-request.schema.json",
@@ -33,7 +33,7 @@
     },
     {
       "name": "asp-client-frame.schema.json",
-      "digest": "blake3-256:f16667311475fd65f4b849611e3df4ca2f7fe847a4730d6fa9d025753fb7cf7c"
+      "digest": "blake3-256:e525d14121d1e061f502dd3f68e11421a6515b62011c813ba36a854f8d5dcaf9"
     },
     {
       "name": "asp-client-graphs-timeline-request.v1.schema.json",
@@ -93,7 +93,7 @@
     },
     {
       "name": "callable-skeleton.schema.json",
-      "digest": "blake3-256:4d999ee27a470459659765bff2ffd3e40c25d7422dfdda09e69733c344ff2d40"
+      "digest": "blake3-256:094f5d077b8aeaf1be0d835246a8bf1f6c6ff26e2238e6d9147236daaa22e9bd"
     },
     {
       "name": "canonical-item-selector.v1.schema.json",
@@ -197,7 +197,7 @@
     },
     {
       "name": "resident-search-result.v1.schema.json",
-      "digest": "blake3-256:66cb31e1a55f6b1ac60e898c2a0bd6a6c0f4aaa6e112625de3307c2e6e4ec3b0"
+      "digest": "blake3-256:f725fd1b7a004f28e7e579e6b6b76626880931ff9663bbd1de42519d66afbe78"
     },
     {
       "name": "resolved-source-scope.v1.schema.json",

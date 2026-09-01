@@ -417,8 +417,7 @@
         "prime",
         "owner",
         "lexical",
-        "ingest",
-        "checkChanged"
+        "ingest"
       ],
       "properties": {
         "prime": {
@@ -437,9 +436,6 @@
           "$ref": "#/$defs/methodId"
         },
         "ingest": {
-          "$ref": "#/$defs/methodId"
-        },
-        "checkChanged": {
           "$ref": "#/$defs/methodId"
         },
         "dependencyTopology": {
