@@ -52,7 +52,10 @@ test("dev command log records ordered active-context events", () => {
     delete process.env.CODEX_HOOK_RUN_ID;
     delete process.env.AGENT_HOOK_RUN_ID;
 
-    const log = startDevCommandLog(["search", "lexical", "metadata", project], project);
+    const log = startDevCommandLog(
+      ["query", "--selector", "typescript://src/demo.ts#item/function/run"],
+      project,
+    );
     finishDevCommandLog(log, 0);
 
     const commandDir = path.join(

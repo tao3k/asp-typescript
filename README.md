@@ -27,23 +27,19 @@ console.log(renderAspTypeScriptAgentCompactText(report));
 
 ## CLI
 
-The public binary is `asp-typescript`.
+The provider binary is `asp-typescript`; public discovery is owned by the root
+ASP Search Playbook.
 
 ```shell
-asp-typescript search workspace .
-asp-typescript search prime --workspace . --view seeds
-asp-typescript search owner src/index.ts --workspace . --view seeds
-asp-typescript search lexical OrderStatus .
-asp-typescript search lexical --query-set OrderStatus --query-set findOrderStatus owner tests .
-rg -n "OrderStatus" src tests | asp-typescript search ingest .
+asp search playbook --language typescript --rg -n -e OrderStatus src tests --tantivy 'title:OrderStatus^2 OR body:OrderStatus'
+asp query playbook --language typescript --selector '<typescript-selector>' --projection source --workspace .
 
 asp-typescript agent doctor --json .
 asp-typescript agent install --client codex .
 asp-typescript agent guide --client codex .
 ```
 
-Compact text is the default agent surface. `--json` emits the shared semantic
-search packet, and `agent doctor --json` emits the semantic language registry.
+`agent doctor --json` emits the semantic language registry.
 Project policy is the exported ASP TypeScript API invoked by package build/test
 ownership; the provider CLI does not duplicate it.
 `agent install --client codex` writes `.codex/config.toml` so Codex hooks route

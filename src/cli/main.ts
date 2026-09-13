@@ -16,8 +16,8 @@ export interface CliStreams {
 export const HELP_TEXT = `asp-typescript — TypeScript native-syntax provider
 
 Usage:
-  asp typescript search playbook <query> [--intent <intent>] [--workspace <root>]
-  asp typescript query --selector <exact-structural-selector> --projection <source|callable-skeleton> --workspace <root>
+  asp search playbook --language typescript --rg -n -e <query> . --tantivy 'title:<query>^2 OR body:<query>'
+  asp query playbook --language typescript --selector <exact-structural-selector> --projection <source|callable-skeleton> --workspace <root>
   asp-typescript query (--catalog <id> | --treesitter-query <s-expression>) [--workspace <root>] [--selector <structural-selector>] [--json]
   asp-typescript ast-patch dry-run --packet <semantic-ast-patch.json|->
   asp-typescript agent doctor [--json]
@@ -85,12 +85,6 @@ export async function runCli(
   if (argv[0] === "project-resolution") {
     const { runProjectResolutionCommand } = await import("./project-resolution.js");
     return runProjectResolutionCommand(argv.slice(1), streams, cwd);
-  }
-  if (argv[0] === "search") {
-    streams.stderr.write(
-      "provider-local search was removed; use asp typescript search playbook <query>\n",
-    );
-    return 2;
   }
   if (argv.length === 0 || argv[0] === "--help" || argv[0] === "-h") {
     streams.stdout.write(HELP_TEXT);

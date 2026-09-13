@@ -232,7 +232,7 @@ function aspOwnedExactProjectionError(): ProtocolErrorArgs {
   return {
     kind: "error",
     message:
-      "exact source projection is ASP-owned; use `asp typescript query --selector <exact-structural-selector> --projection source|callable-skeleton --workspace <workspace-root>`",
+      "exact source projection is ASP-owned; use `asp query playbook --language typescript --selector <exact-structural-selector> --projection source|callable-skeleton --workspace <workspace-root>`",
   };
 }
 

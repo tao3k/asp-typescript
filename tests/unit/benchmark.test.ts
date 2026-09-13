@@ -142,7 +142,6 @@ describe("benchmark: CLI exact-query stable path", () => {
     );
     assert.equal(result.exitCode, 0, result.stderr);
     assert.match(result.stdout, /src\/sample\.ts:1\nalpha/u);
-    assert.doesNotMatch(result.stdout, /\[search-owner\]/u);
     fs.rmSync(dir, { recursive: true, force: true });
   });
 });

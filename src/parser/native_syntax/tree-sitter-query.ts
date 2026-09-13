@@ -234,7 +234,7 @@ function resolveQuery(options: TypeScriptTreeSitterQueryOptions): ResolvedQuery 
   }
   if (options.aspSyntaxQueryPlan === undefined) {
     throw new Error(
-      "tree-sitter query projection requires ASP-compiled query plan; use `asp typescript query --treesitter-query ...` so ASP owns query ABI compilation",
+      "tree-sitter query projection requires an ASP-compiled query plan; use the `--syntax typescript ...` block of `asp search playbook` so ASP owns query ABI compilation",
     );
   }
   return queryShape(

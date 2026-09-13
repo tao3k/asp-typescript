@@ -14,7 +14,7 @@ import {
 
 test("CLI documents the descriptor binary as the primary binary", () => {
   assert.ok(HELP_TEXT.startsWith(`${TYPE_SCRIPT_BINARY} — TypeScript native-syntax provider`));
-  assert.ok(HELP_TEXT.includes("asp typescript search playbook <query>"));
+  assert.ok(HELP_TEXT.includes("asp search playbook --language typescript"));
   assert.doesNotMatch(HELP_TEXT, /search (?:prime|owner|lexical|ingest|pipe)/u);
   assert.doesNotMatch(HELP_TEXT, new RegExp(["typescript", "project", "harness"].join("-"), "u"));
 });

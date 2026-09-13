@@ -6,7 +6,7 @@ Use the TypeScript provider as the native-syntax authority for TypeScript and
 JavaScript source.  All public discovery goes through one command:
 
 #+begin_src sh
-asp typescript search playbook '<question>' --workspace .
+asp search playbook --language typescript --rg -n -e '<question>' . --tantivy 'title:<question>^2 OR body:<question>'
 #+end_src
 
 The Runtime composes ripgrep acquisition, TypeScript native-syntax projection,
@@ -16,21 +16,17 @@ not separate agent-facing commands.
 * Intent selection
 
 #+begin_src sh
-asp typescript search playbook 'where is OrderStatus admitted' \
-  --intent conceptual --workspace .
+asp search playbook --language typescript \
+  --rg -n -e OrderStatus src test \
+  --tantivy term OrderStatus
 
-asp typescript search playbook 'callers and tests for findOrderStatus' \
-  --intent relationship --workspace .
-
-asp typescript search playbook 'exact declaration of findOrderStatus' \
-  --intent exact-literal --workspace .
-
-asp typescript search playbook 'prove no legacy search view remains' \
-  --intent absence-proof --coverage complete --workspace .
+asp search playbook --language typescript \
+  --rg -n -e findOrderStatus src test \
+  --tantivy term findOrderStatus
 #+end_src
 
-An owner scope is expressed as =--scope owner:<path>=.  It narrows the complete
-playbook and does not replace native-syntax evidence with a path-only result.
+A known owner path can narrow the native ripgrep block without replacing
+native-syntax evidence with a path-only result.
 
 * Receipt admission
 
@@ -43,16 +39,10 @@ terminal, never permission to dump source.
 * Exact materialization
 
 #+begin_src sh
-asp typescript query --selector '<typescript-selector>' \
+asp query playbook --language typescript --selector '<typescript-selector>' \
   --projection source --workspace .
 #+end_src
 
 Use =callable-skeleton= when only a callable outline is required.  Edit the
 selected owner and route TypeScript tests, checks, formatting, and builds to
 ASP Testing while preserving the playbook generation and selector identities.
-
-* Removed surfaces
-
-=search prime=, =search owner=, =search lexical=, =search ingest=, and =search
-pipe= are removed public operations.  They have no compatibility aliases and
-must not be emitted as next commands.
