@@ -13,12 +13,6 @@ entrypoint into a catch-all reference page.
 
 ## 02_plans: Alignment Plans
 
-- [Native Parser Alignment Plan](02_plans/201_native_parser_alignment_plan.md):
-  M2 parser-first workplan from native facts to reasoning tree, low-noise
-  policy, compact output, and self-apply validation.
-- [Rust Alignment M4 Plan](02_plans/202_rust_alignment_m4_plan.md):
-  stacked milestone for policy config, rule-pack engine boundaries, compact
-  agent snapshot alignment, and parser-boundary contract hardening.
 - [Verification Policy M5 Plan](02_plans/203_verification_policy_m5_plan.md):
   stacked milestone for parser-fact-driven verification task planning,
   compact reminders, receipts, waivers, and external skill contracts.
@@ -71,10 +65,6 @@ entrypoint into a catch-all reference page.
 - [Rule Catalog](03_features/201_rule_catalog.md): default rule packs,
   blocking/advisory split, catalog functions, compact rendering policy, and
   parser-first rule constraints.
-- [Runner Modes](03_features/202_runner_modes.md): project runner,
-  explicit-path runner, shared config, and path validation.
-- [CLI](03_features/203_cli.md): command entrypoint, output modes, and
-  exit-code contract.
 - [Compact Agent Snapshot](03_features/204_compact_agent_snapshot.md):
   compact text design, section order, line shapes, non-goals, and golden
   contract.

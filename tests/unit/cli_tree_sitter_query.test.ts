@@ -302,7 +302,7 @@ test("direct provider inline tree-sitter query requires ASP compiled plan", () =
     root,
   );
   assert.equal(result.exitCode, 3);
-  assert.match(result.stderr, /requires ASP-compiled query plan/u);
+  assert.match(result.stderr, /requires an ASP-compiled query plan/u);
 });
 
 test("query --catalog declarations uses embedded canonical catalog", () => {

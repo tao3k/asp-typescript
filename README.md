@@ -92,8 +92,7 @@ git diff --check
 Durable package material lives under [docs/](docs/index.md):
 
 - [ASP TypeScript Boundary](docs/01_core/101_asp_typescript_boundary.md)
-- [Runner Modes](docs/03_features/202_runner_modes.md)
-- [CLI](docs/03_features/203_cli.md)
 - [Rule Catalog](docs/03_features/201_rule_catalog.md)
+- [Compact Agent Snapshot](docs/03_features/204_compact_agent_snapshot.md)
 - [Verification Policy](docs/03_features/205_verification_policy.md)
 - [CI](docs/04_development/301_ci.md)

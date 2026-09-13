@@ -150,7 +150,7 @@ test("compact snapshot design is the active documentation contract", () => {
   assertIncludes(compactDoc, "tests/snapshots/agent_snapshot_project.snap");
   assertNoAny(compactDoc, ["[package deps]"], "docs/03_features/204_compact_agent_snapshot.md");
 
-  for (const docPath of ["development.md", "docs/index.md", "docs/03_features/203_cli.md"]) {
+  for (const docPath of ["README.md", "docs/index.md"]) {
     const source = readProjectFile(docPath);
     assertIncludes(source, "204_compact_agent_snapshot.md", docPath);
   }
