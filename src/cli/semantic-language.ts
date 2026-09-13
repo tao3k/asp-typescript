@@ -65,7 +65,13 @@ export interface SemanticLanguageRegistration {
   readonly methods: readonly string[];
   readonly methodDescriptors: readonly SemanticLanguageMethodDescriptor[];
   readonly queryPackDescriptor: ReturnType<typeof typeScriptQueryPackDescriptor>;
-  readonly schemas: typeof TYPE_SCRIPT_PROVIDER_REGISTRATION.schemas;
+  readonly schemas: readonly SemanticLanguageSchemaRegistration[];
+}
+
+export interface SemanticLanguageSchemaRegistration {
+  readonly schemaId: string;
+  readonly schemaVersion: string;
+  readonly path: string;
 }
 
 export interface SemanticLanguageMethodDescriptor {
@@ -133,7 +139,11 @@ export function typeScriptSemanticLanguageRegistration(): SemanticLanguageRegist
     ],
     methodDescriptors: typeScriptSemanticLanguageMethodDescriptors(),
     queryPackDescriptor: typeScriptQueryPackDescriptor(),
-    schemas: TYPE_SCRIPT_PROVIDER_REGISTRATION.schemas,
+    schemas: TYPE_SCRIPT_PROVIDER_REGISTRATION.schemas.map(({ schemaId, schemaVersion, path }) => ({
+      schemaId,
+      schemaVersion,
+      path,
+    })),
   };
 }
 
