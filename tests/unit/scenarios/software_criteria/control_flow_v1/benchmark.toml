@@ -1,4 +1,4 @@
-ASP TypeScript = "vitest"
+harness = "vitest"
 test = "software_criterion_snapshot.test.ts"
 snapshot = "software_criteria/control_flow_v1"
 phase = "cold"

@@ -7,7 +7,7 @@
   "providerId": "asp-typescript",
   "binary": "asp-typescript",
   "providerRegistration": "asp-provider-registration.json",
-  "schemaBundleReceipt": "schemas/.asp-schema-manager-receipt.json",
+  "schemaBundleReceipt": "../schemas/.asp-schema-manager-receipt.json",
   "workspaceArtifact": {
     "root": "languages/asp-typescript/dist",
     "entrypoint": "src/cli/main.js",
