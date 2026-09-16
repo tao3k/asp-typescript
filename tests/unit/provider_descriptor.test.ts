@@ -53,20 +53,17 @@ test("provider registration schemas are loaded from JSON", () => {
   );
 });
 
-test("SchemaManager bundle owns every registered schema in a standalone checkout", () => {
-  const membership = JSON.parse(
-    fs.readFileSync(
-      path.join(process.cwd(), "schemas/.asp-schema-manager-membership.json"),
-      "utf8",
+test("ASP-owned registration schemas remain logical Runtime references", () => {
+  assert.equal(
+    TYPE_SCRIPT_PROVIDER_REGISTRATION.schemas.every(
+      ({ authority, path: schemaPath }) =>
+        authority === "asp" && /^schemas\/[^/]+\.schema\.json$/u.test(schemaPath),
     ),
-  ) as { readonly schemas: readonly { readonly name: string }[] };
-  const distributedNames = new Set(membership.schemas.map(({ name }) => name));
-
-  assert.deepEqual(
-    TYPE_SCRIPT_PROVIDER_REGISTRATION.schemas
-      .map(({ path: schemaPath }) => schemaPath.slice("schemas/".length))
-      .filter((schemaName) => !distributedNames.has(schemaName)),
-    [],
+    true,
+  );
+  assert.equal(
+    fs.existsSync(path.join(process.cwd(), "schemas/provider-route.schema.json")),
+    false,
   );
 });
 
