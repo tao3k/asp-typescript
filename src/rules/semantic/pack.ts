@@ -1,11 +1,11 @@
 import type {
-  TypeScriptHarnessFinding,
-  TypeScriptHarnessRule,
+  AspTypeScriptFinding,
+  AspTypeScriptRule,
   TypeScriptReasoningTree,
 } from "../../model.js";
 import { diagnosticFinding } from "../common.js";
 
-const TS_SEM_R001: TypeScriptHarnessRule = {
+const TS_SEM_R001: AspTypeScriptRule = {
   ruleId: "TS-SEM-R001",
   packId: "typescript.semantic",
   severity: "info",
@@ -15,13 +15,13 @@ const TS_SEM_R001: TypeScriptHarnessRule = {
   labels: { surface: "source", parser: "typescript-program" },
 };
 
-export function typeScriptSemanticRules(): readonly TypeScriptHarnessRule[] {
+export function typeScriptSemanticRules(): readonly AspTypeScriptRule[] {
   return [TS_SEM_R001];
 }
 
 export function evaluateSemanticRules(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   return reasoningTree.diagnostics
     .filter((diagnostic) => diagnostic.phase === "semantic")
     .map((diagnostic) =>

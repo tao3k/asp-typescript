@@ -1,5 +1,5 @@
 /**
- * Project parser implementation for TypeScript harness runs.
+ * Project parser implementation for ASP TypeScript runs.
  *
  * This module coordinates project scope discovery, TypeScript compiler inputs,
  * source parsing, and native parser fact assembly.
@@ -10,9 +10,9 @@ import path from "node:path";
 import ts from "typescript";
 
 import type {
-  TypeScriptHarnessConfig,
+  AspTypeScriptConfig,
   TypeScriptModuleReport,
-  TypeScriptProjectHarnessScope,
+  AspTypeScriptProjectScope,
 } from "../model.js";
 import { readTypeScriptConfigFacts, readTypeScriptProgramInputs } from "./config.js";
 import {
@@ -43,10 +43,10 @@ export {
 export function readProjectResolution(
   projectRootInput: string | URL,
   config: Pick<
-    TypeScriptHarnessConfig,
+    AspTypeScriptConfig,
     "ignoredDirNames" | "includeHiddenDirNames" | "includeTests" | "sourceDirNames" | "testDirNames"
   >,
-): TypeScriptProjectHarnessScope {
+): AspTypeScriptProjectScope {
   const projectRoot = packageProjectRoot(pathFromInput(projectRootInput));
   const configFacts = readTypeScriptConfigFacts(projectRoot);
   const packageJson = readPackageJsonFacts(projectRoot);
@@ -99,8 +99,8 @@ function dedupeSorted(items: string[]): string[] {
 }
 
 export function projectFileNames(
-  scope: TypeScriptProjectHarnessScope,
-  config: Pick<TypeScriptHarnessConfig, "ignoredDirNames" | "includeHiddenDirNames">,
+  scope: AspTypeScriptProjectScope,
+  config: Pick<AspTypeScriptConfig, "ignoredDirNames" | "includeHiddenDirNames">,
 ): string[] {
   if (scope.config.fileNames.length > 0) {
     return [...scope.config.fileNames].sort();
@@ -117,7 +117,7 @@ export function projectFileNames(
 }
 
 export function parseTypeScriptProjectFiles(
-  scope: TypeScriptProjectHarnessScope,
+  scope: AspTypeScriptProjectScope,
   fileNames: readonly string[],
   options: {
     readonly collectSemanticDiagnostics?: boolean;
@@ -202,7 +202,7 @@ export function parseTypeScriptProjectFiles(
 }
 
 function parseStandaloneProjectFiles(
-  scope: TypeScriptProjectHarnessScope,
+  scope: AspTypeScriptProjectScope,
   rootNames: readonly string[],
   compilerOptions: ts.CompilerOptions,
   options: { readonly collectNativeSyntaxFacts?: boolean },
@@ -218,7 +218,7 @@ function parseStandaloneProjectFiles(
 }
 
 function parseStandaloneProjectFile(
-  scope: TypeScriptProjectHarnessScope,
+  scope: AspTypeScriptProjectScope,
   fileName: string,
   compilerOptions: ts.CompilerOptions,
   resolutionCache: ts.ModuleResolutionCache,

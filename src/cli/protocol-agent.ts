@@ -70,7 +70,7 @@ export function renderAgentDoctor(projectRoot: string): string {
       `|language id=${TYPE_SCRIPT_LANGUAGE_ID} provider=${TYPE_SCRIPT_PROVIDER_ID} binary=${TYPE_SCRIPT_BINARY}`,
       `|namespace ${TYPE_SCRIPT_PROVIDER_NAMESPACE}`,
       `|method ${registration.methods.join(",")}`,
-      "|schema semantic-search-packet.v1",
+      "|schema semantic-tree-sitter-query.v1",
     ].join("\n") + "\n"
   );
 }

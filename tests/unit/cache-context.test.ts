@@ -8,7 +8,7 @@ import {
   scratchAtom,
   partitionAtoms,
   partitionFingerprint,
-  type TypeScriptHarnessPrefixAtom,
+  type AspTypeScriptPrefixAtom,
   COMPACT_TEXT_CONTRACT,
 } from "../../src/cache/prefix_atoms.js";
 import {
@@ -98,7 +98,7 @@ describe("PrefixAtom", () => {
   });
 
   it("partitionAtoms separates by cache class", () => {
-    const atoms: TypeScriptHarnessPrefixAtom[] = [
+    const atoms: AspTypeScriptPrefixAtom[] = [
       immutableContractAtom("contract"),
       branchTailAtom("tail", "content"),
       scratchAtom("project_config", "raw"),

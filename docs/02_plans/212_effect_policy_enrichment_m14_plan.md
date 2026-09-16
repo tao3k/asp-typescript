@@ -1,6 +1,6 @@
 # Effect Policy Enrichment M14 Plan
 
-M14 enriches the Effect extension without expanding the harness into a general
+M14 enriches the Effect extension without expanding ASP TypeScript into a general
 Effect style checker:
 
 ```text
@@ -68,4 +68,4 @@ call can reject; R006 only fires on AST-visible rejection signals.
 - Extension policy tests cover runtime boundary advice, entrypoint suppression,
   service requirement advice, typed error-channel advice, Promise interop
   advice, and pack disabling through the existing policy config pass.
-- Self-apply must remain clean under the default harness.
+- Self-apply must remain clean under the default ASP TypeScript.

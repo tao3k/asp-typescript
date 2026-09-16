@@ -1,7 +1,7 @@
 import type {
   TypeScriptDiagnosticSeverity,
-  TypeScriptHarnessConfig,
-  TypeScriptHarnessFinding,
+  AspTypeScriptConfig,
+  AspTypeScriptFinding,
   TypeScriptReasoningTree,
 } from "../model.js";
 import { TYPE_SCRIPT_RULE_PACKS, typeScriptRulePackRuleIds } from "./catalog.js";
@@ -15,8 +15,8 @@ import { evaluateExtensionPolicyRules } from "./extension_policy/pack.js";
 
 export function evaluateDefaultRulePacks(
   reasoningTree: TypeScriptReasoningTree,
-  config: TypeScriptHarnessConfig,
-): readonly TypeScriptHarnessFinding[] {
+  config: AspTypeScriptConfig,
+): readonly AspTypeScriptFinding[] {
   return applyPolicyConfig(
     [
       ...evaluateSyntaxRules(reasoningTree),
@@ -32,9 +32,9 @@ export function evaluateDefaultRulePacks(
 }
 
 function applyPolicyConfig(
-  findings: readonly TypeScriptHarnessFinding[],
-  config: TypeScriptHarnessConfig,
-): readonly TypeScriptHarnessFinding[] {
+  findings: readonly AspTypeScriptFinding[],
+  config: AspTypeScriptConfig,
+): readonly AspTypeScriptFinding[] {
   const disabledRuleIds = new Set([
     ...config.disabledRuleIds,
     ...config.disabledRulePacks.flatMap((rulePack) => typeScriptRulePackRuleIds(rulePack)),
@@ -53,7 +53,7 @@ function applyPolicyConfig(
 }
 
 function configuredRulePackSeverities(
-  config: TypeScriptHarnessConfig,
+  config: AspTypeScriptConfig,
 ): ReadonlyMap<string, TypeScriptDiagnosticSeverity> {
   const severities = new Map<string, TypeScriptDiagnosticSeverity>();
   for (const rulePack of TYPE_SCRIPT_RULE_PACKS) {

@@ -63,4 +63,4 @@ instead of a generic JSX style linter.
 - Extension policy tests cover `TS-EXT-EFFECT-R010`, default `info` severity,
   and agent compact text repair guidance.
 - Boundary tests ensure rules/reasoning stay downstream of parser-owned facts.
-- Self-apply remains clean under the default project harness.
+- Self-apply remains clean under the default ASP TypeScript.

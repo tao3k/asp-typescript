@@ -1,12 +1,12 @@
 import type {
   TypeScriptModuleReport,
   TypeScriptNativeDiagnostic,
-  TypeScriptProjectHarnessScope,
+  AspTypeScriptProjectScope,
   TypeScriptReasoningDiagnosticFact,
 } from "../model.js";
 
 export function reasoningDiagnostics(
-  scope: TypeScriptProjectHarnessScope,
+  scope: AspTypeScriptProjectScope,
   modules: readonly TypeScriptModuleReport[],
 ): TypeScriptReasoningDiagnosticFact[] {
   return [...projectDiagnostics(scope), ...moduleDiagnostics(modules)].sort(compareDiagnostics);
@@ -36,9 +36,7 @@ function compareDiagnostics(
   );
 }
 
-function projectDiagnostics(
-  scope: TypeScriptProjectHarnessScope,
-): TypeScriptReasoningDiagnosticFact[] {
+function projectDiagnostics(scope: AspTypeScriptProjectScope): TypeScriptReasoningDiagnosticFact[] {
   const configDiagnostics = scope.config.diagnostics.map((diagnostic) =>
     reasoningDiagnostic(scope.config.configPath ?? scope.projectRoot, "config", diagnostic),
   );

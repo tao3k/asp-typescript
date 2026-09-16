@@ -19,7 +19,7 @@ TypeScript native parser facts
 
 - Add `TypeScriptVerificationProfileIndex` and
   `TypeScriptVerificationProfileCandidate`.
-- Build the index from a project root or an existing harness report.
+- Build the index from a project root or an existing ASP TypeScript report.
 - Render active profile candidates as compact `[verify-profile]` blocks.
 - Render the full index as JSON for structured consumers.
 - Expose helpers for active candidates, active profile hints, and clear-state
@@ -66,7 +66,7 @@ project-owned semantics.
 
 M6 does not add CLI flags, verification execution, report bundles, performance
 indexes, dependency-signal config, or manifest dependency policy. Those remain
-future milestones if the TypeScript harness needs them after the profile draft
+future milestones if the ASP TypeScript needs them after the profile draft
 surface is stable.
 
 ## Validation
@@ -76,4 +76,4 @@ surface is stable.
 - Public API tests lock the new facade exports.
 - Parser-boundary tests continue to prove verification modules do not import
   parser helpers or TypeScript parser APIs.
-- The repository default harness self-applies with zero findings.
+- The repository default ASP TypeScript self-applies with zero findings.

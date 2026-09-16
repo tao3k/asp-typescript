@@ -1,154 +1,48 @@
-#+TITLE: TypeScript Project Harness Agent Skill
+#+title: ASP TypeScript Native Syntax Playbook
 
-Use =asp-typescript= as a semantic-language provider for TypeScript projects.  The
-public CLI protocol has three top-level entrypoints:
+* Role
 
-#+begin_src shell
-asp-typescript search <view> ... [--json] [--package PATH] [PROJECT_ROOT]
-asp-typescript check [--changed | --full] [--json] [PROJECT_ROOT]
-asp-typescript agent doctor [--json] [PROJECT_ROOT]
-asp-typescript agent install --client codex [PROJECT_ROOT]
-asp-typescript agent guide --client codex [PROJECT_ROOT]
-asp-typescript agent hook --client codex <event> [PROJECT_ROOT]
+Use the TypeScript provider as the native-syntax authority for TypeScript and
+JavaScript source.  All public discovery goes through one command:
+
+#+begin_src sh
+asp search playbook --language typescript --rg -n -e '<question>' . --tantivy 'title:<question>^2 OR body:<question>'
 #+end_src
 
-Do not use direct renderer flags.  =--tree=, =--stats=, =--harness=,
-=--agent-compact=, and =--agent-snapshot= are not protocol commands.
+The Runtime composes ripgrep acquisition, TypeScript native-syntax projection,
+resident Tantivy ranking, and ASP Python Graph correlation.  These stages are
+not separate agent-facing commands.
 
-* Start Here
+* Intent selection
 
-For a multi-package workspace:
+#+begin_src sh
+asp search playbook --language typescript \
+  --rg -n -e OrderStatus src test \
+  --tantivy term OrderStatus
 
-#+begin_src shell
-asp-typescript search workspace .
-asp-typescript search prime --package packages/core .
+asp search playbook --language typescript \
+  --rg -n -e findOrderStatus src test \
+  --tantivy term findOrderStatus
 #+end_src
 
-For a single package:
+A known owner path can narrow the native ripgrep block without replacing
+native-syntax evidence with a path-only result.
 
-#+begin_src shell
-asp-typescript search prime .
+* Receipt admission
+
+Admit only a completed version-1 playbook receipt whose native-syntax stage
+contains owner content digests, canonical selectors, proper byte ranges,
+nonempty query keys, and owner-bound relations.  The projected owner set must
+equal the decision owner set.  Partial or cross-generation evidence is a typed
+terminal, never permission to dump source.
+
+* Exact materialization
+
+#+begin_src sh
+asp query playbook --language typescript --selector '<typescript-selector>' \
+  --projection source --workspace .
 #+end_src
 
-Use =agent doctor --json= when an integration needs the provider registry:
-
-#+begin_src shell
-asp-typescript agent doctor --json .
-#+end_src
-
-Use =agent install --client codex= when Codex should enforce search-first
-source access in a repository:
-
-#+begin_src shell
-asp-typescript agent install --client codex .
-#+end_src
-
-The installed hooks deny raw TypeScript/JavaScript source reads and broad
-source searches unless the candidates flow into =asp-typescript search ingest=.
-The denial message includes a compact command-line guide.  Every actionable
-line starts with =|cmd= or =|pipe= and uses only the installed =asp-typescript=
-binary:
-
-#+begin_src shell
-asp-typescript agent guide --client codex .
-#+end_src
-
-If =.codex/config.toml= already exists, installation preserves other language
-harness blocks and updates or appends only the marked =asp-typescript= block.
-Run installation from the Codex session root that owns the conversation.  If the
-session is rooted at a Rust harness repo while work touches a TypeScript repo,
-install into that Rust root too, so Codex loads a concatenated root config.
-
-The registry is the capability source of truth.  Call only methods listed in
-=methods=; read =methodDescriptors= for command, view, output schema,
-query/stdin requirements, and package-scope support.
-
-* Search Views
-
-| View                                           | Purpose                                                     |
-|------------------------------------------------+-------------------------------------------------------------|
-| =workspace=                                    | Workspace package/router index.  No raw source hits.        |
-| =prime=                                        | Bounded package-level owner/dependency/finding map.         |
-| =owner <path>=                                 | One owner plus adjacent semantic edges.                     |
-| =dependency <pkg>=                             | Package manifest facts plus local import usage.             |
-| =deps <pkg[/subpath][@version][::api]>=        | Version-aware dependency API usage.                         |
-| =symbol <name>=                                | Exported symbol definitions.                                |
-| =callsite <name>=                              | Owner-level import/reexport sites.                          |
-| =import <query>=                               | Import/reexport owner edges.                                |
-| =tests <owner-or-path>=                        | Tests that import a source owner.                           |
-| =text <query>=                                 | Owner-grouped path/export matches.                          |
-| =ingest=                                       | Normalize stdin candidate streams by owner.                 |
-
-* Common Flows
-
-** Understand A Workspace
-
-#+begin_src shell
-asp-typescript search workspace .
-asp-typescript search prime --package <package-path> .
-#+end_src
-
-Read package routing, owner summaries, finding groups, and =next= actions
-before opening files. =search= is a fast syntax/reasoning lane; high-fanout
-lookup views keep core owner/import/export facts, while =prime=, =owner=,
-=api=, and =public-external-types= keep full native parser facts. Use
-=asp-typescript check --changed .= or =check --full= when semantic diagnostics are
-the evidence.
-
-** Inspect A Dependency
-
-#+begin_src shell
-asp-typescript search dependency react .
-asp-typescript search deps react/jsx-runtime@19.0.0::jsx .
-#+end_src
-
-=search deps= distinguishes the current workspace version from an external
-requested version.  Current local usage uses =versionScope=current= and
-=currentWorkspaceVersion=.  External version queries use =versionScope=external=;
-local imports are not evidence for that external version.
-
-** Trace A Symbol Or Import
-
-#+begin_src shell
-asp-typescript search symbol OrderStatus .
-asp-typescript search callsite OrderStatus .
-asp-typescript search import ./order .
-asp-typescript search tests src/domain/order.ts .
-#+end_src
-
-Use owner-grouped output to identify blast radius before editing.
-
-** Normalize External Candidate Streams
-
-#+begin_src shell
-rg -n "OrderStatus" src tests | asp-typescript search ingest .
-git diff --name-only | asp-typescript search ingest .
-#+end_src
-
-Do not paste raw =rg=, =fd=, or diff output into the prompt directly.  Pipe it
-through =search ingest= so the result is grouped by owner and aligned with the
-semantic-search packet.
-
-* Validation
-
-After edits:
-
-#+begin_src shell
-asp-typescript check --changed .
-#+end_src
-
-Before closeout:
-
-#+begin_src shell
-asp-typescript check --full .
-#+end_src
-
-For tools that need structured output:
-
-#+begin_src shell
-asp-typescript search prime --json .
-asp-typescript check --json .
-#+end_src
-
-Compact text remains the default agent-facing surface.  JSON is the validation,
-cache, and artifact contract.
+Use =callable-skeleton= when only a callable outline is required.  Edit the
+selected owner and route TypeScript tests, checks, formatting, and builds to
+ASP Testing while preserving the playbook generation and selector identities.

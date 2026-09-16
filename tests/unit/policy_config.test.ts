@@ -5,12 +5,12 @@ import path from "node:path";
 import test from "node:test";
 
 import {
-  defaultTypeScriptHarnessConfig,
-  isTypeScriptHarnessClean,
-  renderTypeScriptProjectHarness,
-  renderTypeScriptProjectHarnessAgentSnapshot,
-  runTypeScriptProjectHarness,
-  runTypeScriptProjectHarnessAgentSnapshot,
+  defaultAspTypeScriptConfig,
+  isAspTypeScriptClean,
+  renderAspTypeScript,
+  renderAspTypeScriptAgentSnapshot,
+  runAspTypeScript,
+  runAspTypeScriptAgentSnapshot,
   typeScriptRulePackRuleIds,
   withDisabledTypeScriptRule,
   withDisabledTypeScriptRulePack,
@@ -22,12 +22,9 @@ import {
 
 test("policy config can disable a single rule finding", () => {
   const root = unresolvedImportProject("single-rule");
-  const defaultReport = runTypeScriptProjectHarness(root);
-  const config = withDisabledTypeScriptRule(
-    defaultTypeScriptHarnessConfig(),
-    "TS-AGENT-POLICY-001",
-  );
-  const configuredReport = runTypeScriptProjectHarness(root, config);
+  const defaultReport = runAspTypeScript(root);
+  const config = withDisabledTypeScriptRule(defaultAspTypeScriptConfig(), "TS-AGENT-POLICY-001");
+  const configuredReport = runAspTypeScript(root, config);
 
   assert.ok(defaultReport.findings.some((finding) => finding.ruleId === "TS-AGENT-POLICY-001"));
   assert.ok(configuredReport.findings.every((finding) => finding.ruleId !== "TS-AGENT-POLICY-001"));
@@ -36,10 +33,10 @@ test("policy config can disable a single rule finding", () => {
 test("policy config can disable several rules and a built-in rule pack", () => {
   const root = unresolvedImportProject("rule-pack");
   const config = withDisabledTypeScriptRulePack(
-    withDisabledTypeScriptRules(defaultTypeScriptHarnessConfig(), ["TS-SEM-R001"]),
+    withDisabledTypeScriptRules(defaultAspTypeScriptConfig(), ["TS-SEM-R001"]),
     "agent_policy",
   );
-  const report = runTypeScriptProjectHarness(root, config);
+  const report = runAspTypeScript(root, config);
 
   assert.deepEqual(typeScriptRulePackRuleIds("agent_policy"), [
     "TS-AGENT-POLICY-001",
@@ -88,70 +85,65 @@ test("policy config can disable several rules and a built-in rule pack", () => {
 test("policy config can override single-rule and rule-pack severities", () => {
   const root = unresolvedImportProject("severity");
   const ruleConfig = withTypeScriptRuleSeverity(
-    defaultTypeScriptHarnessConfig(),
+    defaultAspTypeScriptConfig(),
     "TS-AGENT-POLICY-001",
     "warning",
   );
   const packConfig = withTypeScriptRulePackSeverity(
-    defaultTypeScriptHarnessConfig(),
+    defaultAspTypeScriptConfig(),
     "agent_policy",
     "warning",
   );
-  const ruleReport = runTypeScriptProjectHarness(root, ruleConfig);
-  const packReport = runTypeScriptProjectHarness(root, packConfig);
+  const ruleReport = runAspTypeScript(root, ruleConfig);
+  const packReport = runAspTypeScript(root, packConfig);
 
   assert.equal(agentFinding(ruleReport).severity, "warning");
-  assert.equal(isTypeScriptHarnessClean(ruleReport), false);
+  assert.equal(isAspTypeScriptClean(ruleReport), false);
   assert.ok(
     packReport.findings
       .filter((finding) => finding.ruleId.startsWith("TS-AGENT-"))
       .every((finding) => finding.severity === "warning"),
   );
-  assert.equal(isTypeScriptHarnessClean(packReport), false);
+  assert.equal(isAspTypeScriptClean(packReport), false);
 });
 
 test("single-rule severity override wins after rule-pack severity", () => {
   const root = unresolvedImportProject("rule-wins");
   const config = withTypeScriptRuleSeverity(
-    withTypeScriptRulePackSeverity(defaultTypeScriptHarnessConfig(), "agent_policy", "info"),
+    withTypeScriptRulePackSeverity(defaultAspTypeScriptConfig(), "agent_policy", "info"),
     "TS-AGENT-POLICY-001",
     "warning",
   );
-  const report = runTypeScriptProjectHarness(root, config);
+  const report = runAspTypeScript(root, config);
 
   assert.equal(agentFinding(report).severity, "warning");
-  assert.equal(isTypeScriptHarnessClean(report), false);
+  assert.equal(isAspTypeScriptClean(report), false);
 });
 
 test("blocking rule ids and blocking severity helper are applied at report time", () => {
   const root = unresolvedImportProject("blocking-rule");
   const config = {
-    ...defaultTypeScriptHarnessConfig(),
+    ...defaultAspTypeScriptConfig(),
     blockingRuleIds: ["TS-AGENT-POLICY-001"],
   };
   const warningConfig = withTypeScriptRuleSeverity(
-    defaultTypeScriptHarnessConfig(),
+    defaultAspTypeScriptConfig(),
     "TS-AGENT-POLICY-001",
     "warning",
   );
   const nonBlockingWarningConfig = withTypeScriptBlockingSeverities(warningConfig, ["error"]);
 
-  assert.equal(isTypeScriptHarnessClean(runTypeScriptProjectHarness(root, config)), false);
-  assert.equal(
-    isTypeScriptHarnessClean(runTypeScriptProjectHarness(root, nonBlockingWarningConfig)),
-    true,
-  );
+  assert.equal(isAspTypeScriptClean(runAspTypeScript(root, config)), false);
+  assert.equal(isAspTypeScriptClean(runAspTypeScript(root, nonBlockingWarningConfig)), true);
 });
 
 test("agent snapshot uses policy-configured findings", () => {
   const root = unresolvedImportProject("snapshot");
-  const defaultSnapshot = renderTypeScriptProjectHarnessAgentSnapshot(
-    runTypeScriptProjectHarnessAgentSnapshot(root),
-  );
-  const configuredSnapshot = renderTypeScriptProjectHarnessAgentSnapshot(
-    runTypeScriptProjectHarnessAgentSnapshot(
+  const defaultSnapshot = renderAspTypeScriptAgentSnapshot(runAspTypeScriptAgentSnapshot(root));
+  const configuredSnapshot = renderAspTypeScriptAgentSnapshot(
+    runAspTypeScriptAgentSnapshot(
       root,
-      withDisabledTypeScriptRule(defaultTypeScriptHarnessConfig(), "TS-AGENT-POLICY-001"),
+      withDisabledTypeScriptRule(defaultAspTypeScriptConfig(), "TS-AGENT-POLICY-001"),
     ),
   );
 
@@ -178,8 +170,8 @@ function unresolvedImportProject(label: string): string {
   return root;
 }
 
-function agentFinding(report: ReturnType<typeof runTypeScriptProjectHarness>) {
+function agentFinding(report: ReturnType<typeof runAspTypeScript>) {
   const finding = report.findings.find((candidate) => candidate.ruleId === "TS-AGENT-POLICY-001");
-  assert.ok(finding, renderTypeScriptProjectHarness(report));
+  assert.ok(finding, renderAspTypeScript(report));
   return finding;
 }

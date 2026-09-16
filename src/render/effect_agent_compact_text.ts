@@ -1,6 +1,6 @@
-import type { TypeScriptHarnessFinding } from "../model.js";
+import type { AspTypeScriptFinding } from "../model.js";
 
-export function effectAgentTaskTitle(finding: TypeScriptHarnessFinding): string | undefined {
+export function effectAgentTaskTitle(finding: AspTypeScriptFinding): string | undefined {
   switch (finding.ruleId) {
     case "TS-EXT-EFFECT-R001":
       return "Make explicit Effect extension config match package dependencies";
@@ -27,13 +27,11 @@ export function effectAgentTaskTitle(finding: TypeScriptHarnessFinding): string 
   }
 }
 
-export function effectAdviceFixSteps(
-  finding: TypeScriptHarnessFinding,
-): readonly string[] | undefined {
+export function effectAdviceFixSteps(finding: AspTypeScriptFinding): readonly string[] | undefined {
   switch (finding.ruleId) {
     case "TS-EXT-EFFECT-R001":
       return [
-        "if Effect policy is intended, add `effect` to package dependencies and keep `typescriptProjectHarness.extensions.effect` enabled",
+        "if Effect policy is intended, add `effect` to package dependencies and keep `asp-typescript.extensions.effect` enabled",
         "otherwise remove the explicit extension config",
       ];
     case "TS-EXT-EFFECT-R002":
@@ -93,7 +91,7 @@ export function effectAdviceFixSteps(
   }
 }
 
-export function effectProblemText(finding: TypeScriptHarnessFinding): string | undefined {
+export function effectProblemText(finding: AspTypeScriptFinding): string | undefined {
   switch (finding.ruleId) {
     case "TS-EXT-EFFECT-R001":
       return "package config enables Effect policy but package dependencies do not provide Effect";
@@ -120,7 +118,7 @@ export function effectProblemText(finding: TypeScriptHarnessFinding): string | u
   }
 }
 
-export function effectParserEvidenceText(finding: TypeScriptHarnessFinding): string | undefined {
+export function effectParserEvidenceText(finding: AspTypeScriptFinding): string | undefined {
   switch (finding.ruleId) {
     case "TS-EXT-EFFECT-R001":
       return "package.json extension config + dependency facts";

@@ -257,7 +257,7 @@ export interface TsAgentSnapshot {
   readonly findingGroups: readonly TsFindingGroup[];
 }
 
-// ── Compact finding (rust-harness contract) ────────────────
+// ── Compact finding (rust-ASP TypeScript contract) ────────────────
 
 export interface TsCompactFinding {
   readonly ruleId: string;

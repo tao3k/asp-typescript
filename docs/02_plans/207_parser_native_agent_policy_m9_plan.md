@@ -1,6 +1,6 @@
 # Parser-Native Agent Policy M9 Plan
 
-M9 aligns the TypeScript harness with the Rust parser-native agent policy
+M9 aligns the ASP TypeScript with the Rust parser-native agent policy
 direction while keeping the TypeScript boundary strict:
 
 ```text
@@ -69,6 +69,6 @@ direnv exec . npm ci
 direnv exec . npm run check
 direnv exec . npm run lint
 direnv exec . npm test
-direnv exec . npm run harness
+direnv exec . npm run check:policy
 direnv exec . git diff --check
 ```

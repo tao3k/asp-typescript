@@ -1,5 +1,5 @@
-import type { TypeScriptHarnessReport } from "../model.js";
+import type { AspTypeScriptReport } from "../model.js";
 
-export function renderTypeScriptProjectHarnessJson(report: TypeScriptHarnessReport): string {
+export function renderAspTypeScriptJson(report: AspTypeScriptReport): string {
   return `${JSON.stringify(report, null, 2)}\n`;
 }

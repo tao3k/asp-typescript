@@ -1,6 +1,6 @@
 # React Extension Render Purity M19 Plan
 
-M19 starts the React extension from the same parser-first harness mechanism as
+M19 starts the React extension from the same parser-first ASP TypeScript mechanism as
 Effect:
 
 ```text
@@ -33,7 +33,7 @@ The policy is calibrated against the local React docs snapshot at
 - Record obvious render-purity signals: `new Date`, `Date.now`,
   `Math.random`, and writes to `document` or `window` during render.
 - Add React package extension activation from `react` dependencies or
-  `typescriptProjectHarness.extensions.react`.
+  `asp-typescript.extensions.react`.
 - Emit `TS-EXT-REACT-R001` as `error` for explicit React config without a
   `react` dependency.
 - Emit `TS-EXT-REACT-R002` as `info` with compact agent repair steps for active
@@ -53,4 +53,4 @@ explicit extension-config consistency check.
   errors, default `info` advice, and compact repair text.
 - Rule catalog and public API tests cover the new rule ids and model facts.
 - Boundary tests ensure rules/reasoning stay downstream of parser-owned facts.
-- Self-apply remains clean under the default harness.
+- Self-apply remains clean under the default ASP TypeScript.

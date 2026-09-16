@@ -1,7 +1,7 @@
 import { advisoryFindings, blockingFindings } from "../model.js";
 import type {
-  TypeScriptHarnessFinding,
-  TypeScriptHarnessReport,
+  AspTypeScriptFinding,
+  AspTypeScriptReport,
   TypeScriptPackageExtensionFact,
 } from "../model.js";
 import {
@@ -33,12 +33,12 @@ export interface TypeScriptAgentCompactTextOptions {
 
 interface AdviceGroup {
   readonly count: number;
-  readonly finding: TypeScriptHarnessFinding;
-  readonly findings: readonly TypeScriptHarnessFinding[];
+  readonly finding: AspTypeScriptFinding;
+  readonly findings: readonly AspTypeScriptFinding[];
 }
 
-export function renderTypeScriptProjectHarnessAgentCompactText(
-  report: TypeScriptHarnessReport,
+export function renderAspTypeScriptAgentCompactText(
+  report: AspTypeScriptReport,
   options: TypeScriptAgentCompactTextOptions = {},
 ): string {
   const findingMode = options.findings ?? "advice";
@@ -52,7 +52,7 @@ export function renderTypeScriptProjectHarnessAgentCompactText(
   const maxTargetGroups = options.maxTargetGroups ?? MAX_TARGET_GROUPS;
   return [
     `AgentCompactText: mode=${findingMode} findings=${findings.length} tasks=${groups.length}`,
-    "Directive: edit listed targets, apply fix steps, rerun harness.",
+    "Directive: edit listed targets, apply fix steps, rerun ASP TypeScript.",
     "RepairTasks:",
     ...compactLines(
       groups.map((group, index) =>
@@ -64,14 +64,14 @@ export function renderTypeScriptProjectHarnessAgentCompactText(
   ].join("\n");
 }
 
-export function renderTypeScriptProjectHarnessAdvice(report: TypeScriptHarnessReport): string {
-  return renderTypeScriptProjectHarnessAgentCompactText(report, { findings: "advice" });
+export function renderAspTypeScriptAdvice(report: AspTypeScriptReport): string {
+  return renderAspTypeScriptAgentCompactText(report, { findings: "advice" });
 }
 
 function selectAgentCompactFindings(
-  report: TypeScriptHarnessReport,
+  report: AspTypeScriptReport,
   findingMode: TypeScriptAgentCompactTextFindingMode,
-): readonly TypeScriptHarnessFinding[] {
+): readonly AspTypeScriptFinding[] {
   switch (findingMode) {
     case "advice":
       return advisoryFindings(report);
@@ -82,10 +82,10 @@ function selectAgentCompactFindings(
   }
 }
 
-function groupedAdviceFindings(findings: readonly TypeScriptHarnessFinding[]): AdviceGroup[] {
+function groupedAdviceFindings(findings: readonly AspTypeScriptFinding[]): AdviceGroup[] {
   const groups = new Map<
     string,
-    { count: number; finding: TypeScriptHarnessFinding; findings: TypeScriptHarnessFinding[] }
+    { count: number; finding: AspTypeScriptFinding; findings: AspTypeScriptFinding[] }
   >();
   for (const finding of findings) {
     const key = `${finding.severity}\0${finding.ruleId}\0${finding.title}`;
@@ -110,11 +110,11 @@ function compareAdviceGroups(left: AdviceGroup, right: AdviceGroup): number {
   );
 }
 
-function adviceGroupPriority(finding: TypeScriptHarnessFinding): number {
+function adviceGroupPriority(finding: AspTypeScriptFinding): number {
   return severityPriority(finding.severity) * 100 + packPriority(finding.packId);
 }
 
-function severityPriority(severity: TypeScriptHarnessFinding["severity"]): number {
+function severityPriority(severity: AspTypeScriptFinding["severity"]): number {
   switch (severity) {
     case "error":
       return 0;
@@ -125,7 +125,7 @@ function severityPriority(severity: TypeScriptHarnessFinding["severity"]): numbe
   }
 }
 
-function packPriority(packId: TypeScriptHarnessFinding["packId"]): number {
+function packPriority(packId: AspTypeScriptFinding["packId"]): number {
   switch (packId) {
     case "typescript.extension_policy":
       return 0;
@@ -147,7 +147,7 @@ function packPriority(packId: TypeScriptHarnessFinding["packId"]): number {
 }
 
 function renderRepairTask(
-  report: TypeScriptHarnessReport,
+  report: AspTypeScriptReport,
   group: AdviceGroup,
   index: number,
   maxTargetExamples: number,
@@ -169,7 +169,7 @@ function renderRepairTask(
 }
 
 function projectCoverageLines(
-  report: TypeScriptHarnessReport,
+  report: AspTypeScriptReport,
   group: AdviceGroup,
   maxTargetGroups: number,
 ): readonly string[] {
@@ -193,13 +193,11 @@ function projectCoverageLines(
   ];
 }
 
-function isKnownExtensionFinding(finding: TypeScriptHarnessFinding): boolean {
+function isKnownExtensionFinding(finding: AspTypeScriptFinding): boolean {
   return extensionNameForFinding(finding) !== undefined;
 }
 
-function extensionNameForFinding(
-  finding: TypeScriptHarnessFinding,
-): "effect" | "react" | undefined {
+function extensionNameForFinding(finding: AspTypeScriptFinding): "effect" | "react" | undefined {
   if (finding.ruleId.startsWith("TS-EXT-EFFECT-")) {
     return "effect";
   }
@@ -210,8 +208,8 @@ function extensionNameForFinding(
 }
 
 function extensionFact(
-  report: TypeScriptHarnessReport,
-  finding: TypeScriptHarnessFinding,
+  report: AspTypeScriptReport,
+  finding: AspTypeScriptFinding,
 ): TypeScriptPackageExtensionFact | undefined {
   const extensionName = extensionNameForFinding(finding);
   return report.reasoningTree.packageExtensions.find(
@@ -233,14 +231,14 @@ function extensionSourceLabel(extension: TypeScriptPackageExtensionFact): string
 interface TargetOwnerGroup {
   readonly owner: string;
   readonly count: number;
-  readonly first: TypeScriptHarnessFinding;
+  readonly first: AspTypeScriptFinding;
 }
 
 function groupedTargetOwners(
-  report: TypeScriptHarnessReport,
-  findings: readonly TypeScriptHarnessFinding[],
+  report: AspTypeScriptReport,
+  findings: readonly AspTypeScriptFinding[],
 ): readonly TargetOwnerGroup[] {
-  const groups = new Map<string, { count: number; first: TypeScriptHarnessFinding }>();
+  const groups = new Map<string, { count: number; first: AspTypeScriptFinding }>();
   for (const finding of findings) {
     const owner = targetOwnerPath(report, finding);
     const existing = groups.get(owner);
@@ -255,10 +253,7 @@ function groupedTargetOwners(
     .sort((left, right) => right.count - left.count || left.owner.localeCompare(right.owner));
 }
 
-function targetOwnerPath(
-  report: TypeScriptHarnessReport,
-  finding: TypeScriptHarnessFinding,
-): string {
+function targetOwnerPath(report: AspTypeScriptReport, finding: AspTypeScriptFinding): string {
   const rawPath = finding.location.path;
   if (rawPath === undefined) {
     return "<project>";
@@ -283,11 +278,11 @@ function renderTargetGroup(group: TargetOwnerGroup): string {
   return `   - ${group.owner} x${group.count}${suffix}`;
 }
 
-function uniqueTargetFileCount(findings: readonly TypeScriptHarnessFinding[]): number {
+function uniqueTargetFileCount(findings: readonly AspTypeScriptFinding[]): number {
   return new Set(findings.map((finding) => finding.location.path ?? "<project>")).size;
 }
 
-function renderTaskHeader(finding: TypeScriptHarnessFinding, count: number, index: number): string {
+function renderTaskHeader(finding: AspTypeScriptFinding, count: number, index: number): string {
   const context = compactTaskContext(finding);
   const contextSuffix = context === "" ? "" : ` (${context})`;
   return `[${finding.ruleId}] ${capitalizeSeverity(finding.severity)} x${count}: ${agentTaskTitle(
@@ -299,7 +294,7 @@ function capitalizeSeverity(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-function agentTaskTitle(finding: TypeScriptHarnessFinding): string {
+function agentTaskTitle(finding: AspTypeScriptFinding): string {
   const effectTitle = effectAgentTaskTitle(finding);
   if (effectTitle !== undefined) {
     return effectTitle;
@@ -324,7 +319,7 @@ function agentTaskTitle(finding: TypeScriptHarnessFinding): string {
   }
 }
 
-function adviceFixSteps(finding: TypeScriptHarnessFinding): readonly string[] {
+function adviceFixSteps(finding: AspTypeScriptFinding): readonly string[] {
   const effectSteps = effectAdviceFixSteps(finding);
   if (effectSteps !== undefined) {
     return effectSteps;
@@ -406,11 +401,11 @@ function adviceFixSteps(finding: TypeScriptHarnessFinding): readonly string[] {
         "example from shadcn/ui: every config object has a corresponding Zod schema",
       ];
     default:
-      return ["open the target, apply the rule contract in source, and rerun harness"];
+      return ["open the target, apply the rule contract in source, and rerun ASP TypeScript"];
   }
 }
 
-function problemText(finding: TypeScriptHarnessFinding): string {
+function problemText(finding: AspTypeScriptFinding): string {
   const effectProblem = effectProblemText(finding);
   if (effectProblem !== undefined) {
     return effectProblem;
@@ -435,7 +430,7 @@ function problemText(finding: TypeScriptHarnessFinding): string {
   }
 }
 
-function adviceParserEvidenceText(finding: TypeScriptHarnessFinding): string {
+function adviceParserEvidenceText(finding: AspTypeScriptFinding): string {
   const effectEvidence = effectParserEvidenceText(finding);
   if (effectEvidence !== undefined) {
     return effectEvidence;
@@ -457,7 +452,7 @@ function adviceParserEvidenceText(finding: TypeScriptHarnessFinding): string {
   }
 }
 
-function compactTaskContext(finding: TypeScriptHarnessFinding): string {
+function compactTaskContext(finding: AspTypeScriptFinding): string {
   const parts = [problemText(finding)];
   const parserEvidence = adviceParserEvidenceText(finding);
   if (parserEvidence !== "") {
@@ -466,14 +461,11 @@ function compactTaskContext(finding: TypeScriptHarnessFinding): string {
   return parts.join("; ");
 }
 
-function renderTargetExample(
-  report: TypeScriptHarnessReport,
-  finding: TypeScriptHarnessFinding,
-): string {
+function renderTargetExample(report: AspTypeScriptReport, finding: AspTypeScriptFinding): string {
   return `   - @ ${renderLocation(report, finding)} ${targetDetailText(finding)}`;
 }
 
-function targetDetailText(finding: TypeScriptHarnessFinding): string {
+function targetDetailText(finding: AspTypeScriptFinding): string {
   switch (finding.ruleId) {
     case "TS-EXT-EFFECT-R002":
       return labelValue("apis", finding.labels.async_surfaces) ?? finding.label;
@@ -510,10 +502,7 @@ function labelValue(label: string, value: string | undefined): string | undefine
   return value === undefined || value === "" ? undefined : `${label}=${value}`;
 }
 
-function renderLocation(
-  report: TypeScriptHarnessReport,
-  finding: TypeScriptHarnessFinding,
-): string {
+function renderLocation(report: AspTypeScriptReport, finding: AspTypeScriptFinding): string {
   const rawPath = finding.location.path ?? "<project>";
   const displayPath =
     rawPath === "<project>"

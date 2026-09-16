@@ -2,7 +2,7 @@ import path from "node:path";
 
 import ts from "typescript";
 
-import type { TypeScriptProjectConfigFacts, TypeScriptProjectHarnessScope } from "../model.js";
+import type { TypeScriptProjectConfigFacts, AspTypeScriptProjectScope } from "../model.js";
 import { slashPath } from "../reasoning/path_utils.js";
 import {
   compilerOptionFacts,
@@ -65,7 +65,7 @@ export function readTypeScriptConfigFacts(projectRoot: string): TypeScriptProjec
 }
 
 export function readTypeScriptProgramInputs(
-  scope: TypeScriptProjectHarnessScope,
+  scope: AspTypeScriptProjectScope,
 ): TypeScriptProgramInputs {
   const configPath = scope.config.configPath;
   if (configPath === undefined) {

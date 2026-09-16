@@ -1,6 +1,6 @@
 # Agent Advice Test Gate M10 Plan
 
-M10 aligns the TypeScript harness with the Rust cargo-test gate behavior added
+M10 aligns the ASP TypeScript with the Rust cargo-test gate behavior added
 after the parser-native agent policy milestone:
 
 ```text
@@ -12,15 +12,15 @@ configured parser/reasoning facts
 
 ## Scope
 
-- Add `assertTypeScriptProjectHarnessAgentClean(projectRoot, config?)` as a
+- Add `assertAspTypeScriptAgentClean(projectRoot, config?)` as a
   public project-level assertion helper.
-- Keep `assertTypeScriptProjectHarnessClean()` blocking-only, matching the
+- Keep `assertAspTypeScriptClean()` blocking-only, matching the
   existing CLI exit-code contract.
 - Make the agent-clean helper fail after configured-blocking findings are
   handled when visible `info` advice remains.
-- Render the failure with `renderTypeScriptProjectHarnessAgentCompactText()` so
+- Render the failure with `renderAspTypeScriptAgentCompactText()` so
   test output is compact repair feedback, not JSON or an expanded report.
-  `renderTypeScriptProjectHarnessAdvice()` remains a compatibility alias for
+  `renderAspTypeScriptAdvice()` remains a compatibility alias for
   advice-only compact text. The first agent surface is `RepairTasks:` with
   explicit `fix:` steps and target locators; rule ids are metadata, not the
   primary instruction.
@@ -51,6 +51,6 @@ direnv exec . npm ci
 direnv exec . npm run check
 direnv exec . npm run lint
 direnv exec . npm test
-direnv exec . npm run harness
+direnv exec . npm run check:policy
 direnv exec . git diff --check
 ```

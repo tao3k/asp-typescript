@@ -1,11 +1,11 @@
 import type {
-  TypeScriptHarnessFinding,
-  TypeScriptHarnessRule,
+  AspTypeScriptFinding,
+  AspTypeScriptRule,
   TypeScriptReasoningTree,
 } from "../../model.js";
 import { diagnosticFinding } from "../common.js";
 
-const TS_SYN_R001: TypeScriptHarnessRule = {
+const TS_SYN_R001: AspTypeScriptRule = {
   ruleId: "TS-SYN-R001",
   packId: "typescript.syntax",
   severity: "error",
@@ -14,13 +14,13 @@ const TS_SYN_R001: TypeScriptHarnessRule = {
   labels: { surface: "source", parser: "typescript" },
 };
 
-export function typeScriptSyntaxRules(): readonly TypeScriptHarnessRule[] {
+export function typeScriptSyntaxRules(): readonly AspTypeScriptRule[] {
   return [TS_SYN_R001];
 }
 
 export function evaluateSyntaxRules(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   return reasoningTree.diagnostics
     .filter((diagnostic) => diagnostic.phase === "syntax")
     .map((diagnostic) =>

@@ -1,4 +1,4 @@
-import type { RulePackDescriptor, TypeScriptRulePack, TypeScriptHarnessRule } from "../model.js";
+import type { RulePackDescriptor, TypeScriptRulePack, AspTypeScriptRule } from "../model.js";
 import { typeScriptAgentPolicyRules } from "./agent_policy/pack.js";
 import { typeScriptModularityRules } from "./modularity/pack.js";
 import { typeScriptProjectPolicyRules } from "./project_policy/pack.js";
@@ -68,11 +68,11 @@ export function typeScriptRulePackDescriptors(): readonly RulePackDescriptor[] {
 
 export function typeScriptRulePackRuleIds(
   rulePack: TypeScriptRulePack,
-): readonly TypeScriptHarnessRule["ruleId"][] {
+): readonly AspTypeScriptRule["ruleId"][] {
   return typeScriptRulePackRules(rulePack).map((rule) => rule.ruleId);
 }
 
-function typeScriptRulePackRules(rulePack: TypeScriptRulePack): readonly TypeScriptHarnessRule[] {
+function typeScriptRulePackRules(rulePack: TypeScriptRulePack): readonly AspTypeScriptRule[] {
   switch (rulePack) {
     case "syntax":
       return typeScriptSyntaxRules();

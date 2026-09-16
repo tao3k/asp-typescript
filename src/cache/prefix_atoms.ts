@@ -9,7 +9,7 @@ import { atomFingerprint, groupFingerprint } from "./fingerprint.js";
 // ── Cache classification ──────────────────────────────────
 
 /** Stability class for DeepSeek cache-friendly prompt partitioning. */
-export type TypeScriptHarnessCacheClass =
+export type AspTypeScriptCacheClass =
   | "immutable_prefix" // Protocol rules, format contracts — system prompt
   | "session_stable" // Project structure — changes only on git change
   | "path_append" // Current repair path — append-only
@@ -30,9 +30,9 @@ export type PrefixAtomKind =
 
 // ── The atom ───────────────────────────────────────────────
 
-export interface TypeScriptHarnessPrefixAtom {
+export interface AspTypeScriptPrefixAtom {
   readonly atomId: string;
-  readonly cacheClass: TypeScriptHarnessCacheClass;
+  readonly cacheClass: AspTypeScriptCacheClass;
   readonly kind: PrefixAtomKind;
 
   /** Stable text payload — what goes into the prompt. */
@@ -50,11 +50,11 @@ export interface TypeScriptHarnessPrefixAtom {
 let nextId = 0;
 
 function newAtom(
-  cacheClass: TypeScriptHarnessCacheClass,
+  cacheClass: AspTypeScriptCacheClass,
   kind: PrefixAtomKind,
   stableText: string,
   sourceRefs: readonly string[] = [],
-): TypeScriptHarnessPrefixAtom {
+): AspTypeScriptPrefixAtom {
   const contentHash = atomFingerprint(stableText);
   return {
     atomId: `atom-${String(++nextId).padStart(4, "0")}`,
@@ -69,11 +69,11 @@ function newAtom(
 
 // ── Immutable contracts (system prompt) ────────────────────
 
-export function immutableContractAtom(contractText: string): TypeScriptHarnessPrefixAtom {
+export function immutableContractAtom(contractText: string): AspTypeScriptPrefixAtom {
   return newAtom("immutable_prefix", "immutable_contract", contractText);
 }
 
-export const COMPACT_TEXT_CONTRACT = `Compact text must clone rust-harness format:
+export const COMPACT_TEXT_CONTRACT = `Compact text must clone ASP Rust format:
 [RULE-ID] Severity: Title
 @ path:line:column
 fix: short repair command
@@ -83,7 +83,7 @@ Contract: stable rule requirement
 
 Clean output: [ok] ts`;
 
-export const TOOL_USAGE_CONTRACT = `When repairing: 1) Read the target file first. 2) Apply SEARCH/REPLACE. 3) Run relevant tests. 4) Rerun harness to verify repair.`;
+export const TOOL_USAGE_CONTRACT = `When repairing: 1) Read the target file first. 2) Apply SEARCH/REPLACE. 3) Run relevant tests. 4) Rerun ASP TypeScript to verify repair.`;
 
 export const AUTHORITY_ORDER_CONTRACT = `Authority order: parser facts > receipts > complete waivers > config hints > LLM prose`;
 
@@ -98,7 +98,7 @@ export interface ProjectStructureInput {
   readonly sourceRefs: readonly string[];
 }
 
-export function projectStructureAtoms(input: ProjectStructureInput): TypeScriptHarnessPrefixAtom[] {
+export function projectStructureAtoms(input: ProjectStructureInput): AspTypeScriptPrefixAtom[] {
   return [
     newAtom("session_stable", "project_config", input.modulesSummary, input.sourceRefs),
     newAtom("session_stable", "extension", input.extensions, input.sourceRefs),
@@ -117,7 +117,7 @@ export interface RepairStateInput {
   readonly sourceRefs: readonly string[];
 }
 
-export function repairStateAtoms(input: RepairStateInput): TypeScriptHarnessPrefixAtom[] {
+export function repairStateAtoms(input: RepairStateInput): AspTypeScriptPrefixAtom[] {
   return [
     newAtom("path_append", "finding_group", input.selectedFindings, input.sourceRefs),
     newAtom("path_append", "verification_task", input.verificationTasks, input.sourceRefs),
@@ -131,7 +131,7 @@ export function branchTailAtom(
   label: string,
   content: string,
   sourceRefs: readonly string[] = [],
-): TypeScriptHarnessPrefixAtom {
+): AspTypeScriptPrefixAtom {
   return newAtom("branch_tail", "finding_group", `[${label}]\n${content}`, sourceRefs);
 }
 
@@ -141,21 +141,21 @@ export function scratchAtom(
   kind: PrefixAtomKind,
   content: string,
   sourceRefs: readonly string[] = [],
-): TypeScriptHarnessPrefixAtom {
+): AspTypeScriptPrefixAtom {
   return newAtom("scratch_only", kind, content, sourceRefs);
 }
 
 // ── Grouping ───────────────────────────────────────────────
 
 export interface PartitionedAtoms {
-  readonly immutablePrefix: readonly TypeScriptHarnessPrefixAtom[];
-  readonly sessionStable: readonly TypeScriptHarnessPrefixAtom[];
-  readonly pathAppend: readonly TypeScriptHarnessPrefixAtom[];
-  readonly branchTail: readonly TypeScriptHarnessPrefixAtom[];
-  readonly scratchOnly: readonly TypeScriptHarnessPrefixAtom[];
+  readonly immutablePrefix: readonly AspTypeScriptPrefixAtom[];
+  readonly sessionStable: readonly AspTypeScriptPrefixAtom[];
+  readonly pathAppend: readonly AspTypeScriptPrefixAtom[];
+  readonly branchTail: readonly AspTypeScriptPrefixAtom[];
+  readonly scratchOnly: readonly AspTypeScriptPrefixAtom[];
 }
 
-export function partitionAtoms(atoms: readonly TypeScriptHarnessPrefixAtom[]): PartitionedAtoms {
+export function partitionAtoms(atoms: readonly AspTypeScriptPrefixAtom[]): PartitionedAtoms {
   return {
     immutablePrefix: atoms.filter((a) => a.cacheClass === "immutable_prefix"),
     sessionStable: atoms.filter((a) => a.cacheClass === "session_stable"),

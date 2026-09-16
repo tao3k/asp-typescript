@@ -5,11 +5,11 @@ import ts from "typescript";
 import type {
   TypeScriptImportFact,
   TypeScriptNativeImportResolutionFact,
-  TypeScriptProjectHarnessScope,
+  AspTypeScriptProjectScope,
 } from "../model.js";
 
 export function resolveNativeImportFact(
-  scope: TypeScriptProjectHarnessScope,
+  scope: AspTypeScriptProjectScope,
   containingFile: string,
   importFact: TypeScriptImportFact,
   compilerOptions: ts.CompilerOptions,
@@ -43,7 +43,7 @@ export function resolveNativeImportFact(
 }
 
 function classifyNativeImportResolution(
-  scope: TypeScriptProjectHarnessScope,
+  scope: AspTypeScriptProjectScope,
   moduleSpecifier: string,
   resolvedModule: ts.ResolvedModuleFull | undefined,
 ): TypeScriptNativeImportResolutionFact["resolution"] {
@@ -73,7 +73,7 @@ function classifyNativeImportResolution(
   return "external";
 }
 
-function matchesPathAlias(scope: TypeScriptProjectHarnessScope, moduleSpecifier: string): boolean {
+function matchesPathAlias(scope: AspTypeScriptProjectScope, moduleSpecifier: string): boolean {
   return scope.config.pathAliases.some((alias) => {
     const wildcard = alias.pattern.indexOf("*");
     if (wildcard === -1) {

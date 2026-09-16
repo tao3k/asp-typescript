@@ -1,21 +1,21 @@
 import type {
-  TypeScriptHarnessFinding,
-  TypeScriptHarnessRule,
+  AspTypeScriptFinding,
+  AspTypeScriptRule,
   TypeScriptReasoningTree,
 } from "../../model.js";
 import { diagnosticFinding, relativeToProject } from "../common.js";
 
-const TS_PROJ_R001: TypeScriptHarnessRule = {
+const TS_PROJ_R001: AspTypeScriptRule = {
   ruleId: "TS-AGENT-PROJECT-001",
   packId: "typescript.project_policy",
   severity: "warning",
   title: "Project should declare tsconfig",
   requirement:
-    "Project runs should declare tsconfig.json so the harness sees TypeScript's source set.",
+    "Project runs should declare tsconfig.json so ASP TypeScript sees TypeScript's source set.",
   labels: { surface: "project", parser: "tsconfig" },
 };
 
-const TS_PROJ_R002: TypeScriptHarnessRule = {
+const TS_PROJ_R002: AspTypeScriptRule = {
   ruleId: "TS-AGENT-PROJECT-002",
   packId: "typescript.project_policy",
   severity: "error",
@@ -24,7 +24,7 @@ const TS_PROJ_R002: TypeScriptHarnessRule = {
   labels: { surface: "project", parser: "tsconfig" },
 };
 
-const TS_PROJ_R003: TypeScriptHarnessRule = {
+const TS_PROJ_R003: AspTypeScriptRule = {
   ruleId: "TS-AGENT-PROJECT-003",
   packId: "typescript.project_policy",
   severity: "info",
@@ -34,7 +34,7 @@ const TS_PROJ_R003: TypeScriptHarnessRule = {
   labels: { surface: "project", parser: "package-json" },
 };
 
-const TS_PROJ_R004: TypeScriptHarnessRule = {
+const TS_PROJ_R004: AspTypeScriptRule = {
   ruleId: "TS-AGENT-PROJECT-004",
   packId: "typescript.project_policy",
   severity: "info",
@@ -44,7 +44,7 @@ const TS_PROJ_R004: TypeScriptHarnessRule = {
   labels: { surface: "project-reference", parser: "tsconfig" },
 };
 
-const TS_PROJ_R005: TypeScriptHarnessRule = {
+const TS_PROJ_R005: AspTypeScriptRule = {
   ruleId: "TS-AGENT-PROJECT-005",
   packId: "typescript.project_policy",
   severity: "info",
@@ -54,7 +54,7 @@ const TS_PROJ_R005: TypeScriptHarnessRule = {
   labels: { surface: "project", parser: "tsconfig" },
 };
 
-const TS_PROJ_R006: TypeScriptHarnessRule = {
+const TS_PROJ_R006: AspTypeScriptRule = {
   ruleId: "TS-AGENT-PROJECT-006",
   packId: "typescript.project_policy",
   severity: "info",
@@ -64,14 +64,14 @@ const TS_PROJ_R006: TypeScriptHarnessRule = {
   labels: { surface: "project", parser: "package-json", build_tool: "rspack" },
 };
 
-export function typeScriptProjectPolicyRules(): readonly TypeScriptHarnessRule[] {
+export function typeScriptProjectPolicyRules(): readonly AspTypeScriptRule[] {
   return [TS_PROJ_R001, TS_PROJ_R002, TS_PROJ_R003, TS_PROJ_R004, TS_PROJ_R005, TS_PROJ_R006];
 }
 
 export function evaluateProjectPolicyRules(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
-  const findings: TypeScriptHarnessFinding[] = [];
+): AspTypeScriptFinding[] {
+  const findings: AspTypeScriptFinding[] = [];
   if (reasoningTree.runMode === "project" && reasoningTree.configPath === undefined) {
     findings.push({
       ruleId: TS_PROJ_R001.ruleId,
@@ -105,7 +105,7 @@ export function evaluateProjectPolicyRules(
 
 function evaluateProjectReferenceConfigAdvice(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   return reasoningTree.projectReferencePackages.flatMap((referencePackage) => {
     if (referencePackage.configPath === undefined) {
       return [
@@ -151,7 +151,7 @@ function evaluateProjectReferenceConfigAdvice(
 
 function evaluatePackageEntryResolutionModeAdvice(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   if (
     reasoningTree.configPath === undefined ||
     (!reasoningTree.packageExports.length && !reasoningTree.packageImports.length)
@@ -187,7 +187,7 @@ function evaluatePackageEntryResolutionModeAdvice(
 
 function evaluateRspackBuildSurfaceAdvice(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   const rspack = reasoningTree.packageBuildTools.find((buildTool) => buildTool.name === "rspack");
   if (rspack === undefined || rspack.scriptNames.length > 0) {
     return [];
@@ -220,5 +220,5 @@ function rspackSignalSummary(
     buildTool.packageNames.length > 0 ? `packages ${buildTool.packageNames.join(",")}` : undefined,
     buildTool.configFiles.length > 0 ? `configs ${buildTool.configFiles.join(",")}` : undefined,
   ].filter((part): part is string => part !== undefined);
-  return parts.length === 0 ? "package.json harness config" : parts.join(" and ");
+  return parts.length === 0 ? "package.json ASP TypeScript config" : parts.join(" and ");
 }

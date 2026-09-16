@@ -5,8 +5,8 @@
  * agent-facing findings without requiring provider-private heuristics.
  */
 import type {
-  TypeScriptHarnessFinding,
-  TypeScriptHarnessRule,
+  AspTypeScriptFinding,
+  AspTypeScriptRule,
   TypeScriptEffectPromiseInteropRiskFact,
   TypeScriptEffectResourceScopeRiskFact,
   TypeScriptEffectRuntimeCallFact,
@@ -29,7 +29,7 @@ import {
 } from "./react_pack.js";
 import { evaluateShadcnPolicyRules, shadcnPolicyRules } from "./shadcn/pack.js";
 
-export const TS_EXT_EFFECT_R001: TypeScriptHarnessRule = {
+export const TS_EXT_EFFECT_R001: AspTypeScriptRule = {
   ruleId: "TS-EXT-EFFECT-R001",
   packId: "typescript.extension_policy",
   severity: "error",
@@ -39,7 +39,7 @@ export const TS_EXT_EFFECT_R001: TypeScriptHarnessRule = {
   labels: { surface: "extension", parser: "package-json", extension: "effect" },
 };
 
-export const TS_EXT_EFFECT_R002: TypeScriptHarnessRule = {
+export const TS_EXT_EFFECT_R002: AspTypeScriptRule = {
   ruleId: "TS-EXT-EFFECT-R002",
   packId: "typescript.extension_policy",
   severity: "info",
@@ -49,7 +49,7 @@ export const TS_EXT_EFFECT_R002: TypeScriptHarnessRule = {
   labels: { surface: "extension", parser: "native-syntax", extension: "effect" },
 };
 
-export const TS_EXT_EFFECT_R003: TypeScriptHarnessRule = {
+export const TS_EXT_EFFECT_R003: AspTypeScriptRule = {
   ruleId: "TS-EXT-EFFECT-R003",
   packId: "typescript.extension_policy",
   severity: "info",
@@ -59,7 +59,7 @@ export const TS_EXT_EFFECT_R003: TypeScriptHarnessRule = {
   labels: { surface: "extension", parser: "native-syntax", extension: "effect" },
 };
 
-export const TS_EXT_EFFECT_R004: TypeScriptHarnessRule = {
+export const TS_EXT_EFFECT_R004: AspTypeScriptRule = {
   ruleId: "TS-EXT-EFFECT-R004",
   packId: "typescript.extension_policy",
   severity: "info",
@@ -69,7 +69,7 @@ export const TS_EXT_EFFECT_R004: TypeScriptHarnessRule = {
   labels: { surface: "extension", parser: "native-syntax", extension: "effect" },
 };
 
-export const TS_EXT_EFFECT_R005: TypeScriptHarnessRule = {
+export const TS_EXT_EFFECT_R005: AspTypeScriptRule = {
   ruleId: "TS-EXT-EFFECT-R005",
   packId: "typescript.extension_policy",
   severity: "info",
@@ -79,7 +79,7 @@ export const TS_EXT_EFFECT_R005: TypeScriptHarnessRule = {
   labels: { surface: "extension", parser: "native-syntax", extension: "effect" },
 };
 
-export const TS_EXT_EFFECT_R006: TypeScriptHarnessRule = {
+export const TS_EXT_EFFECT_R006: AspTypeScriptRule = {
   ruleId: "TS-EXT-EFFECT-R006",
   packId: "typescript.extension_policy",
   severity: "info",
@@ -89,7 +89,7 @@ export const TS_EXT_EFFECT_R006: TypeScriptHarnessRule = {
   labels: { surface: "extension", parser: "native-syntax", extension: "effect" },
 };
 
-export const TS_EXT_EFFECT_R007: TypeScriptHarnessRule = {
+export const TS_EXT_EFFECT_R007: AspTypeScriptRule = {
   ruleId: "TS-EXT-EFFECT-R007",
   packId: "typescript.extension_policy",
   severity: "info",
@@ -99,7 +99,7 @@ export const TS_EXT_EFFECT_R007: TypeScriptHarnessRule = {
   labels: { surface: "extension", parser: "native-syntax", extension: "effect" },
 };
 
-export const TS_EXT_EFFECT_R011: TypeScriptHarnessRule = {
+export const TS_EXT_EFFECT_R011: AspTypeScriptRule = {
   ruleId: "TS-EXT-EFFECT-R011",
   packId: "typescript.extension_policy",
   severity: "warning",
@@ -109,7 +109,7 @@ export const TS_EXT_EFFECT_R011: TypeScriptHarnessRule = {
   labels: { surface: "extension", parser: "reasoning-tree", extension: "effect" },
 };
 
-export const TS_EXT_EFFECT_R012: TypeScriptHarnessRule = {
+export const TS_EXT_EFFECT_R012: AspTypeScriptRule = {
   ruleId: "TS-EXT-EFFECT-R012",
   packId: "typescript.extension_policy",
   severity: "warning",
@@ -119,7 +119,7 @@ export const TS_EXT_EFFECT_R012: TypeScriptHarnessRule = {
   labels: { surface: "extension", parser: "native-syntax", extension: "effect" },
 };
 
-export const TS_EXT_EFFECT_R013: TypeScriptHarnessRule = {
+export const TS_EXT_EFFECT_R013: AspTypeScriptRule = {
   ruleId: "TS-EXT-EFFECT-R013",
   packId: "typescript.extension_policy",
   severity: "warning",
@@ -129,7 +129,7 @@ export const TS_EXT_EFFECT_R013: TypeScriptHarnessRule = {
   labels: { surface: "extension", parser: "reasoning-tree", extension: "effect" },
 };
 
-export function typeScriptExtensionPolicyRules(): readonly TypeScriptHarnessRule[] {
+export function typeScriptExtensionPolicyRules(): readonly AspTypeScriptRule[] {
   return [
     TS_EXT_EFFECT_R001,
     TS_EXT_EFFECT_R002,
@@ -151,7 +151,7 @@ export function typeScriptExtensionPolicyRules(): readonly TypeScriptHarnessRule
 
 export function evaluateExtensionPolicyRules(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   return [
     ...evaluateEffectConfigurationFindings(reasoningTree),
     ...evaluateEffectAsyncSurfaceAdvice(reasoningTree),
@@ -173,7 +173,7 @@ export function evaluateExtensionPolicyRules(
 
 function evaluateEffectConfigurationFindings(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   return reasoningTree.packageExtensions.flatMap((extension) => {
     if (
       extension.name !== "effect" ||
@@ -197,7 +197,7 @@ function evaluateEffectConfigurationFindings(
           activation: extension.activation,
           capabilities: extension.capabilities.join(","),
           config: extension.configSource ?? "package.json",
-          repair: "add effect and keep typescriptProjectHarness.extensions.effect enabled",
+          repair: "add effect and keep asp-typescript.extensions.effect enabled",
         },
       },
     ];
@@ -206,7 +206,7 @@ function evaluateEffectConfigurationFindings(
 
 function evaluateEffectAsyncSurfaceAdvice(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   if (!effectPolicyIsActive(reasoningTree.packageExtensions)) {
     return [];
   }
@@ -217,7 +217,7 @@ function evaluateEffectAsyncSurfaceAdvice(
 
 function effectAsyncSurfaceAdviceForModule(
   moduleReport: TypeScriptReasoningModule,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   const rawAsyncSurfaces = moduleReport.publicAsyncEffectSurfaces.filter(
     (surface) => !surface.returnsEffect && (surface.isAsync || surface.returnsPromise),
   );
@@ -249,7 +249,7 @@ function effectAsyncSurfaceAdviceForModule(
 
 function evaluateEffectRuntimeBoundaryAdvice(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   if (!effectPolicyIsActive(reasoningTree.packageExtensions)) {
     return [];
   }
@@ -260,7 +260,7 @@ function evaluateEffectRuntimeBoundaryAdvice(
 
 function effectRuntimeBoundaryAdviceForModule(
   moduleReport: TypeScriptReasoningModule,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   const disallowedRuntimeCalls = moduleReport.effectRuntimeCalls.filter(
     (call) => !isAllowedEffectRuntimeBoundary(call.runtimeBoundaryKind),
   );
@@ -298,7 +298,7 @@ function isAllowedEffectRuntimeBoundary(
 
 function evaluateEffectServiceRequirementAdvice(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   if (!effectPolicyIsActive(reasoningTree.packageExtensions)) {
     return [];
   }
@@ -309,7 +309,7 @@ function evaluateEffectServiceRequirementAdvice(
 
 function effectServiceRequirementAdviceForModule(
   moduleReport: TypeScriptReasoningModule,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   return moduleReport.effectServiceMethods
     .filter((method) => requirementTypeLeaks(method.requirementsTypeText))
     .map((method) => ({
@@ -334,7 +334,7 @@ function effectServiceRequirementAdviceForModule(
 
 function evaluateEffectTypedErrorAdvice(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   if (!effectPolicyIsActive(reasoningTree.packageExtensions)) {
     return [];
   }
@@ -345,7 +345,7 @@ function evaluateEffectTypedErrorAdvice(
 
 function effectTypedErrorAdviceForModule(
   moduleReport: TypeScriptReasoningModule,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   const weakFunctionSurfaces = moduleReport.publicAsyncEffectSurfaces.filter(
     (surface) => surface.returnsEffect && surface.errorChannelKind === "weak",
   );
@@ -386,7 +386,7 @@ function effectTypedErrorAdviceForModule(
 
 function evaluateEffectPromiseInteropAdvice(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   if (!effectPolicyIsActive(reasoningTree.packageExtensions)) {
     return [];
   }
@@ -397,7 +397,7 @@ function evaluateEffectPromiseInteropAdvice(
 
 function effectPromiseInteropAdviceForModule(
   moduleReport: TypeScriptReasoningModule,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   const first = moduleReport.effectPromiseInteropRisks[0];
   if (first === undefined) {
     return [];
@@ -428,7 +428,7 @@ function effectPromiseInteropAdviceForModule(
 
 function evaluateEffectResourceScopeAdvice(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   if (!effectPolicyIsActive(reasoningTree.packageExtensions)) {
     return [];
   }
@@ -439,7 +439,7 @@ function evaluateEffectResourceScopeAdvice(
 
 function effectResourceScopeAdviceForModule(
   moduleReport: TypeScriptReasoningModule,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   const first = moduleReport.effectResourceScopeRisks[0];
   if (first === undefined) {
     return [];
@@ -536,7 +536,7 @@ function cappedNames(names: readonly string[], max: number): string {
 /** R011: Effect production modules importing test utilities. */
 function evaluateEffectTestUtilityLeak(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   const TEST_UTILITY_NAMES = [
     "TestClock",
     "TestServices",
@@ -573,7 +573,7 @@ function evaluateEffectTestUtilityLeak(
 /** R012: Effect service methods with weak error channels. */
 function evaluateEffectWeakErrorChannel(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   // Find modules that actually import from Effect (not gRPC or other service patterns)
   const effectImporters = new Set<string>();
   for (const dep of reasoningTree.ownerDependencies) {
@@ -610,7 +610,7 @@ function evaluateEffectWeakErrorChannel(
 /** R013: Effect fiber fork without FiberRefs context propagation. */
 function evaluateEffectFiberContextLeak(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   // Detect modules that use fork-like operations but don't import FiberRefs propagation helpers
   const FORK_SIGNAL_NAMES = ["fork", "forkDaemon", "forkIn", "forkScoped", "forkWithErrorHandler"];
   const CONTEXT_PROPAGATION_FILES = new Set<string>();
@@ -645,7 +645,7 @@ function evaluateEffectFiberContextLeak(
     }));
 }
 
-function findingSortKey(finding: TypeScriptHarnessFinding): string {
+function findingSortKey(finding: AspTypeScriptFinding): string {
   return `${finding.ruleId}\0${finding.location.path ?? ""}\0${finding.location.line}\0${finding.summary}`;
 }
 

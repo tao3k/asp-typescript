@@ -5,10 +5,10 @@ import path from "node:path";
 import test from "node:test";
 
 import {
-  isTypeScriptHarnessClean,
-  renderTypeScriptProjectHarness,
+  isAspTypeScriptClean,
+  renderAspTypeScript,
   renderTypeScriptReasoningTree,
-  runTypeScriptProjectHarness,
+  runAspTypeScript,
 } from "../../src/index.js";
 import { relativePath } from "./path_helpers.js";
 
@@ -24,11 +24,11 @@ test("project parser exposes native TypeScript semantic diagnostics as non-block
   );
   fs.writeFileSync(path.join(root, "src", "index.ts"), "export const value: string = 1;\n");
 
-  const report = runTypeScriptProjectHarness(root);
-  const rendered = renderTypeScriptProjectHarness(report);
+  const report = runAspTypeScript(root);
+  const rendered = renderAspTypeScript(report);
   const snapshot = renderTypeScriptReasoningTree(report);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.deepEqual(
     report.modules.flatMap((moduleReport) =>
       moduleReport.semanticDiagnostics.map((diagnostic) => ({
@@ -94,13 +94,13 @@ test("project parser preserves native TypeScript related diagnostic information"
     ].join("\n"),
   );
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
   const snapshot = renderTypeScriptReasoningTree(report);
-  const rendered = renderTypeScriptProjectHarness(report);
+  const rendered = renderAspTypeScript(report);
   const [diagnostic] = report.modules.flatMap((moduleReport) => moduleReport.semanticDiagnostics);
   assert.ok(diagnostic !== undefined);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.equal(diagnostic.code, 2741);
   assert.deepEqual(
     diagnostic.relatedInformation.map((relatedInformation) => ({

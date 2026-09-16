@@ -16,4 +16,9 @@ test("registry replaces direct-source-read with the canonical exact-selector que
   assert.ok(!descriptor.outputModes?.includes("code"));
   assert.equal("codeOutput" in descriptor, false);
   assert.equal(descriptor.supportsJson, true);
+  assert.ok(language.schemas.length > 0);
+  assert.ok(
+    language.schemas.every((schema) => !("authority" in schema)),
+    "semantic-language registry schema references must preserve their V1 shape",
+  );
 });

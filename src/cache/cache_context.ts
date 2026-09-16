@@ -1,11 +1,11 @@
 /**
- * Prompt cache context assembly for TypeScript harness runs.
+ * Prompt cache context assembly for ASP TypeScript runs.
  *
  * This module groups parser and repair facts into reusable prompt cache
  * classes without changing the underlying parser-owned facts.
  */
 import {
-  type TypeScriptHarnessPrefixAtom,
+  type AspTypeScriptPrefixAtom,
   type PartitionedAtoms,
   partitionAtoms,
   partitionFingerprint,
@@ -44,7 +44,7 @@ export interface AssembledCacheContext {
   readonly partition: PartitionedAtoms;
   readonly fingerprint: string;
   readonly tokenEstimate: number;
-  readonly allAtoms: readonly TypeScriptHarnessPrefixAtom[];
+  readonly allAtoms: readonly AspTypeScriptPrefixAtom[];
 }
 
 /**
@@ -58,7 +58,7 @@ export interface AssembledCacheContext {
  * - scratch_only: raw debug data (omitted in default)
  */
 export function buildCacheContext(input: CacheContextInput): AssembledCacheContext {
-  const atoms: TypeScriptHarnessPrefixAtom[] = [];
+  const atoms: AspTypeScriptPrefixAtom[] = [];
 
   // ── immutable_prefix ──
   atoms.push(immutableContractAtom(COMPACT_TEXT_CONTRACT));

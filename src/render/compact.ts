@@ -1,6 +1,6 @@
 export {
-  renderTypeScriptProjectHarnessAdvice,
-  renderTypeScriptProjectHarnessAgentCompactText,
+  renderAspTypeScriptAdvice,
+  renderAspTypeScriptAgentCompactText,
 } from "../render/agent_compact_text.js";
 export type {
   TypeScriptAgentCompactTextFindingMode,

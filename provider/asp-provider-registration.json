@@ -47,18 +47,36 @@
     "operations": [
       {
         "operation": "projection-batch",
-        "requestSchemaId": "https://schemas.agent-semantic-protocols.dev/provider-language-projection-batch-request.schema.json",
-        "responseSchemaId": "https://schemas.agent-semantic-protocols.dev/provider-language-projection-batch-response.schema.json"
+        "requestSchema": {
+          "schemaId": "agent.semantic-protocols.provider-language-projection-batch-request",
+          "schemaVersion": "1"
+        },
+        "responseSchema": {
+          "schemaId": "agent.semantic-protocols.provider-language-projection-batch-response",
+          "schemaVersion": "1"
+        }
       },
       {
         "operation": "project-resolution",
-        "requestSchemaId": "https://schemas.agent-semantic-protocols.dev/provider-project-resolution-request.schema.json",
-        "responseSchemaId": "https://schemas.agent-semantic-protocols.dev/provider-project-resolution-response.schema.json"
+        "requestSchema": {
+          "schemaId": "agent.semantic-protocols.provider-project-resolution-request",
+          "schemaVersion": "1"
+        },
+        "responseSchema": {
+          "schemaId": "agent.semantic-protocols.provider-project-resolution-response",
+          "schemaVersion": "1"
+        }
       },
       {
         "operation": "query",
-        "requestSchemaId": "https://agent-semantic-protocols.dev/schemas/provider-native-exact-request.v1.schema.json",
-        "responseSchemaId": "https://agent-semantic-protocols.dev/schemas/provider-native-exact-response.v1.schema.json"
+        "requestSchema": {
+          "schemaId": "agent.semantic-protocols.provider-native-exact-request",
+          "schemaVersion": "1"
+        },
+        "responseSchema": {
+          "schemaId": "agent.semantic-protocols.provider-native-exact-projection",
+          "schemaVersion": "1"
+        }
       }
     ]
   },
@@ -88,7 +106,10 @@
         "streaming": false
       },
       "output": {
-        "schemaId": "agent.semantic-protocols.source-index-projection",
+        "schema": {
+          "schemaId": "agent.semantic-protocols.source-index-projection",
+          "schemaVersion": "1"
+        },
         "mediaType": "application/json"
       },
       "failureSchemaIds": ["agent.semantic-protocols.route-failure"],
@@ -107,7 +128,10 @@
       "schemaVersion": "1",
       "routeId": "typescript.search",
       "operation": "search",
-      "requestSchemaId": "agent.semantic-protocols.asp-client-search-request",
+      "requestSchema": {
+        "schemaId": "agent.semantic-protocols.asp-client-search-request",
+        "schemaVersion": "1"
+      },
       "authority": "asp-server",
       "target": {
         "languageId": "typescript",
@@ -148,7 +172,7 @@
         "streaming": false
       },
       "output": {
-        "schemaId": "agent.semantic-protocols.search-packet",
+        "schema": { "schemaId": "agent.semantic-protocols.search-packet", "schemaVersion": "1" },
         "mediaType": "application/json"
       },
       "failureSchemaIds": ["agent.semantic-protocols.route-failure"],
@@ -167,7 +191,10 @@
       "schemaVersion": "1",
       "routeId": "typescript.query",
       "operation": "query",
-      "requestSchemaId": "agent.semantic-protocols.asp-client-exact-query-request",
+      "requestSchema": {
+        "schemaId": "agent.semantic-protocols.asp-client-exact-query-request",
+        "schemaVersion": "1"
+      },
       "authority": "asp-server",
       "target": {
         "languageId": "typescript",
@@ -213,7 +240,7 @@
         "streaming": false
       },
       "output": {
-        "schemaId": "agent.semantic-protocols.query-result",
+        "schema": { "schemaId": "agent.semantic-protocols.query-result", "schemaVersion": "1" },
         "mediaType": "application/json"
       },
       "failureSchemaIds": ["agent.semantic-protocols.route-failure"],
@@ -224,72 +251,6 @@
       },
       "telemetry": {
         "spanName": "asp.route.typescript.query",
-        "attributeSlots": []
-      }
-    },
-    {
-      "schemaId": "agent.semantic-protocols.provider-route",
-      "schemaVersion": "1",
-      "routeId": "typescript.search.owner",
-      "operation": "search.owner",
-      "requestSchemaId": "agent.semantic-protocols.asp-client-owner-search-request",
-      "authority": "asp-server",
-      "target": {
-        "languageId": "typescript",
-        "providerId": "asp-typescript"
-      },
-      "inputs": [
-        {
-          "name": "schemaId",
-          "valueType": "string",
-          "cardinality": "required",
-          "source": "request"
-        },
-        {
-          "name": "schemaVersion",
-          "valueType": "string",
-          "cardinality": "required",
-          "source": "request"
-        },
-        {
-          "name": "ownerPath",
-          "valueType": "workspace-relative-path",
-          "cardinality": "required",
-          "source": "request"
-        },
-        { "name": "query", "valueType": "string", "cardinality": "optional", "source": "request" },
-        {
-          "name": "view",
-          "valueType": "presentation",
-          "cardinality": "optional",
-          "source": "request"
-        }
-      ],
-      "requirements": [
-        {
-          "kind": "state",
-          "state": "terminal-generation"
-        }
-      ],
-      "effects": {
-        "access": "read",
-        "idempotent": true,
-        "cancellable": true,
-        "concurrency": "shared-read",
-        "streaming": false
-      },
-      "output": {
-        "schemaId": "agent.semantic-protocols.search-packet",
-        "mediaType": "application/json"
-      },
-      "failureSchemaIds": ["agent.semantic-protocols.route-failure"],
-      "cache": {
-        "authority": "asp-server",
-        "scope": "workspace",
-        "keySlots": []
-      },
-      "telemetry": {
-        "spanName": "asp.route.typescript.search.owner",
         "attributeSlots": []
       }
     }

@@ -1,6 +1,6 @@
 import path from "node:path";
 
-import type { TypeScriptHarnessReport } from "../model.js";
+import type { AspTypeScriptReport } from "../model.js";
 import type {
   TypeScriptVerificationEvidence,
   TypeScriptVerificationPolicy,
@@ -12,7 +12,7 @@ import type {
 } from "./model.js";
 
 export function resolveTypeScriptVerificationTask(
-  report: TypeScriptHarnessReport,
+  report: AspTypeScriptReport,
   policy: TypeScriptVerificationPolicy,
   kind: TypeScriptVerificationTaskKind,
   ownerPath: string,
@@ -67,7 +67,7 @@ export function resolveTypeScriptVerificationTask(
 }
 
 function matchingReceipt(
-  report: TypeScriptHarnessReport,
+  report: AspTypeScriptReport,
   receipts: readonly TypeScriptVerificationReceipt[],
   kind: TypeScriptVerificationTaskKind,
   ownerPath: string,
@@ -82,7 +82,7 @@ function matchingReceipt(
 }
 
 function matchingWaiver(
-  report: TypeScriptHarnessReport,
+  report: AspTypeScriptReport,
   waivers: readonly TypeScriptVerificationWaiver[],
   kind: TypeScriptVerificationTaskKind,
   ownerPath: string,
@@ -104,7 +104,7 @@ function waiverMissingFields(waiver: TypeScriptVerificationWaiver): readonly str
   ].filter((field): field is string => field !== undefined);
 }
 
-function normalizeHintOwnerPath(report: TypeScriptHarnessReport, ownerPath: string): string {
+function normalizeHintOwnerPath(report: AspTypeScriptReport, ownerPath: string): string {
   return path.isAbsolute(ownerPath)
     ? path.resolve(ownerPath)
     : path.resolve(report.reasoningTree.projectRoot, ownerPath);

@@ -7,10 +7,10 @@ import test from "node:test";
 import {
   activeTypeScriptVerificationProfileHints,
   buildTypeScriptVerificationProfileIndexWithConfig,
-  defaultTypeScriptHarnessConfig,
+  defaultAspTypeScriptConfig,
   renderTypeScriptVerificationProfileIndex,
   renderTypeScriptVerificationProfileIndexJson,
-  runTypeScriptProjectHarness,
+  runAspTypeScript,
   typeScriptVerificationProfileIndexIsClear,
   withTypeScriptVerificationDependencySignal,
   withTypeScriptVerificationProfileHint,
@@ -26,7 +26,7 @@ test("verification profile index suggests missing owner hints from parser facts"
 
   const index = buildTypeScriptVerificationProfileIndexWithConfig(
     root,
-    defaultTypeScriptHarnessConfig(),
+    defaultAspTypeScriptConfig(),
   );
   const rendered = renderTypeScriptVerificationProfileIndex(index);
   const json = JSON.parse(renderTypeScriptVerificationProfileIndexJson(index)) as {
@@ -55,7 +55,7 @@ test("verification profile index suggests missing owner hints from parser facts"
   assert.match(rendered, /\|state: missing_profile/u);
   assert.match(rendered, /\|suggest: external_dependency,public_api/u);
   assert.match(rendered, /\|tasks: chaos,stress/u);
-  assert.match(rendered, /\|fact: module=role=facade layer=harness/u);
+  assert.match(rendered, /\|fact: module=role=facade layer=asp/u);
   assert.match(rendered, /\|fact: imports=external=1 package_import=0 unresolved=0/u);
   assert.match(rendered, /\|fact: external_roots=node:fs/u);
   assert.match(rendered, /\[verify-profile\] profile_hints/u);
@@ -79,7 +79,7 @@ test("verification profile index renders drift and goes quiet when configured", 
     'import { readFileSync } from "node:fs";\nexport const api = readFileSync;\n',
   );
   const partialConfig = withTypeScriptVerificationProfileHint(
-    defaultTypeScriptHarnessConfig(),
+    defaultAspTypeScriptConfig(),
     profileHint("src/index.ts", ["public_api", "security_boundary"]),
   );
 
@@ -100,7 +100,7 @@ test("verification profile index renders drift and goes quiet when configured", 
   const configuredIndex = buildTypeScriptVerificationProfileIndexWithConfig(
     root,
     withTypeScriptVerificationProfileHint(
-      defaultTypeScriptHarnessConfig(),
+      defaultAspTypeScriptConfig(),
       profileHint("src/index.ts", ["external_dependency", "public_api"]),
     ),
   );
@@ -116,12 +116,12 @@ test("verification profile dependency signals enrich responsibility inference wi
     "dependency-signal",
     'import { readFileSync } from "node:fs";\nexport const api = readFileSync;\n',
   );
-  const config = withTypeScriptVerificationDependencySignal(defaultTypeScriptHarnessConfig(), {
+  const config = withTypeScriptVerificationDependencySignal(defaultAspTypeScriptConfig(), {
     dependency: "node:fs",
     responsibilities: ["persistence"],
   });
 
-  const report = runTypeScriptProjectHarness(root, config);
+  const report = runAspTypeScript(root, config);
   const index = buildTypeScriptVerificationProfileIndexWithConfig(root, config);
   const rendered = renderTypeScriptVerificationProfileIndex(index);
 

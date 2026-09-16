@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { renderTypeScriptReasoningTree, runTypeScriptProjectHarness } from "../../src/index.js";
+import { renderTypeScriptReasoningTree, runAspTypeScript } from "../../src/index.js";
 import { relativePath } from "./path_helpers.js";
 
 test("project runner preserves tsconfig allowJs native file selection", () => {
@@ -40,7 +40,7 @@ test("project runner preserves tsconfig allowJs native file selection", () => {
   );
   fs.writeFileSync(path.join(root, "vite.config.mjs"), "export default {};\n");
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
   const rendered = renderTypeScriptReasoningTree(report);
 
   assert.deepEqual(

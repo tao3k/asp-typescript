@@ -36,7 +36,13 @@ test("projection-batch projects canonical owner items for the resident server", 
   });
   const projected = response as {
     readonly schemaId: string;
-    readonly owners: readonly [{ readonly items: readonly [{ readonly selector: string }] }];
+    readonly owners: readonly [
+      {
+        readonly projectionState: string;
+        readonly diagnostic: unknown;
+        readonly items: readonly [{ readonly selector: string }];
+      },
+    ];
   };
   assert.equal(
     projected.schemaId,
@@ -47,4 +53,6 @@ test("projection-batch projects canonical owner items for the resident server", 
     "typescript://src/service.ts#item/interface/Service",
   );
   assert.equal(projected.owners.length, 1);
+  assert.equal(projected.owners[0].projectionState, "ready");
+  assert.equal(projected.owners[0].diagnostic, null);
 });

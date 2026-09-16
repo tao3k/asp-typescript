@@ -16,7 +16,7 @@ export type TypeScriptPackageBuildToolSignalKind =
   | "dependency"
   | "script"
   | "config"
-  | "harness-config";
+  | "asp-config";
 
 export type TypeScriptPackageBuildToolDependencySource = TypeScriptPackageDependencySource;
 

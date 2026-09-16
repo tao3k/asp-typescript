@@ -5,11 +5,11 @@ import path from "node:path";
 import test from "node:test";
 
 import {
-  isTypeScriptHarnessClean,
-  renderTypeScriptProjectHarnessAgentCompactText,
-  renderTypeScriptProjectHarness,
+  isAspTypeScriptClean,
+  renderAspTypeScriptAgentCompactText,
+  renderAspTypeScript,
   renderTypeScriptReasoningTree,
-  runTypeScriptProjectHarness,
+  runAspTypeScript,
 } from "../../src/index.js";
 
 test("React dependency activates render purity advice from parser-native facts", () => {
@@ -37,13 +37,13 @@ test("React dependency activates render purity advice from parser-native facts",
     },
   });
 
-  const report = runTypeScriptProjectHarness(root);
-  const rendered = renderTypeScriptProjectHarness(report);
+  const report = runAspTypeScript(root);
+  const rendered = renderAspTypeScript(report);
   const snapshot = renderTypeScriptReasoningTree(report);
-  const advice = renderTypeScriptProjectHarnessAgentCompactText(report);
+  const advice = renderAspTypeScriptAgentCompactText(report);
   const findings = report.findings.filter((finding) => finding.ruleId.startsWith("TS-EXT-REACT"));
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.deepEqual(
     report.projectResolution?.packageJson.packageExtensions.map((extension) => ({
       name: extension.name,
@@ -90,18 +90,18 @@ test("React dependency activates render purity advice from parser-native facts",
 test("explicit React enablement without dependency is an error-level blocking finding", () => {
   const root = reactProject("config-missing-dependency", {
     packageJson: {
-      typescriptProjectHarness: { extensions: { React: "enable" } },
+      "asp-typescript": { extensions: { React: "enable" } },
     },
     source: {
       "clock.tsx": ["export function Clock() {", "  return <time />;", "}"],
     },
   });
 
-  const report = runTypeScriptProjectHarness(root);
-  const rendered = renderTypeScriptProjectHarness(report);
+  const report = runAspTypeScript(root);
+  const rendered = renderAspTypeScript(report);
   const snapshot = renderTypeScriptReasoningTree(report);
 
-  assert.equal(isTypeScriptHarnessClean(report), false);
+  assert.equal(isAspTypeScriptClean(report), false);
   assert.deepEqual(
     report.findings
       .filter((finding) => finding.ruleId.startsWith("TS-EXT-REACT"))
@@ -156,11 +156,11 @@ test("React hook order violations are error-level structural findings", () => {
     },
   });
 
-  const report = runTypeScriptProjectHarness(root);
-  const advice = renderTypeScriptProjectHarnessAgentCompactText(report, { findings: "all" });
+  const report = runAspTypeScript(root);
+  const advice = renderAspTypeScriptAgentCompactText(report, { findings: "all" });
   const finding = report.findings.find((candidate) => candidate.ruleId === "TS-EXT-REACT-R003");
 
-  assert.equal(isTypeScriptHarnessClean(report), false);
+  assert.equal(isAspTypeScriptClean(report), false);
   assert.equal(finding?.severity, "error");
   assert.match(finding?.labels.react_hook_calls ?? "", /BadHooks:useEffect/u);
   assert.match(finding?.labels.react_hook_calls ?? "", /BadHooks:useState/u);
@@ -201,11 +201,11 @@ test("React static component and hook factories produce compiler-readiness advic
     },
   });
 
-  const report = runTypeScriptProjectHarness(root);
-  const advice = renderTypeScriptProjectHarnessAgentCompactText(report);
+  const report = runAspTypeScript(root);
+  const advice = renderAspTypeScriptAgentCompactText(report);
   const finding = report.findings.find((candidate) => candidate.ruleId === "TS-EXT-REACT-R004");
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.equal(finding?.severity, "info");
   assert.match(finding?.labels.react_static_definitions ?? "", /Parent:ThemedButton/u);
   assert.match(finding?.labels.react_static_definitions ?? "", /Parent:useThemedLabel/u);

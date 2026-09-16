@@ -1,6 +1,6 @@
 import type {
-  TypeScriptHarnessFinding,
-  TypeScriptHarnessRule,
+  AspTypeScriptFinding,
+  AspTypeScriptRule,
   TypeScriptPackageEntryResolutionFact,
   TypeScriptPublicFunctionControlFlowFact,
   TypeScriptPublicFunctionParamFact,
@@ -25,7 +25,7 @@ import {
   withAgentSoftwareCriteria,
 } from "./software_criteria.js";
 
-const TS_AGENT_R001: TypeScriptHarnessRule = {
+const TS_AGENT_R001: AspTypeScriptRule = {
   ruleId: "TS-AGENT-POLICY-001",
   packId: "typescript.agent_policy",
   severity: "info",
@@ -35,7 +35,7 @@ const TS_AGENT_R001: TypeScriptHarnessRule = {
   labels: { surface: "agent", parser: "reasoning-tree" },
 };
 
-const TS_AGENT_R002: TypeScriptHarnessRule = {
+const TS_AGENT_R002: AspTypeScriptRule = {
   ruleId: "TS-AGENT-POLICY-002",
   packId: "typescript.agent_policy",
   severity: "info",
@@ -45,7 +45,7 @@ const TS_AGENT_R002: TypeScriptHarnessRule = {
   labels: { surface: "agent", parser: "reasoning-tree" },
 };
 
-const TS_AGENT_R003: TypeScriptHarnessRule = {
+const TS_AGENT_R003: AspTypeScriptRule = {
   ruleId: "TS-AGENT-POLICY-003",
   packId: "typescript.agent_policy",
   severity: "info",
@@ -55,7 +55,7 @@ const TS_AGENT_R003: TypeScriptHarnessRule = {
   labels: { surface: "agent", parser: "reasoning-tree" },
 };
 
-const TS_AGENT_R004: TypeScriptHarnessRule = {
+const TS_AGENT_R004: AspTypeScriptRule = {
   ruleId: "TS-AGENT-POLICY-004",
   packId: "typescript.agent_policy",
   severity: "info",
@@ -65,7 +65,7 @@ const TS_AGENT_R004: TypeScriptHarnessRule = {
   labels: { surface: "agent", parser: "native-syntax" },
 };
 
-const TS_AGENT_R005: TypeScriptHarnessRule = {
+const TS_AGENT_R005: AspTypeScriptRule = {
   ruleId: "TS-AGENT-POLICY-005",
   packId: "typescript.agent_policy",
   severity: "info",
@@ -75,7 +75,7 @@ const TS_AGENT_R005: TypeScriptHarnessRule = {
   labels: { surface: "agent", parser: "native-syntax" },
 };
 
-const TS_AGENT_R006: TypeScriptHarnessRule = {
+const TS_AGENT_R006: AspTypeScriptRule = {
   ruleId: "TS-AGENT-POLICY-006",
   packId: "typescript.agent_policy",
   severity: "info",
@@ -85,7 +85,7 @@ const TS_AGENT_R006: TypeScriptHarnessRule = {
   labels: { surface: "agent", parser: "native-syntax" },
 };
 
-const TS_AGENT_R007: TypeScriptHarnessRule = {
+const TS_AGENT_R007: AspTypeScriptRule = {
   ruleId: "TS-AGENT-POLICY-007",
   packId: "typescript.agent_policy",
   severity: "info",
@@ -95,7 +95,7 @@ const TS_AGENT_R007: TypeScriptHarnessRule = {
   labels: { surface: "agent", parser: "native-syntax" },
 };
 
-const TS_AGENT_R008: TypeScriptHarnessRule = {
+const TS_AGENT_R008: AspTypeScriptRule = {
   ruleId: "TS-AGENT-POLICY-008",
   packId: "typescript.agent_policy",
   severity: "info",
@@ -105,7 +105,7 @@ const TS_AGENT_R008: TypeScriptHarnessRule = {
   labels: { surface: "agent", parser: "native-syntax" },
 };
 
-const TS_AGENT_R013: TypeScriptHarnessRule = {
+const TS_AGENT_R013: AspTypeScriptRule = {
   ruleId: "TS-AGENT-POLICY-013",
   packId: "typescript.agent_policy",
   severity: "info",
@@ -115,7 +115,7 @@ const TS_AGENT_R013: TypeScriptHarnessRule = {
   labels: { surface: "agent", parser: "reasoning-tree" },
 };
 
-const TS_AGENT_R014: TypeScriptHarnessRule = {
+const TS_AGENT_R014: AspTypeScriptRule = {
   ruleId: "TS-AGENT-POLICY-014",
   packId: "typescript.agent_policy",
   severity: "info",
@@ -125,7 +125,7 @@ const TS_AGENT_R014: TypeScriptHarnessRule = {
   labels: { surface: "agent", parser: "reasoning-tree" },
 };
 
-const TS_AGENT_R015: TypeScriptHarnessRule = {
+const TS_AGENT_R015: AspTypeScriptRule = {
   ruleId: "TS-AGENT-POLICY-015",
   packId: "typescript.agent_policy",
   severity: "info",
@@ -135,7 +135,7 @@ const TS_AGENT_R015: TypeScriptHarnessRule = {
   labels: { surface: "agent", parser: "reasoning-tree" },
 };
 
-const TS_AGENT_R016: TypeScriptHarnessRule = {
+const TS_AGENT_R016: AspTypeScriptRule = {
   ruleId: "TS-AGENT-POLICY-016",
   packId: "typescript.agent_policy",
   severity: "info",
@@ -145,7 +145,7 @@ const TS_AGENT_R016: TypeScriptHarnessRule = {
   labels: { surface: "agent", parser: "reasoning-tree" },
 };
 
-export function typeScriptAgentPolicyRules(): readonly TypeScriptHarnessRule[] {
+export function typeScriptAgentPolicyRules(): readonly AspTypeScriptRule[] {
   return [
     TS_AGENT_R001,
     TS_AGENT_R002,
@@ -168,7 +168,7 @@ export function typeScriptAgentPolicyRules(): readonly TypeScriptHarnessRule[] {
 
 export function evaluateAgentPolicyRules(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   const NON_TS_ASSET_EXTENSIONS = [
     ".css",
     ".scss",
@@ -221,7 +221,7 @@ export function evaluateAgentPolicyRules(
 
 function evaluatePackageEntryAdvice(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   return reasoningTree.packageEntryResolutions
     .filter(
       (entry): entry is TypeScriptPackageEntryResolutionFact =>
@@ -242,7 +242,7 @@ function evaluatePackageEntryAdvice(
 
 function evaluateFacadeIntentAdvice(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   return reasoningTree.ownerBranches.flatMap((branch) => {
     if (!branch.roles.includes("facade") || branch.hasIntentDoc) {
       return [];
@@ -280,7 +280,7 @@ function packageConditionsLabel(conditions: readonly string[]): string {
 
 function evaluateNativeApiShapeAdvice(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   return sourceModules(reasoningTree)
     .flatMap((moduleReport) => [
       ...flagParameterAdvice(moduleReport),
@@ -290,7 +290,7 @@ function evaluateNativeApiShapeAdvice(
     .sort((left, right) => findingSortKey(left).localeCompare(findingSortKey(right)));
 }
 
-function flagParameterAdvice(moduleReport: TypeScriptReasoningModule): TypeScriptHarnessFinding[] {
+function flagParameterAdvice(moduleReport: TypeScriptReasoningModule): AspTypeScriptFinding[] {
   const rule = TS_AGENT_R004;
   return groupedFunctionParams(moduleReport.publicFunctionParams).flatMap((params) => {
     const flagParams = params.filter((param) => param.flagContractType !== undefined);
@@ -317,7 +317,7 @@ function flagParameterAdvice(moduleReport: TypeScriptReasoningModule): TypeScrip
   });
 }
 
-function broadParameterAdvice(moduleReport: TypeScriptReasoningModule): TypeScriptHarnessFinding[] {
+function broadParameterAdvice(moduleReport: TypeScriptReasoningModule): AspTypeScriptFinding[] {
   const rule = TS_AGENT_R005;
   return groupedFunctionParams(moduleReport.publicFunctionParams).flatMap((params) => {
     const first = params[0];
@@ -341,7 +341,7 @@ function broadParameterAdvice(moduleReport: TypeScriptReasoningModule): TypeScri
   });
 }
 
-function tupleApiAdvice(moduleReport: TypeScriptReasoningModule): TypeScriptHarnessFinding[] {
+function tupleApiAdvice(moduleReport: TypeScriptReasoningModule): AspTypeScriptFinding[] {
   const rule = TS_AGENT_R006;
   return moduleReport.publicTupleApiSurfaces.map((surface) => ({
     ruleId: rule.ruleId,
@@ -359,7 +359,7 @@ function tupleApiAdvice(moduleReport: TypeScriptReasoningModule): TypeScriptHarn
 
 function evaluateNativeAlgorithmShapeAdvice(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   return sourceModules(reasoningTree)
     .flatMap((moduleReport) => moduleReport.publicFunctionControlFlows)
     .flatMap((controlFlow) => [
@@ -372,7 +372,7 @@ function evaluateNativeAlgorithmShapeAdvice(
 
 function nestedAlgorithmAdvice(
   controlFlow: TypeScriptPublicFunctionControlFlowFact,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   const criteria = nestedAlgorithmCriteria(controlFlow);
   if (criteria.length === 0) {
     return [];
@@ -397,7 +397,7 @@ function nestedAlgorithmAdvice(
 
 function broadLinearAlgorithmAdvice(
   controlFlow: TypeScriptPublicFunctionControlFlowFact,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   const criteria = broadLinearAlgorithmCriteria(controlFlow);
   if (criteria.length === 0) {
     return [];
@@ -421,7 +421,7 @@ function broadLinearAlgorithmAdvice(
 
 function manualTransformLoopAdvice(
   controlFlow: TypeScriptPublicFunctionControlFlowFact,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   if (controlFlow.manualTransformLoopCount === 0) {
     return [];
   }
@@ -521,9 +521,7 @@ function sourceModules(tree: TypeScriptReasoningTree): readonly TypeScriptReason
 }
 
 /** R013: Modules with exports but no module-level documentation. */
-function evaluateMissingModuleDoc(
-  reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+function evaluateMissingModuleDoc(reasoningTree: TypeScriptReasoningTree): AspTypeScriptFinding[] {
   return reasoningTree.ownerBranches
     .filter((branch) => moduleNeedsIntentDoc(branch))
     .sort(moduleDocFindingSort)
@@ -569,7 +567,7 @@ function moduleDocFindingSort(
 /** R014: Files importing many symbols from the same dependency. */
 function evaluateNamedImportDensity(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   return reasoningTree.ownerBranches
     .filter((b) => b.roles.includes("source") || b.roles.includes("facade"))
     .flatMap((b) => {
@@ -599,7 +597,7 @@ function evaluateNamedImportDensity(
 /** R015: Facade modules with excessive exports. */
 function evaluateFacadeExportDensity(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   return reasoningTree.ownerBranches
     .filter((b) => b.roles.includes("facade") && !b.hasIntentDoc && b.exportNames.length > 30)
     .slice(0, 10)
@@ -619,7 +617,7 @@ function evaluateFacadeExportDensity(
 /** R016: Domain error types without documentation. */
 function evaluateUndocumentedErrorTypes(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   const ERROR_NAME_PATTERNS = ["Error", "Exception", "Failure", "Fault"];
   return reasoningTree.ownerBranches
     .filter(
@@ -649,7 +647,7 @@ function evaluateUndocumentedErrorTypes(
     });
 }
 
-function findingSortKey(finding: TypeScriptHarnessFinding): string {
+function findingSortKey(finding: AspTypeScriptFinding): string {
   return `${finding.ruleId}\0${finding.location.path ?? ""}\0${finding.location.line}\0${finding.summary}`;
 }
 

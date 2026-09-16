@@ -5,8 +5,8 @@
  * policy findings about component purity and static definitions.
  */
 import type {
-  TypeScriptHarnessFinding,
-  TypeScriptHarnessRule,
+  AspTypeScriptFinding,
+  AspTypeScriptRule,
   TypeScriptReactHookCallSignalFact,
   TypeScriptReactRenderPuritySignalFact,
   TypeScriptReactStaticDefinitionSignalFact,
@@ -15,7 +15,7 @@ import type {
 } from "../../model.js";
 import { reactPolicyIsActive, reactPolicySourceModules } from "./react_modules.js";
 
-export const TS_EXT_REACT_R001: TypeScriptHarnessRule = {
+export const TS_EXT_REACT_R001: AspTypeScriptRule = {
   ruleId: "TS-EXT-REACT-R001",
   packId: "typescript.extension_policy",
   severity: "error",
@@ -25,7 +25,7 @@ export const TS_EXT_REACT_R001: TypeScriptHarnessRule = {
   labels: { surface: "extension", parser: "package-json", extension: "react" },
 };
 
-export const TS_EXT_REACT_R002: TypeScriptHarnessRule = {
+export const TS_EXT_REACT_R002: AspTypeScriptRule = {
   ruleId: "TS-EXT-REACT-R002",
   packId: "typescript.extension_policy",
   severity: "info",
@@ -35,7 +35,7 @@ export const TS_EXT_REACT_R002: TypeScriptHarnessRule = {
   labels: { surface: "extension", parser: "native-syntax", extension: "react" },
 };
 
-export const TS_EXT_REACT_R003: TypeScriptHarnessRule = {
+export const TS_EXT_REACT_R003: AspTypeScriptRule = {
   ruleId: "TS-EXT-REACT-R003",
   packId: "typescript.extension_policy",
   severity: "error",
@@ -45,7 +45,7 @@ export const TS_EXT_REACT_R003: TypeScriptHarnessRule = {
   labels: { surface: "extension", parser: "native-syntax", extension: "react" },
 };
 
-export const TS_EXT_REACT_R004: TypeScriptHarnessRule = {
+export const TS_EXT_REACT_R004: AspTypeScriptRule = {
   ruleId: "TS-EXT-REACT-R004",
   packId: "typescript.extension_policy",
   severity: "info",
@@ -57,7 +57,7 @@ export const TS_EXT_REACT_R004: TypeScriptHarnessRule = {
 
 export function evaluateReactConfigurationFindings(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   return reasoningTree.packageExtensions.flatMap((extension) => {
     if (
       extension.name !== "react" ||
@@ -81,7 +81,7 @@ export function evaluateReactConfigurationFindings(
           activation: extension.activation,
           capabilities: extension.capabilities.join(","),
           config: extension.configSource ?? "package.json",
-          repair: "add react and keep typescriptProjectHarness.extensions.react enabled",
+          repair: "add react and keep asp-typescript.extensions.react enabled",
         },
       },
     ];
@@ -90,7 +90,7 @@ export function evaluateReactConfigurationFindings(
 
 export function evaluateReactRenderPurityAdvice(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   if (!reactPolicyIsActive(reasoningTree.packageExtensions)) {
     return [];
   }
@@ -101,7 +101,7 @@ export function evaluateReactRenderPurityAdvice(
 
 export function evaluateReactHookCallFindings(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   if (!reactPolicyIsActive(reasoningTree.packageExtensions)) {
     return [];
   }
@@ -112,7 +112,7 @@ export function evaluateReactHookCallFindings(
 
 export function evaluateReactStaticDefinitionAdvice(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   if (!reactPolicyIsActive(reasoningTree.packageExtensions)) {
     return [];
   }
@@ -123,7 +123,7 @@ export function evaluateReactStaticDefinitionAdvice(
 
 function reactRenderPurityAdviceForModule(
   moduleReport: TypeScriptReasoningModule,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   const first = moduleReport.reactRenderPuritySignals[0];
   if (first === undefined) {
     return [];
@@ -162,7 +162,7 @@ function reactRenderPurityAdviceForModule(
 
 function reactHookCallFindingsForModule(
   moduleReport: TypeScriptReasoningModule,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   const first = moduleReport.reactHookCallSignals[0];
   if (first === undefined) {
     return [];
@@ -196,7 +196,7 @@ function reactHookCallFindingsForModule(
 
 function reactStaticDefinitionAdviceForModule(
   moduleReport: TypeScriptReasoningModule,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   const first = moduleReport.reactStaticDefinitionSignals[0];
   if (first === undefined) {
     return [];

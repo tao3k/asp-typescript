@@ -1,13 +1,13 @@
 import type {
   TypeScriptEffectConcurrencySignalFact,
-  TypeScriptHarnessFinding,
-  TypeScriptHarnessRule,
+  AspTypeScriptFinding,
+  AspTypeScriptRule,
   TypeScriptReasoningModule,
   TypeScriptReasoningTree,
 } from "../../model.js";
 import { effectPolicyIsActive, sourceModules } from "./effect_modules.js";
 
-export const TS_EXT_EFFECT_R008: TypeScriptHarnessRule = {
+export const TS_EXT_EFFECT_R008: AspTypeScriptRule = {
   ruleId: "TS-EXT-EFFECT-R008",
   packId: "typescript.extension_policy",
   severity: "info",
@@ -19,7 +19,7 @@ export const TS_EXT_EFFECT_R008: TypeScriptHarnessRule = {
 
 export function evaluateEffectConcurrencyAdvice(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   if (!effectPolicyIsActive(reasoningTree.packageExtensions)) {
     return [];
   }
@@ -30,7 +30,7 @@ export function evaluateEffectConcurrencyAdvice(
 
 function effectConcurrencyAdviceForModule(
   moduleReport: TypeScriptReasoningModule,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   const first = moduleReport.effectConcurrencySignals[0];
   if (first === undefined) {
     return [];

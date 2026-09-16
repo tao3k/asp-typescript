@@ -5,27 +5,27 @@ import path from "node:path";
 import test from "node:test";
 
 import {
-  isTypeScriptHarnessClean,
-  renderTypeScriptProjectHarnessAgentCompactText,
-  renderTypeScriptProjectHarness,
+  isAspTypeScriptClean,
+  renderAspTypeScriptAgentCompactText,
+  renderAspTypeScript,
   renderTypeScriptReasoningTree,
-  runTypeScriptProjectHarness,
+  runAspTypeScript,
   typeScriptProjectPolicyRules,
 } from "../../src/index.js";
 import { relativePath } from "./path_helpers.js";
 
-test("project harness reports malformed package json without throwing", () => {
+test("ASP TypeScript reports malformed package json without throwing", () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-package-json-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(path.join(root, "tsconfig.json"), JSON.stringify({ include: ["src/**/*.ts"] }));
   fs.writeFileSync(path.join(root, "package.json"), '{ "name": }\n');
   fs.writeFileSync(path.join(root, "src", "index.ts"), "export const ok = 1;\n");
 
-  const report = runTypeScriptProjectHarness(root);
-  const rendered = renderTypeScriptProjectHarness(report);
+  const report = runAspTypeScript(root);
+  const rendered = renderAspTypeScript(report);
   const snapshot = renderTypeScriptReasoningTree(report);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.deepEqual(
     typeScriptProjectPolicyRules().map((rule) => `${rule.ruleId}:${rule.severity}`),
     [
@@ -55,7 +55,7 @@ test("project harness reports malformed package json without throwing", () => {
   assert.match(snapshot, /TS-AGENT-PROJECT-003 x1 first=package\.json/u);
 });
 
-test("project harness reports malformed project reference package json without throwing", () => {
+test("ASP TypeScript reports malformed project reference package json without throwing", () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-reference-package-json-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.mkdirSync(path.join(root, "packages", "broken"), { recursive: true });
@@ -76,9 +76,9 @@ test("project harness reports malformed project reference package json without t
   fs.writeFileSync(path.join(root, "packages", "broken", "package.json"), '{ "name": }\n');
   fs.writeFileSync(path.join(root, "src", "index.ts"), "export const ok = 1;\n");
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.deepEqual(
     report.findings.map((finding) => `${finding.ruleId}:${finding.severity}`),
     ["TS-AGENT-PROJECT-003:info"],
@@ -115,7 +115,7 @@ test("project parser records package dependency facts from package json", () => 
   fs.writeFileSync(path.join(root, "tsconfig.json"), JSON.stringify({ include: ["src/**/*.ts"] }));
   fs.writeFileSync(path.join(root, "src", "index.ts"), "export const ok = 1;\n");
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
 
   const dependencies = report.projectResolution?.packageJson.dependencies ?? [];
   assert.deepEqual(
@@ -181,9 +181,9 @@ test("project policy reports referenced package config shape as advice", () => {
     "export const core = 1;\n",
   );
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.deepEqual(
     report.findings
       .filter((finding) => finding.ruleId === "TS-AGENT-PROJECT-004")
@@ -219,9 +219,9 @@ test("project policy reports package entry module resolution as advice", () => {
   );
   fs.writeFileSync(path.join(root, "src", "index.ts"), "export const ok = 1;\n");
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.deepEqual(
     report.findings
       .filter((finding) => finding.ruleId === "TS-AGENT-PROJECT-005")
@@ -253,7 +253,7 @@ test("project policy uses TypeScript effective module resolution facts", () => {
   );
   fs.writeFileSync(path.join(root, "src", "index.ts"), "export const ok = 1;\n");
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
 
   assert.equal(report.reasoningTree.compilerOptions.moduleResolution, "NodeNext");
   assert.deepEqual(
@@ -262,7 +262,7 @@ test("project policy uses TypeScript effective module resolution facts", () => {
   );
 });
 
-test("project harness reports malformed workspace package json without throwing", () => {
+test("ASP TypeScript reports malformed workspace package json without throwing", () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-workspace-package-json-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.mkdirSync(path.join(root, "packages", "broken"), { recursive: true });
@@ -277,9 +277,9 @@ test("project harness reports malformed workspace package json without throwing"
   fs.writeFileSync(path.join(root, "packages", "broken", "package.json"), '{ "name": }\n');
   fs.writeFileSync(path.join(root, "src", "index.ts"), "export const ok = 1;\n");
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.deepEqual(
     report.findings.map((finding) => `${finding.ruleId}:${finding.severity}`),
     ["TS-AGENT-PROJECT-003:info"],
@@ -303,7 +303,7 @@ test("project harness reports malformed workspace package json without throwing"
   assert.match(rendered, /TS-AGENT-PROJECT-003 x1 first=packages\/broken\/package\.json/u);
 });
 
-test("project harness discovers workspace package facts from package json", () => {
+test("ASP TypeScript discovers workspace package facts from package json", () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-workspace-packages-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.mkdirSync(path.join(root, "packages", "core"), { recursive: true });
@@ -346,7 +346,7 @@ test("project harness discovers workspace package facts from package json", () =
     'import type { Core } from "@example/core";\nexport const ok = 1;\n',
   );
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
   const packageJson = report.projectResolution?.packageJson;
   assert.ok(packageJson !== undefined);
   assert.deepEqual(
@@ -395,7 +395,7 @@ test("project harness discovers workspace package facts from package json", () =
   );
 });
 
-test("project harness discovers pnpm workspace package facts", () => {
+test("ASP TypeScript discovers pnpm workspace package facts", () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-pnpm-workspace-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.mkdirSync(path.join(root, "packages", "core"), { recursive: true });
@@ -422,7 +422,7 @@ test("project harness discovers pnpm workspace package facts", () => {
   fs.writeFileSync(path.join(root, "tsconfig.json"), JSON.stringify({ include: ["src/**/*.ts"] }));
   fs.writeFileSync(path.join(root, "src", "index.ts"), "export const ok = 1;\n");
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
   const packageJson = report.projectResolution?.packageJson;
   assert.ok(packageJson !== undefined);
   assert.deepEqual(
@@ -450,7 +450,7 @@ test("project harness discovers pnpm workspace package facts", () => {
   );
 });
 
-test("project harness keeps package entry source locations from the TypeScript JSON AST", () => {
+test("ASP TypeScript keeps package entry source locations from the TypeScript JSON AST", () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-package-json-locations-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(
@@ -488,7 +488,7 @@ test("project harness keeps package entry source locations from the TypeScript J
     ].join("\n"),
   );
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
   const packageJson = report.projectResolution?.packageJson;
   assert.ok(packageJson !== undefined);
   assert.deepEqual(
@@ -520,7 +520,7 @@ test("project harness keeps package entry source locations from the TypeScript J
   );
 });
 
-test("project harness preserves conditional package targets from the TypeScript JSON AST", () => {
+test("ASP TypeScript preserves conditional package targets from the TypeScript JSON AST", () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-package-json-conditions-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(
@@ -561,7 +561,7 @@ test("project harness preserves conditional package targets from the TypeScript 
     ].join("\n"),
   );
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
   const packageJson = report.projectResolution?.packageJson;
   assert.ok(packageJson !== undefined);
 
@@ -610,7 +610,7 @@ test("project harness preserves conditional package targets from the TypeScript 
   assert.match(rendered, /package imports:#internal \[default\] --owner--> src\/internal\.ts/u);
 });
 
-test("project harness records Rspack build tool facts from package json and config files", () => {
+test("ASP TypeScript records Rspack build tool facts from package json and config files", () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-rspack-build-tool-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(path.join(root, "src", "index.ts"), "export const ok = 1;\n");
@@ -635,7 +635,7 @@ test("project harness records Rspack build tool facts from package json and conf
     }),
   );
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
   const packageJson = report.projectResolution?.packageJson;
   assert.ok(packageJson !== undefined);
   assert.deepEqual(
@@ -660,7 +660,7 @@ test("project harness records Rspack build tool facts from package json and conf
   );
 
   const snapshot = renderTypeScriptReasoningTree(report);
-  const advice = renderTypeScriptProjectHarnessAgentCompactText(report);
+  const advice = renderAspTypeScriptAgentCompactText(report);
   assert.match(snapshot, /Modules: source=2 branches=2 orphaned=1 build-tools=1 findings=1/u);
   assert.match(
     snapshot,
@@ -705,7 +705,7 @@ test("Rspack script facts satisfy the build tool surface advice", () => {
     }),
   );
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
 
   assert.deepEqual(
     report.projectResolution?.packageJson.packageBuildTools.map((buildTool) => ({
@@ -729,7 +729,7 @@ test("Rspack script facts satisfy the build tool surface advice", () => {
   );
 });
 
-test("package json harness config can explicitly expose Rspack build tool intent", () => {
+test("package json ASP TypeScript config can explicitly expose Rspack build tool intent", () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-rspack-config-intent-"));
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(path.join(root, "src", "index.ts"), "export const ok = 1;\n");
@@ -738,7 +738,7 @@ test("package json harness config can explicitly expose Rspack build tool intent
     path.join(root, "package.json"),
     JSON.stringify({
       name: "@example/rspack-config-intent",
-      typescriptProjectHarness: {
+      "asp-typescript": {
         buildTools: {
           rspack: "enable",
         },
@@ -746,7 +746,7 @@ test("package json harness config can explicitly expose Rspack build tool intent
     }),
   );
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
 
   assert.deepEqual(
     report.projectResolution?.packageJson.packageBuildTools.map((buildTool) => ({
@@ -764,12 +764,12 @@ test("package json harness config can explicitly expose Rspack build tool intent
         packageNames: [],
         configFiles: [],
         scriptNames: [],
-        signals: ["harness-config:typescriptProjectHarness:rspack"],
+        signals: ["asp-config:asp-typescript:rspack"],
       },
     ],
   );
   assert.match(
     report.findings.find((finding) => finding.ruleId === "TS-AGENT-PROJECT-006")?.summary ?? "",
-    /package\.json harness config/u,
+    /package\.json ASP TypeScript config/u,
   );
 });

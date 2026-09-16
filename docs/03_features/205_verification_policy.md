@@ -7,7 +7,7 @@ not run the verifier.
 
 ## Authority Chain
 
-The verification planner consumes `TypeScriptHarnessReport.reasoningTree`.
+The verification planner consumes `AspTypeScriptReport.reasoningTree`.
 It does not inspect TypeScript ASTs, call `typescript`, call parser helpers, or
 rebuild module resolution. Native parser facts first become reasoning tree
 facts, then profile hints map those owners to verification tasks.
@@ -19,7 +19,7 @@ verification become a second semantic parser.
 
 ## Configuration
 
-`TypeScriptHarnessConfig.verificationPolicy` contains:
+`AspTypeScriptConfig.verificationPolicy` contains:
 
 - `profileHints`: owner responsibility declarations.
 - `receipts`: completed verification results keyed by task fingerprint.
@@ -93,7 +93,7 @@ incomplete waivers remain visible with a `resolution` line.
    |performance: pending phase=after_unit_tests_pass fingerprint=tsv:...
    |why: performance=profile declares latency-sensitive TypeScript owner
    |requires: performance=benchmark_command,baseline,regression_threshold,latency_or_throughput,allocation_profile,profile_artifact
-   |fact: performance.module=role=source layer=harness
+   |fact: performance.module=role=source layer=asp
    |contract: performance=performance skill must report benchmark command, baseline, regression threshold, latency or throughput, allocation profile, and profiling artifact for this fingerprint
 ```
 
@@ -152,7 +152,7 @@ import {
   buildTypeScriptVerificationReportBundle,
   renderTypeScriptVerificationReportArtifactJson,
   writeTypeScriptVerificationReports,
-} from "typescript-lang-project-harness";
+} from "asp-typescript";
 
 const index = buildTypeScriptVerificationTaskIndex(plan);
 const perf = buildTypeScriptVerificationPerformanceIndex(plan);
@@ -198,7 +198,7 @@ import {
   activeTypeScriptVerificationProfileHints,
   buildTypeScriptVerificationProfileIndex,
   renderTypeScriptVerificationProfileIndex,
-} from "typescript-lang-project-harness";
+} from "asp-typescript";
 
 const index = buildTypeScriptVerificationProfileIndex(".");
 console.log(renderTypeScriptVerificationProfileIndex(index));
@@ -220,7 +220,7 @@ When active candidates exist, the compact renderer appends a
    |state: missing_profile
    |suggest: external_dependency,public_api
    |tasks: chaos,stress
-   |fact: module=role=facade layer=harness
+   |fact: module=role=facade layer=asp
    |fact: imports=external=1 package_import=0 unresolved=0
 [verify-profile] profile_hints
    |state: missing_profile_config

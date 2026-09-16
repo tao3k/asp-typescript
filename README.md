@@ -1,6 +1,6 @@
-# typescript-lang-project-harness
+# asp-typescript
 
-Standalone project-level TypeScript language harness for agent repair loops,
+Standalone project-level TypeScript ASP language provider for agent repair loops,
 local checks, and CI policy gates.
 
 The package keeps one strict boundary: TypeScript semantics come from the
@@ -11,48 +11,41 @@ source text as the source of truth.
 ## Use
 
 ```ts
-import { assertTypeScriptProjectHarnessClean } from "typescript-lang-project-harness";
+import { assertAspTypeScriptClean } from "asp-typescript";
 
-assertTypeScriptProjectHarnessClean(new URL(".", import.meta.url));
+assertAspTypeScriptClean(new URL(".", import.meta.url));
 ```
 
 For compact repair output:
 
 ```ts
-import {
-  renderTypeScriptProjectHarnessAgentCompactText,
-  runTypeScriptProjectHarness,
-} from "typescript-lang-project-harness";
+import { renderAspTypeScriptAgentCompactText, runAspTypeScript } from "asp-typescript";
 
-const report = runTypeScriptProjectHarness(".");
-console.log(renderTypeScriptProjectHarnessAgentCompactText(report));
+const report = runAspTypeScript(".");
+console.log(renderAspTypeScriptAgentCompactText(report));
 ```
 
 ## CLI
 
-The public binary is `asp-typescript`.
+The provider binary is `asp-typescript`; public discovery is owned by the root
+ASP Search Playbook.
 
 ```shell
-asp-typescript search workspace .
-asp-typescript search prime --workspace . --view seeds
-asp-typescript search owner src/index.ts --workspace . --view seeds
-asp-typescript search lexical OrderStatus .
-asp-typescript search lexical --query-set OrderStatus --query-set findOrderStatus owner tests .
-rg -n "OrderStatus" src tests | asp-typescript search ingest .
+asp search playbook --language typescript --rg -n -e OrderStatus src tests --tantivy 'title:OrderStatus^2 OR body:OrderStatus'
+asp query playbook --language typescript --selector '<typescript-selector>' --projection source --workspace .
 
-asp-typescript check --changed .
-asp-typescript check --full .
 asp-typescript agent doctor --json .
 asp-typescript agent install --client codex .
 asp-typescript agent guide --client codex .
 ```
 
-Compact text is the default agent surface. `--json` emits the shared semantic
-search packet, and `agent doctor --json` emits the semantic language registry.
+`agent doctor --json` emits the semantic language registry.
+Project policy is the exported ASP TypeScript API invoked by package build/test
+ownership; the provider CLI does not duplicate it.
 `agent install --client codex` writes `.codex/config.toml` so Codex hooks route
 raw TypeScript/JavaScript source reads and broad candidate searches back through
 `asp-typescript search` packets. Existing multi-language hook config is preserved:
-the installer updates its own marked block or appends one when another harness
+the installer updates its own marked block or appends one when another ASP provider
 already owns hooks. `agent guide --client codex` prints the command-line guide
 used in hook denials; every actionable line uses the installed `asp-typescript`
 binary.
@@ -90,7 +83,7 @@ npm run lint
 npm run format:check
 npm run test:implementation
 npm run test:policy
-npm run harness
+npm run check:policy
 git diff --check
 ```
 
@@ -98,9 +91,8 @@ git diff --check
 
 Durable package material lives under [docs/](docs/index.md):
 
-- [Harness Boundary](docs/01_core/101_harness_boundary.md)
-- [Runner Modes](docs/03_features/202_runner_modes.md)
-- [CLI](docs/03_features/203_cli.md)
+- [ASP TypeScript Boundary](docs/01_core/101_asp_typescript_boundary.md)
 - [Rule Catalog](docs/03_features/201_rule_catalog.md)
+- [Compact Agent Snapshot](docs/03_features/204_compact_agent_snapshot.md)
 - [Verification Policy](docs/03_features/205_verification_policy.md)
 - [CI](docs/04_development/301_ci.md)

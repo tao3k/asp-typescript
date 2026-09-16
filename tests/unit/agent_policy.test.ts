@@ -5,9 +5,9 @@ import path from "node:path";
 import test from "node:test";
 
 import {
-  isTypeScriptHarnessClean,
-  renderTypeScriptProjectHarness,
-  runTypeScriptProjectHarness,
+  isAspTypeScriptClean,
+  renderAspTypeScript,
+  runAspTypeScript,
   typeScriptAgentPolicyRules,
   typeScriptExtensionPolicyRules,
   typeScriptModularityRules,
@@ -110,10 +110,10 @@ test("agent policy reports unresolved project imports without blocking", () => {
     ['import "./missing.js";', 'import "#missing";', 'import "@app/missing";'].join("\n"),
   );
 
-  const report = runTypeScriptProjectHarness(root);
-  const rendered = renderTypeScriptProjectHarness(report);
+  const report = runAspTypeScript(root);
+  const rendered = renderAspTypeScript(report);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.deepEqual(
     typeScriptAgentPolicyRules().map((rule) => rule.ruleId),
     [
@@ -172,10 +172,10 @@ test("agent policy reports unresolved package entries without blocking", () => {
   );
   fs.writeFileSync(path.join(root, "src", "index.ts"), "export const ok = 1;\n");
 
-  const report = runTypeScriptProjectHarness(root);
-  const rendered = renderTypeScriptProjectHarness(report);
+  const report = runAspTypeScript(root);
+  const rendered = renderAspTypeScript(report);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.deepEqual(
     report.findings.map((finding) => finding.ruleId),
     ["TS-AGENT-POLICY-002", "TS-AGENT-POLICY-002"],
@@ -199,10 +199,10 @@ test("agent policy reports multi-owner facades without intent docs", () => {
     ].join("\n"),
   );
 
-  const report = runTypeScriptProjectHarness(root);
-  const rendered = renderTypeScriptProjectHarness(report);
+  const report = runAspTypeScript(root);
+  const rendered = renderAspTypeScript(report);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.deepEqual(
     report.findings.map((finding) => finding.ruleId),
     ["TS-AGENT-POLICY-003"],
@@ -241,7 +241,7 @@ test("agent policy reports missing module docs for broad public surfaces only", 
     ].join("\n"),
   );
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
   const missingDocPaths = report.findings
     .filter((finding) => finding.ruleId === "TS-AGENT-POLICY-013")
     .flatMap((finding) =>
@@ -272,10 +272,10 @@ test("agent policy reports parser-native public API shape advice without blockin
     ].join("\n"),
   );
 
-  const report = runTypeScriptProjectHarness(root);
-  const rendered = renderTypeScriptProjectHarness(report);
+  const report = runAspTypeScript(root);
+  const rendered = renderAspTypeScript(report);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.deepEqual(
     report.findings.map((finding) => finding.ruleId),
     ["TS-AGENT-POLICY-004", "TS-AGENT-POLICY-005", "TS-AGENT-POLICY-006"],
@@ -315,10 +315,10 @@ test("agent policy reports parser-native algorithm shape advice without blocking
     ].join("\n"),
   );
 
-  const report = runTypeScriptProjectHarness(root);
-  const rendered = renderTypeScriptProjectHarness(report);
+  const report = runAspTypeScript(root);
+  const rendered = renderAspTypeScript(report);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.deepEqual(
     report.findings.map((finding) => finding.ruleId),
     ["TS-AGENT-POLICY-007", "TS-AGENT-POLICY-008"],
@@ -367,12 +367,12 @@ test("agent policy labels parser-native traversal knot advice", () => {
     ].join("\n"),
   );
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
   const traversalFinding = report.findings.find(
     (finding) => finding.ruleId === "TS-AGENT-POLICY-007",
   );
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.equal(traversalFinding?.labels.softwareCriteria, "control-flow.traversal-knot");
 });
 
@@ -398,12 +398,12 @@ test("agent policy labels parser-native literal dispatch advice", () => {
     ].join("\n"),
   );
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
   const dispatchFinding = report.findings.find(
     (finding) => finding.ruleId === "TS-AGENT-POLICY-007",
   );
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.equal(dispatchFinding?.labels.softwareCriteria, "control-flow.literal-dispatch-chain");
   assert.match(dispatchFinding?.summary ?? "", /control-flow\.literal-dispatch-chain/u);
 });
@@ -427,10 +427,10 @@ test("agent policy reports parser-native public data shape advice without blocki
     ].join("\n"),
   );
 
-  const report = runTypeScriptProjectHarness(root);
-  const rendered = renderTypeScriptProjectHarness(report);
+  const report = runAspTypeScript(root);
+  const rendered = renderAspTypeScript(report);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.deepEqual(
     report.findings.map((finding) => finding.ruleId),
     ["TS-AGENT-POLICY-009"],
@@ -457,9 +457,9 @@ test("agent policy keeps model schema modules out of public data shape advice", 
     ].join("\n"),
   );
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.deepEqual(report.findings, []);
 });
 
@@ -483,10 +483,10 @@ test("agent policy reports parser-native public type boundary advice without blo
     ].join("\n"),
   );
 
-  const report = runTypeScriptProjectHarness(root);
-  const rendered = renderTypeScriptProjectHarness(report);
+  const report = runAspTypeScript(root);
+  const rendered = renderAspTypeScript(report);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.deepEqual(
     report.findings.map((finding) => finding.ruleId),
     ["TS-AGENT-POLICY-010", "TS-AGENT-POLICY-011", "TS-AGENT-POLICY-012"],
@@ -518,9 +518,9 @@ test("agent policy keeps model schema modules out of public type boundary advice
     ].join("\n"),
   );
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.deepEqual(
     report.findings.map((f) => f.ruleId),
     [],

@@ -7,40 +7,40 @@ import {
   readProjectResolution,
   parseTypeScriptProjectFiles,
 } from "../parser.js";
-import { defaultTypeScriptHarnessConfig, typeScriptHarnessConfigForProject } from "../config.js";
+import { defaultAspTypeScriptConfig, aspTypeScriptConfigForProject } from "../config.js";
 import { buildTypeScriptReasoningTree } from "../reasoning.js";
 import { evaluateDefaultRulePacks } from "../rules.js";
 import type {
-  TypeScriptHarnessConfig,
-  TypeScriptHarnessReport,
-  TypeScriptProjectHarnessAgentSnapshot,
-  TypeScriptProjectHarnessAgentSnapshotPackage,
+  AspTypeScriptConfig,
+  AspTypeScriptReport,
+  AspTypeScriptAgentSnapshot,
+  AspTypeScriptAgentSnapshotPackage,
 } from "../model.js";
 
-export interface TypeScriptProjectHarnessEmbeddedOptions {
-  readonly config?: TypeScriptHarnessConfig;
+export interface AspTypeScriptEmbeddedOptions {
+  readonly config?: AspTypeScriptConfig;
   readonly collectSemanticDiagnostics?: boolean;
   readonly emitAdvice?: boolean;
   readonly writeAdvice?: (message: string) => unknown;
 }
 
-interface TypeScriptProjectHarnessRunOptions {
+interface AspTypeScriptRunOptions {
   readonly collectSemanticDiagnostics?: boolean;
   readonly collectNativeSyntaxFacts?: boolean;
   readonly evaluateRules?: boolean;
   readonly fileNames?: readonly string[];
 }
 
-export function runTypeScriptProjectHarness(
+export function runAspTypeScript(
   projectRootInput: string | URL,
-  config?: TypeScriptHarnessConfig,
-  options: TypeScriptProjectHarnessRunOptions = {},
-): TypeScriptHarnessReport {
+  config?: AspTypeScriptConfig,
+  options: AspTypeScriptRunOptions = {},
+): AspTypeScriptReport {
   const projectRoot = pathFromInput(projectRootInput);
   if (!fs.existsSync(projectRoot)) {
     throw new Error(`project root does not exist: ${projectRoot}`);
   }
-  const selectedConfig = config ?? typeScriptHarnessConfigForProject(projectRoot);
+  const selectedConfig = config ?? aspTypeScriptConfigForProject(projectRoot);
   const scope = readProjectResolution(projectRoot, selectedConfig);
   const parseOptions = {
     ...(options.collectSemanticDiagnostics === undefined
@@ -70,23 +70,20 @@ export function runTypeScriptProjectHarness(
   };
 }
 
-export function runTypeScriptProjectHarnessAgentSnapshot(
+export function runAspTypeScriptAgentSnapshot(
   projectRootInput: string | URL,
-  config: TypeScriptHarnessConfig = defaultTypeScriptHarnessConfig(),
-): TypeScriptProjectHarnessAgentSnapshot {
-  return buildTypeScriptProjectHarnessAgentSnapshot(
-    runTypeScriptProjectHarness(projectRootInput, config),
-    config,
-  );
+  config: AspTypeScriptConfig = defaultAspTypeScriptConfig(),
+): AspTypeScriptAgentSnapshot {
+  return buildAspTypeScriptAgentSnapshot(runAspTypeScript(projectRootInput, config), config);
 }
 
-export function buildTypeScriptProjectHarnessAgentSnapshot(
-  rootReport: TypeScriptHarnessReport,
-  config: TypeScriptHarnessConfig = defaultTypeScriptHarnessConfig(),
-): TypeScriptProjectHarnessAgentSnapshot {
+export function buildAspTypeScriptAgentSnapshot(
+  rootReport: AspTypeScriptReport,
+  config: AspTypeScriptConfig = defaultAspTypeScriptConfig(),
+): AspTypeScriptAgentSnapshot {
   const projectRoot = rootReport.reasoningTree.projectRoot;
   const memberReports = agentSnapshotMemberPackageRoots(rootReport).map((packageRoot) =>
-    runTypeScriptProjectHarness(packageRoot, config),
+    runAspTypeScript(packageRoot, config),
   );
   const packages = [rootReport, ...memberReports].map((report) =>
     agentSnapshotPackage(projectRoot, report),
@@ -94,7 +91,7 @@ export function buildTypeScriptProjectHarnessAgentSnapshot(
   return { projectRoot, packages };
 }
 
-function agentSnapshotMemberPackageRoots(rootReport: TypeScriptHarnessReport): string[] {
+function agentSnapshotMemberPackageRoots(rootReport: AspTypeScriptReport): string[] {
   const projectRoot = path.resolve(rootReport.reasoningTree.projectRoot);
   const packageRoots = new Set<string>();
   for (const referencePackage of rootReport.reasoningTree.projectReferencePackages) {
@@ -114,8 +111,8 @@ function agentSnapshotMemberPackageRoots(rootReport: TypeScriptHarnessReport): s
 
 function agentSnapshotPackage(
   snapshotRoot: string,
-  report: TypeScriptHarnessReport,
-): TypeScriptProjectHarnessAgentSnapshotPackage {
+  report: AspTypeScriptReport,
+): AspTypeScriptAgentSnapshotPackage {
   const packageRoot = report.reasoningTree.projectRoot;
   return {
     packageRoot,

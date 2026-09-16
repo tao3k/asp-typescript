@@ -248,7 +248,7 @@ describe("compact text renderer", () => {
     assert.equal(output, "[ok] ts");
   });
 
-  it("renders finding in rust-harness compact format", () => {
+  it("renders finding in ASP Rust compact format", () => {
     const project = parseProject(FIXTURES);
     const findings = buildCompactFindings(project.modules);
 

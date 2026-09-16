@@ -66,10 +66,8 @@ const BUILD_TOOL_DESCRIPTORS: readonly BuildToolDescriptor[] = [
   },
 ];
 
-const HARNESS_CONFIG_SOURCE_NAMES: readonly TypeScriptPackageExtensionConfigSource[] = [
-  "typescriptProjectHarness",
-  "typescriptLangProjectHarness",
-  "typescript-lang-project-harness",
+const ASP_CONFIG_SOURCE_NAMES: readonly TypeScriptPackageExtensionConfigSource[] = [
+  "asp-typescript",
 ];
 
 export function packageBuildToolFacts(
@@ -125,13 +123,13 @@ function packageBuildToolFact(
         ]
       : [];
   });
-  const harnessConfigSignals = descriptor.configKeys.flatMap((configKey) => {
+  const aspConfigSignals = descriptor.configKeys.flatMap((configKey) => {
     const config = packageBuildToolConfigProperty(document, configKey);
     return config === undefined
       ? []
       : [
           {
-            kind: "harness-config" as const,
+            kind: "asp-config" as const,
             value: configKey,
             source: config.source,
             location: config.location,
@@ -142,7 +140,7 @@ function packageBuildToolFact(
     ...dependencySignals,
     ...scriptSignals,
     ...configSignals,
-    ...harnessConfigSignals,
+    ...aspConfigSignals,
   ];
   const firstSignal = signals[0];
   if (firstSignal === undefined) {
@@ -168,7 +166,7 @@ function packageBuildToolConfigProperty(
 ):
   | { readonly source: TypeScriptPackageExtensionConfigSource; readonly location: SourceLocation }
   | undefined {
-  for (const source of HARNESS_CONFIG_SOURCE_NAMES) {
+  for (const source of ASP_CONFIG_SOURCE_NAMES) {
     const configProperty = packageJsonProperty(document, source);
     if (configProperty === undefined || !ts.isObjectLiteralExpression(configProperty.initializer)) {
       continue;

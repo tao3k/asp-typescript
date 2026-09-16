@@ -4,11 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import {
-  isTypeScriptHarnessClean,
-  renderTypeScriptProjectHarness,
-  runTypeScriptProjectHarness,
-} from "../../src/index.js";
+import { isAspTypeScriptClean, renderAspTypeScript, runAspTypeScript } from "../../src/index.js";
 
 test("test layout pack reports test modules outside configured test roots without blocking", () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-test-layout-"));
@@ -23,10 +19,10 @@ test("test layout pack reports test modules outside configured test roots withou
   fs.writeFileSync(path.join(root, "src", "domain.test.ts"), "export const fixture = 1;\n");
   fs.writeFileSync(path.join(root, "tests", "domain.test.ts"), "export const ok = 1;\n");
 
-  const report = runTypeScriptProjectHarness(root);
-  const rendered = renderTypeScriptProjectHarness(report);
+  const report = runAspTypeScript(root);
+  const rendered = renderAspTypeScript(report);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.deepEqual(
     report.findings.map((finding) => `${finding.ruleId}:${finding.severity}`),
     ["TS-TEST-R001:info"],

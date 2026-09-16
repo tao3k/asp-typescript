@@ -1,7 +1,7 @@
 # Type Boundary Quality M12 Plan
 
-M12 continues the Rust harness alignment by strengthening TypeScript type
-quality advice without turning the harness into a linter:
+M12 continues the ASP Rust alignment by strengthening TypeScript type
+quality advice without turning ASP TypeScript into a linter:
 
 ```text
 TypeScript native type-boundary facts
@@ -51,6 +51,6 @@ direnv exec . npm ci
 direnv exec . npm run check
 direnv exec . npm run lint
 direnv exec . npm test
-direnv exec . npm run harness
+direnv exec . npm run check:policy
 direnv exec . git diff --check
 ```

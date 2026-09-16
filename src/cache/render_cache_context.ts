@@ -4,7 +4,7 @@
  * This module serializes cache atoms into compact prompt sections while
  * preserving the cache class boundaries used by the adapter.
  */
-import type { TypeScriptHarnessPrefixAtom, PartitionedAtoms } from "./prefix_atoms.js";
+import type { AspTypeScriptPrefixAtom, PartitionedAtoms } from "./prefix_atoms.js";
 
 // ── Render output ──────────────────────────────────────────
 
@@ -47,7 +47,7 @@ export function renderFullPrompt(blocks: RenderedCacheBlocks): string {
 }
 
 /** Render a single cache-class group as compact text. */
-function renderAtomGroup(atoms: readonly TypeScriptHarnessPrefixAtom[]): string {
+function renderAtomGroup(atoms: readonly AspTypeScriptPrefixAtom[]): string {
   if (atoms.length === 0) return "";
 
   const lines: string[] = [];

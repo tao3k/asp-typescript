@@ -1,13 +1,13 @@
 import type {
   TypeScriptEffectSchemaBoundarySignalFact,
-  TypeScriptHarnessFinding,
-  TypeScriptHarnessRule,
+  AspTypeScriptFinding,
+  AspTypeScriptRule,
   TypeScriptReasoningModule,
   TypeScriptReasoningTree,
 } from "../../model.js";
 import { effectPolicyIsActive, sourceModules } from "./effect_modules.js";
 
-export const TS_EXT_EFFECT_R009: TypeScriptHarnessRule = {
+export const TS_EXT_EFFECT_R009: AspTypeScriptRule = {
   ruleId: "TS-EXT-EFFECT-R009",
   packId: "typescript.extension_policy",
   severity: "info",
@@ -19,7 +19,7 @@ export const TS_EXT_EFFECT_R009: TypeScriptHarnessRule = {
 
 export function evaluateEffectSchemaBoundaryAdvice(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   if (!effectPolicyIsActive(reasoningTree.packageExtensions)) {
     return [];
   }
@@ -30,7 +30,7 @@ export function evaluateEffectSchemaBoundaryAdvice(
 
 function effectSchemaBoundaryAdviceForModule(
   moduleReport: TypeScriptReasoningModule,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   const first = moduleReport.effectSchemaBoundarySignals[0];
   if (first === undefined) {
     return [];

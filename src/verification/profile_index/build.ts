@@ -1,14 +1,14 @@
 import path from "node:path";
 
-import { defaultTypeScriptHarnessConfig } from "../../config.js";
+import { defaultAspTypeScriptConfig } from "../../config.js";
 import type {
-  TypeScriptHarnessConfig,
-  TypeScriptHarnessReport,
+  AspTypeScriptConfig,
+  AspTypeScriptReport,
   TypeScriptImportEdgeFact,
   TypeScriptReasoningModule,
   TypeScriptReasoningOwnerBranchFact,
 } from "../../model.js";
-import { runTypeScriptProjectHarness } from "../../runner.js";
+import { runAspTypeScript } from "../../runner.js";
 import { taskKindsForResponsibilities } from "../profile.js";
 import type {
   TypeScriptOwnerResponsibility,
@@ -41,22 +41,22 @@ export function buildTypeScriptVerificationProfileIndex(
 ): TypeScriptVerificationProfileIndex {
   return buildTypeScriptVerificationProfileIndexWithConfig(
     projectRootInput,
-    defaultTypeScriptHarnessConfig(),
+    defaultAspTypeScriptConfig(),
   );
 }
 
 export function buildTypeScriptVerificationProfileIndexWithConfig(
   projectRootInput: string | URL,
-  config: TypeScriptHarnessConfig,
+  config: AspTypeScriptConfig,
 ): TypeScriptVerificationProfileIndex {
   return buildTypeScriptVerificationProfileIndexForReport(
-    runTypeScriptProjectHarness(projectRootInput, config),
+    runAspTypeScript(projectRootInput, config),
     config.verificationPolicy,
   );
 }
 
 export function buildTypeScriptVerificationProfileIndexForReport(
-  report: TypeScriptHarnessReport,
+  report: AspTypeScriptReport,
   policy: TypeScriptVerificationPolicy,
 ): TypeScriptVerificationProfileIndex {
   const candidates = report.reasoningTree.modules
@@ -77,7 +77,7 @@ export function buildTypeScriptVerificationProfileIndexForReport(
 }
 
 function profileCandidate(
-  report: TypeScriptHarnessReport,
+  report: AspTypeScriptReport,
   policy: TypeScriptVerificationPolicy,
   moduleReport: TypeScriptReasoningModule,
 ): TypeScriptVerificationProfileCandidate | undefined {
@@ -142,7 +142,7 @@ function isPublicSurface(
 }
 
 function profileSignals(
-  report: TypeScriptHarnessReport,
+  report: AspTypeScriptReport,
   policy: TypeScriptVerificationPolicy,
   moduleReport: TypeScriptReasoningModule,
   branch: TypeScriptReasoningOwnerBranchFact | undefined,
@@ -275,7 +275,7 @@ function profileCandidateState(
 }
 
 function matchingProfileHint(
-  report: TypeScriptHarnessReport,
+  report: AspTypeScriptReport,
   policy: TypeScriptVerificationPolicy,
   ownerPath: string,
 ): TypeScriptVerificationProfileHint | undefined {
@@ -285,7 +285,7 @@ function matchingProfileHint(
 }
 
 function ownerBranchForModule(
-  report: TypeScriptHarnessReport,
+  report: AspTypeScriptReport,
   moduleReport: TypeScriptReasoningModule,
 ): TypeScriptReasoningOwnerBranchFact | undefined {
   return report.reasoningTree.ownerBranches.find((branch) => branch.path === moduleReport.path);
@@ -293,13 +293,13 @@ function ownerBranchForModule(
 
 function countEdges(
   edges: readonly TypeScriptImportEdgeFact[],
-  resolution: TypeScriptHarnessReport["reasoningTree"]["edges"][number]["resolution"],
+  resolution: AspTypeScriptReport["reasoningTree"]["edges"][number]["resolution"],
 ): number {
   return edges.filter((edge) => edge.resolution === resolution).length;
 }
 
 function ownerModulePaths(
-  report: TypeScriptHarnessReport,
+  report: AspTypeScriptReport,
   moduleReport: TypeScriptReasoningModule,
   branch: TypeScriptReasoningOwnerBranchFact | undefined,
 ): readonly string[] {
@@ -350,14 +350,14 @@ function uniqueSortedStrings(values: readonly string[]): readonly string[] {
   );
 }
 
-function normalizeHintOwnerPath(report: TypeScriptHarnessReport, ownerPath: string): string {
+function normalizeHintOwnerPath(report: AspTypeScriptReport, ownerPath: string): string {
   return path.isAbsolute(ownerPath)
     ? path.resolve(ownerPath)
     : path.resolve(report.reasoningTree.projectRoot, ownerPath);
 }
 
 function ownerNamespace(
-  report: TypeScriptHarnessReport,
+  report: AspTypeScriptReport,
   moduleReport: TypeScriptReasoningModule,
 ): string {
   const relativePath = compactPath(report, moduleReport.path);
@@ -365,6 +365,6 @@ function ownerNamespace(
   return extension.length === 0 ? relativePath : relativePath.slice(0, -extension.length);
 }
 
-function compactPath(report: TypeScriptHarnessReport, value: string): string {
+function compactPath(report: AspTypeScriptReport, value: string): string {
   return path.relative(report.reasoningTree.projectRoot, value).replaceAll("\\", "/") || ".";
 }

@@ -1,6 +1,6 @@
 # Verification VAS M8 Plan
 
-M8 aligns the TypeScript harness with the latest Rust VAS verification artifact
+M8 aligns the ASP TypeScript with the latest Rust VAS verification artifact
 surface while keeping the TypeScript parser-first boundary intact:
 
 ```text
@@ -71,6 +71,6 @@ direnv exec . npm ci
 direnv exec . npm run check
 direnv exec . npm run lint
 direnv exec . npm test
-direnv exec . npm run harness
+direnv exec . npm run check:policy
 direnv exec . git diff --check
 ```

@@ -52,7 +52,7 @@ test("TypeScript semantics stay in the parser layer", () => {
   );
   assert.doesNotMatch(
     rulesSource,
-    /TypeScriptModuleReport|TypeScriptProjectHarnessScope|TypeScriptHarnessRunMode/u,
+    /TypeScriptModuleReport|AspTypeScriptProjectScope|AspTypeScriptRunMode/u,
   );
   assert.doesNotMatch(
     rulesSource,

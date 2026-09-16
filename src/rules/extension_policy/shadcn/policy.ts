@@ -1,6 +1,6 @@
-import type { TypeScriptHarnessRule } from "../../../model.js";
+import type { AspTypeScriptRule } from "../../../model.js";
 
-export const TS_EXT_SHADCN_R001: TypeScriptHarnessRule = {
+export const TS_EXT_SHADCN_R001: AspTypeScriptRule = {
   ruleId: "TS-EXT-SHADCN-R001",
   packId: "typescript.extension_policy",
   severity: "error",
@@ -10,7 +10,7 @@ export const TS_EXT_SHADCN_R001: TypeScriptHarnessRule = {
   labels: { surface: "extension", parser: "package-json", extension: "shadcn" },
 };
 
-export const TS_EXT_SHADCN_R002: TypeScriptHarnessRule = {
+export const TS_EXT_SHADCN_R002: AspTypeScriptRule = {
   ruleId: "TS-EXT-SHADCN-R002",
   packId: "typescript.extension_policy",
   severity: "info",
@@ -20,7 +20,7 @@ export const TS_EXT_SHADCN_R002: TypeScriptHarnessRule = {
   labels: { surface: "extension", parser: "reasoning-tree", extension: "shadcn" },
 };
 
-export const TS_EXT_SHADCN_R003: TypeScriptHarnessRule = {
+export const TS_EXT_SHADCN_R003: AspTypeScriptRule = {
   ruleId: "TS-EXT-SHADCN-R003",
   packId: "typescript.extension_policy",
   severity: "info",

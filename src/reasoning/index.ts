@@ -1,6 +1,6 @@
 import type {
   TypeScriptModuleReport,
-  TypeScriptProjectHarnessScope,
+  AspTypeScriptProjectScope,
   TypeScriptReasoningTree,
 } from "../model.js";
 import { moduleDiagnostics, reasoningDiagnostics } from "./diagnostics.js";
@@ -20,7 +20,7 @@ import { commonAncestor } from "./path_utils.js";
 import { orphanedSourceFiles, shadowedSourceOwners } from "./source_shape.js";
 
 export function buildTypeScriptReasoningTree(
-  scope: TypeScriptProjectHarnessScope,
+  scope: AspTypeScriptProjectScope,
   modules: readonly TypeScriptModuleReport[],
 ): TypeScriptReasoningTree {
   const modulePaths = new Set(modules.map((moduleReport) => moduleReport.path));
@@ -125,7 +125,7 @@ export function buildExplicitTypeScriptReasoningTree(
 
 function withOptionalProjectFacts(
   tree: TypeScriptReasoningTree,
-  scope: TypeScriptProjectHarnessScope,
+  scope: AspTypeScriptProjectScope,
 ): TypeScriptReasoningTree {
   const withPackageName =
     scope.packageJson.name === undefined ? tree : { ...tree, packageName: scope.packageJson.name };

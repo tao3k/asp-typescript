@@ -1,5 +1,5 @@
 /**
- * Public facade for the TypeScript project harness library API.
+ * Public facade for the ASP TypeScript library API.
  *
  * Exports are grouped by model, configuration, parsing, rendering, execution,
  * rules, and verification so consumers can select a stable responsibility
@@ -17,11 +17,11 @@ export type {
   SourceLocation,
   TypeScriptDiagnosticSeverity,
   TypeScriptExportFact,
-  TypeScriptHarnessConfig,
-  TypeScriptHarnessFinding,
-  TypeScriptHarnessReport,
-  TypeScriptHarnessRule,
-  TypeScriptHarnessRunMode,
+  AspTypeScriptConfig,
+  AspTypeScriptFinding,
+  AspTypeScriptReport,
+  AspTypeScriptRule,
+  AspTypeScriptRunMode,
   TypeScriptRulePack,
   TypeScriptImportFact,
   TypeScriptImportEdgeFact,
@@ -49,10 +49,10 @@ export type {
   TypeScriptPackageExtensionFact,
   TypeScriptPackageExtensionName,
   TypeScriptPathAliasFact,
-  TypeScriptProjectHarnessAgentSnapshot,
-  TypeScriptProjectHarnessAgentSnapshotPackage,
+  AspTypeScriptAgentSnapshot,
+  AspTypeScriptAgentSnapshotPackage,
   TypeScriptProjectConfigFacts,
-  TypeScriptProjectHarnessScope,
+  AspTypeScriptProjectScope,
   TypeScriptProjectReferencePackageFact,
   TypeScriptProjectReferenceResolutionFact,
   TypeScriptEffectErrorChannelKind,
@@ -99,11 +99,11 @@ export {
   advisoryFindings,
   blockingFindings,
   fileCount,
-  isTypeScriptHarnessClean,
+  isAspTypeScriptClean,
   parsedCount,
 } from "./model.js";
 export {
-  defaultTypeScriptHarnessConfig,
+  defaultAspTypeScriptConfig,
   defaultTypeScriptVerificationPolicy,
   withDisabledTypeScriptRule,
   withDisabledTypeScriptRulePack,
@@ -131,11 +131,11 @@ export {
 } from "./parser.js";
 export {
   renderAssertionMessage,
-  renderTypeScriptProjectHarness,
-  renderTypeScriptProjectHarnessAgentCompactText,
-  renderTypeScriptProjectHarnessAgentSnapshot,
-  renderTypeScriptProjectHarnessAdvice,
-  renderTypeScriptProjectHarnessJson,
+  renderAspTypeScript,
+  renderAspTypeScriptAgentCompactText,
+  renderAspTypeScriptAgentSnapshot,
+  renderAspTypeScriptAdvice,
+  renderAspTypeScriptJson,
   renderTypeScriptReasoningTree,
 } from "./render.js";
 export type {
@@ -144,16 +144,16 @@ export type {
   TypeScriptRenderOptions,
 } from "./render.js";
 export {
-  assertTypeScriptProjectHarnessAgentClean,
-  assertTypeScriptProjectHarnessEmbeddedClean,
-  assertTypeScriptLangHarnessClean,
-  assertTypeScriptProjectHarnessClean,
-  buildTypeScriptProjectHarnessAgentSnapshot,
-  runTypeScriptLangHarness,
-  runTypeScriptProjectHarnessAgentSnapshot,
-  runTypeScriptProjectHarness,
+  assertAspTypeScriptAgentClean,
+  assertAspTypeScriptEmbeddedClean,
+  assertAspTypeScriptPathsClean,
+  assertAspTypeScriptClean,
+  buildAspTypeScriptAgentSnapshot,
+  runAspTypeScriptPaths,
+  runAspTypeScriptAgentSnapshot,
+  runAspTypeScript,
 } from "./runner.js";
-export type { TypeScriptProjectHarnessEmbeddedOptions } from "./runner.js";
+export type { AspTypeScriptEmbeddedOptions } from "./runner.js";
 export {
   typeScriptAgentPolicyRules,
   typeScriptExtensionPolicyRules,
@@ -166,10 +166,10 @@ export {
   typeScriptTestLayoutRules,
 } from "./rules.js";
 export {
-  renderTypeScriptHarnessRulesMarkdown,
-  typeScriptHarnessRulesMarkdown,
-  writeTypeScriptHarnessRulesToUnitTests,
-} from "./rules/harness-rules.js";
+  renderAspTypeScriptRulesMarkdown,
+  aspTypeScriptRulesMarkdown,
+  writeAspTypeScriptRulesToUnitTests,
+} from "./rules/asp-rules.js";
 export {
   activeTypeScriptVerificationProfileCandidates,
   activeTypeScriptVerificationProfileHints,

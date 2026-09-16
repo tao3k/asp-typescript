@@ -1,6 +1,6 @@
-import type { TypeScriptHarnessFinding } from "../model.js";
+import type { AspTypeScriptFinding } from "../model.js";
 
-export function reactAgentTaskTitle(finding: TypeScriptHarnessFinding): string | undefined {
+export function reactAgentTaskTitle(finding: AspTypeScriptFinding): string | undefined {
   switch (finding.ruleId) {
     case "TS-EXT-REACT-R001":
       return "Make explicit React extension config match package dependencies";
@@ -15,13 +15,11 @@ export function reactAgentTaskTitle(finding: TypeScriptHarnessFinding): string |
   }
 }
 
-export function reactAdviceFixSteps(
-  finding: TypeScriptHarnessFinding,
-): readonly string[] | undefined {
+export function reactAdviceFixSteps(finding: AspTypeScriptFinding): readonly string[] | undefined {
   switch (finding.ruleId) {
     case "TS-EXT-REACT-R001":
       return [
-        "if React policy is intended, add `react` to package dependencies and keep `typescriptProjectHarness.extensions.react` enabled",
+        "if React policy is intended, add `react` to package dependencies and keep `asp-typescript.extensions.react` enabled",
         "otherwise remove the explicit extension config",
       ];
     case "TS-EXT-REACT-R002":
@@ -50,7 +48,7 @@ export function reactAdviceFixSteps(
   }
 }
 
-export function reactProblemText(finding: TypeScriptHarnessFinding): string | undefined {
+export function reactProblemText(finding: AspTypeScriptFinding): string | undefined {
   switch (finding.ruleId) {
     case "TS-EXT-REACT-R001":
       return "package config enables React policy but package dependencies do not provide React";
@@ -65,7 +63,7 @@ export function reactProblemText(finding: TypeScriptHarnessFinding): string | un
   }
 }
 
-export function reactParserEvidenceText(finding: TypeScriptHarnessFinding): string | undefined {
+export function reactParserEvidenceText(finding: AspTypeScriptFinding): string | undefined {
   switch (finding.ruleId) {
     case "TS-EXT-REACT-R001":
       return "package.json extension config + dependency facts";

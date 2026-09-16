@@ -1,7 +1,7 @@
 # Verification Report Bundle M7 Plan
 
-M7 continues the stacked verification lane after M6. It aligns the TypeScript
-harness with the Rust harness report-artifact contract without adding external
+M7 continues the stacked verification lane after M6. It aligns ASP TypeScript
+with the ASP Rust report-artifact contract without adding external
 execution. The milestone stays downstream of native parser facts:
 
 ```text
@@ -53,7 +53,7 @@ verification skills.
 - Unit tests cover report obligations, task-index records, failed receipt
   evidence, missing receipt evidence keys, bundle persistence, artifact JSON,
   quiet satisfied tasks, and public API exports.
-- Self-apply remains the default package harness gate.
+- Self-apply remains the default package ASP TypeScript gate.
 - Acceptance remains:
 
 ```shell
@@ -61,6 +61,6 @@ direnv exec . npm ci
 direnv exec . npm run check
 direnv exec . npm run lint
 direnv exec . npm test
-direnv exec . npm run harness
+direnv exec . npm run check:policy
 direnv exec . git diff --check
 ```

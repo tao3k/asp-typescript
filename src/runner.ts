@@ -1,18 +1,18 @@
 /**
- * Public runner facade for TypeScript harness execution.
+ * Public runner facade for ASP TypeScript execution.
  *
  * This module re-exports project run, assertion, and verification entrypoints
  * while keeping parser and policy internals behind stable APIs.
  */
 export {
-  runTypeScriptProjectHarness,
-  runTypeScriptProjectHarnessAgentSnapshot,
-  buildTypeScriptProjectHarnessAgentSnapshot,
+  runAspTypeScript,
+  runAspTypeScriptAgentSnapshot,
+  buildAspTypeScriptAgentSnapshot,
 } from "./runner/run-project.js";
-export { runTypeScriptLangHarness, assertTypeScriptLangHarnessClean } from "./runner/run-paths.js";
+export { runAspTypeScriptPaths, assertAspTypeScriptPathsClean } from "./runner/run-paths.js";
 export {
-  assertTypeScriptProjectHarnessClean,
-  assertTypeScriptProjectHarnessAgentClean,
-  assertTypeScriptProjectHarnessEmbeddedClean,
+  assertAspTypeScriptClean,
+  assertAspTypeScriptAgentClean,
+  assertAspTypeScriptEmbeddedClean,
 } from "./runner/assert-clean.js";
-export type { TypeScriptProjectHarnessEmbeddedOptions } from "./runner/run-project.js";
+export type { AspTypeScriptEmbeddedOptions } from "./runner/run-project.js";

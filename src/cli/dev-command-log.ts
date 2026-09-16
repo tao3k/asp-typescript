@@ -29,21 +29,6 @@ const VALUE_OPTIONS = new Set([
   "--view",
 ]);
 
-const SEARCH_PIPES = new Set([
-  "dependency",
-  "deps",
-  "docs",
-  "features",
-  "lexical",
-  "items",
-  "owner",
-  "owners",
-  "prime",
-  "symbol",
-  "tests",
-  "workspace",
-]);
-
 type DevCommandLog =
   | { readonly enabled: false }
   | {
@@ -390,19 +375,13 @@ function normalizeCommand(argv: readonly string[]): NormalizedCommand {
   const querySetCount = args.filter(
     (arg) => arg === "--query-set" || arg.startsWith("--query-set="),
   ).length;
-  const pipes = [
-    ...new Set(args.map(normalizeToken).filter((token) => SEARCH_PIPES.has(token))),
-  ].sort();
-  const view = namespace === "search" ? firstPositionalAfter(args, namespaceIndex) : undefined;
-  const normalizedView = view === undefined ? undefined : normalizeToken(view);
+  const pipes: readonly string[] = [];
+  const normalizedView = undefined;
   const method =
-    namespace === "search" && normalizedView !== undefined
-      ? `search/${normalizedView}`
-      : namespace === "agent"
-        ? `agent/${normalizeToken(firstPositionalAfter(args, namespaceIndex) ?? "unknown")}`
-        : namespace;
-  const query =
-    optionValue(args, "--query") ?? firstQueryPositional(args, namespaceIndex, normalizedView);
+    namespace === "agent"
+      ? `agent/${normalizeToken(firstPositionalAfter(args, namespaceIndex) ?? "unknown")}`
+      : namespace;
+  const query = optionValue(args, "--query");
   return {
     namespace,
     method,
@@ -429,38 +408,6 @@ function firstPositionalAfter(args: readonly string[], start: number): string | 
     if (!arg.startsWith("-")) {
       return arg;
     }
-  }
-  return undefined;
-}
-
-function firstQueryPositional(
-  args: readonly string[],
-  namespaceIndex: number,
-  view: string | undefined,
-): string | undefined {
-  let skippedView = view === undefined;
-  let skipNext = false;
-  for (const arg of args.slice(Math.max(0, namespaceIndex + 1))) {
-    if (skipNext) {
-      skipNext = false;
-      continue;
-    }
-    if (optionTakesValue(arg)) {
-      skipNext = !arg.includes("=");
-      continue;
-    }
-    if (arg.startsWith("-")) {
-      continue;
-    }
-    const token = normalizeToken(arg);
-    if (!skippedView && token === view) {
-      skippedView = true;
-      continue;
-    }
-    if (SEARCH_PIPES.has(token)) {
-      continue;
-    }
-    return arg;
   }
   return undefined;
 }

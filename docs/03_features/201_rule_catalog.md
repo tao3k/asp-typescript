@@ -1,6 +1,6 @@
 # Rule Catalog
 
-The harness exposes deterministic rule metadata through compact library
+ASP TypeScript exposes deterministic rule metadata through compact library
 functions:
 
 - `typeScriptRulePackDescriptors()`
@@ -73,7 +73,7 @@ for advisory rules; it does not mutate catalog severity.
 `TS-EXT-EFFECT-R002` through `TS-EXT-EFFECT-R010`, `TS-EXT-REACT-R002`, and
 `TS-EXT-REACT-R004` rules are `info` findings. They are rendered by default for
 repair agents but do not fail assertions unless a caller promotes them or uses
-the agent test-gate helper `assertTypeScriptProjectHarnessAgentClean()`.
+the agent test-gate helper `assertAspTypeScriptAgentClean()`.
 The agent test-gate helper renders grouped compact advice text so large
 projects keep a bounded first reading surface for agents.
 
@@ -102,7 +102,7 @@ projects keep a bounded first reading surface for agents.
 - `TS-MOD-R002`: package project modules should stay below their layer line
   budgets and split by concern. The rule scans the whole package reasoning
   tree, not a single hard-coded file. Parser, reasoning, and model layers use
-  the strictest budget; policy, harness, and render layers have explicit
+  the strictest budget; policy, ASP TypeScript, and render layers have explicit
   orchestration budgets instead of sharing one hard-coded threshold.
 - `TS-TEST-R001`: when configured test roots exist, parser-visible test modules
   should live under those roots.
@@ -130,7 +130,7 @@ projects keep a bounded first reading surface for agents.
   responsibilities into small named helpers or pipeline steps.
 - `TS-AGENT-POLICY-009`: public source data surfaces should avoid clusters of
   semantic primitive fields such as identifiers, URLs, paths, byte/time units,
-  or boolean mode fields unless the raw DTO boundary is explicit. Harness
+  or boolean mode fields unless the raw DTO boundary is explicit. ASP TypeScript
   model-layer modules, including nested `src/**/model.ts` schema modules, stay
   outside this advice surface.
 - `TS-AGENT-POLICY-010`: public semantic type aliases such as `OwnerId = string`
@@ -148,7 +148,7 @@ projects keep a bounded first reading surface for agents.
   that expose async domain work should prefer `Effect.Effect<A, E, R>` return
   types over raw `Promise` or implicit async Promise surfaces. Promise interop
   remains valid at adapters and runtime boundaries. Activation is project-wide:
-  an `effect` dependency or explicit Effect config asks the harness to guide
+  an `effect` dependency or explicit Effect config asks ASP TypeScript to guide
   agents toward `Effect.Effect<Success, DomainError, Requirements>`,
   `Effect.tryPromise({ try: () => promise, catch: (cause) => ... })`, and
   entrypoint/adapter-only `Effect.run*` execution. Explicit Effect config only
@@ -222,7 +222,7 @@ projects keep a bounded first reading surface for agents.
 
 ## Reasoning Tree Policy
 
-The harness treats a TypeScript package as an agent reasoning tree: the nearest
+ASP TypeScript treats a TypeScript package as an agent reasoning tree: the nearest
 parent `package.json` anchors the package project, `tsconfig.json` selects the
 TypeScript source set, `package.json` declares public package subpaths, source
 files expose parser-owned imports/exports, and import edges show whether a
@@ -259,7 +259,7 @@ lines, but it does not expose a generic manifest dependency model and it does
 not create package-manager gates.
 M16 adds parser-owned build-tool facts for Rspack/Rsbuild-family projects. The
 parser may read known package dependency names, package scripts, config-file
-presence, and optional `typescriptProjectHarness.buildTools` config to produce
+presence, and optional `asp-typescript.buildTools` config to produce
 `packageBuildTools` facts. Policy consumes only those typed facts and keeps the
 result as agent orientation/advice.
 M17 starts Effect capability-boundary coverage for Schema validation. The
@@ -313,7 +313,7 @@ Compact text is the primary repair surface:
 Agent snapshots may also render TypeScript related diagnostic information as
 indented `related` lines under the primary diagnostic.
 
-Structured consumers should use `renderTypeScriptProjectHarnessJson()` or the
+Structured consumers should use `renderAspTypeScriptJson()` or the
 serializable report shape instead of parsing compact text.
 
 ## Parser-First Policy
@@ -333,7 +333,7 @@ API/data/control-flow facts, and project/module-level diagnostic facts consumed
 by the reasoning tree. The reasoning layer owns
 source-shape projections such as shadowed owner namespaces and orphaned source
 files after native parser facts and TypeScript import resolution are available.
-The harness layer
+ASP TypeScript layer
 owns rule catalogs, project/test layout policy, reporting, and assertion
 behavior. Rule evaluation consumes the reasoning tree, including its typed
 `runMode`, not parser module reports or project parser scopes. The

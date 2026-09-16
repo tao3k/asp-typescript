@@ -1,5 +1,5 @@
 /**
- * Public verification facade for TypeScript harness planning.
+ * Public verification facade for ASP TypeScript planning.
  *
  * This module re-exports verification planners, receipts, persistence helpers,
  * and report renderers for external consumers.

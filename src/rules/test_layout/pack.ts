@@ -1,12 +1,12 @@
 import type {
-  TypeScriptHarnessFinding,
-  TypeScriptHarnessRule,
+  AspTypeScriptFinding,
+  AspTypeScriptRule,
   TypeScriptReasoningTree,
 } from "../../model.js";
 import { relativeToProject } from "../common.js";
 import { isInsideAny } from "../modularity/pack.js";
 
-const TS_TEST_R001: TypeScriptHarnessRule = {
+const TS_TEST_R001: AspTypeScriptRule = {
   ruleId: "TS-TEST-R001",
   packId: "typescript.test_layout",
   severity: "info",
@@ -16,13 +16,13 @@ const TS_TEST_R001: TypeScriptHarnessRule = {
   labels: { surface: "test-layout", parser: "reasoning-tree" },
 };
 
-export function typeScriptTestLayoutRules(): readonly TypeScriptHarnessRule[] {
+export function typeScriptTestLayoutRules(): readonly AspTypeScriptRule[] {
   return [TS_TEST_R001];
 }
 
 export function evaluateTestLayoutRules(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   if (reasoningTree.testRoots.length === 0) {
     return [];
   }
