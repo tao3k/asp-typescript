@@ -48,7 +48,7 @@ test("serve exposes the declared HTTP JSON lifecycle", async () => {
     assert.equal(receipt.transport, "http-json");
     assert.deepEqual(
       (receipt.operations as Array<{ operation: string }>).map(({ operation }) => operation),
-      ["projection-batch", "project-resolution", "query"],
+      ["ast-inspect", "ast-verify", "projection-batch", "project-resolution", "query"],
     );
 
     const projectionPayload = {

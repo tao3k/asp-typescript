@@ -1,0 +1,29 @@
+{
+  "schemaId": "agent.semantic-protocols.provider-core-manifest",
+  "schemaVersion": "1",
+  "languageId": "typescript",
+  "providerId": "asp-typescript",
+  "displayName": "TypeScript",
+  "extensions": [".ts", ".tsx", ".mts", ".cts"],
+  "projectMarkers": ["tsconfig.json", "package.json"],
+  "syntaxSurface": {
+    "lineComment": "//",
+    "blockComment": ["/*", "*/"],
+    "delimiterPairs": [["(", ")"], ["[", "]"], ["{", "}"]],
+    "statementTerminator": ";",
+    "stringDelimiters": ["\"", "'", "`"]
+  },
+  "transport": {
+    "transport": "http-json",
+    "command": ["serve"],
+    "healthPath": "/health",
+    "requestPath": "/v1/provider-runtime",
+    "shutdownPath": "/shutdown"
+  },
+  "capabilities": {
+    "astInspect": true,
+    "astVerify": true,
+    "openEdb": true,
+    "projectResolution": true
+  }
+}
