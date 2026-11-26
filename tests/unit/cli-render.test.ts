@@ -26,9 +26,7 @@ function captureStd() {
 describe("CLI protocol help", () => {
   it("documents the current provider entrypoints", () => {
     assert.ok(HELP_TEXT.includes("asp search playbook --language typescript"));
-    assert.ok(
-      HELP_TEXT.includes(`${TYPE_SCRIPT_BINARY} query (--catalog <id> | --treesitter-query`),
-    );
+    assert.ok(HELP_TEXT.includes(`${TYPE_SCRIPT_BINARY} query --catalog flow-lite`));
     assert.ok(HELP_TEXT.includes(`${TYPE_SCRIPT_BINARY} agent doctor`));
   });
 

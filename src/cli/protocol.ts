@@ -18,16 +18,10 @@ import {
   type FlowLiteQueryArgs,
 } from "./protocol-flow-lite-query.js";
 import {
-  isTreeSitterQueryArgs,
-  parseTreeSitterQueryArgs,
-  type TreeSitterQueryArgs,
-} from "./protocol-tree-sitter-query.js";
-import {
   buildOwnerItemSemanticReadPacket,
   renderOwnerItemSemanticReadPacket,
   renderOwnerItemSemanticReadPacketJson,
 } from "./source-read.js";
-import { renderTypeScriptTreeSitterQuery } from "../parser/native_syntax/tree-sitter-query.js";
 
 export interface CliStreams {
   readonly stdout: { write(chunk: string): unknown };
@@ -37,7 +31,6 @@ export interface CliStreams {
 
 export type ProtocolArgs =
   | DirectSourceReadArgs
-  | TreeSitterQueryArgs
   | FlowLiteQueryArgs
   | AgentArgs
   | AstPatchArgs
@@ -76,9 +69,7 @@ export function parseProtocolArgs(argv: readonly string[]): ProtocolArgs | undef
     const queryArgs = argv.slice(1);
     return isFlowLiteQueryArgs(queryArgs)
       ? parseFlowLiteQueryArgs(queryArgs)
-      : isTreeSitterQueryArgs(queryArgs)
-        ? parseTreeSitterQueryArgs(queryArgs)
-        : parseQueryArgs(queryArgs);
+      : parseQueryArgs(queryArgs);
   }
   if (command === "ast-patch") return parseAstPatchArgs(argv.slice(1));
   if (command === "agent") return parseAgentArgs(argv.slice(1));
@@ -129,12 +120,6 @@ export function runProtocolCli(
         args.json
           ? renderOwnerItemSemanticReadPacketJson(packet)
           : renderOwnerItemSemanticReadPacket(packet),
-      );
-      return 0;
-    }
-    if (args.kind === "tree-sitter-query") {
-      streams.stdout.write(
-        renderTypeScriptTreeSitterQuery(resolveProviderProjectRoot(cwd, args), args),
       );
       return 0;
     }

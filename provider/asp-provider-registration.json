@@ -24,13 +24,6 @@
     "dependencyTopology": true,
     "dependencyTopologyMetadata": true
   },
-  "queryPackDescriptor": {
-    "descriptorId": "typescript.search",
-    "descriptorVersion": "1",
-    "languageId": "typescript",
-    "termRoleOverrides": [],
-    "recipes": []
-  },
   "runtimeContract": {
     "transport": "http-json",
     "clientBinding": "schema-driven",
@@ -45,6 +38,28 @@
       "warmupPolicy": "before-ready"
     },
     "operations": [
+      {
+        "operation": "ast-inspect",
+        "requestSchema": {
+          "schemaId": "agent.semantic-protocols.ast-inspect",
+          "schemaVersion": "1"
+        },
+        "responseSchema": {
+          "schemaId": "agent.semantic-protocols.ast-inspect",
+          "schemaVersion": "1"
+        }
+      },
+      {
+        "operation": "ast-verify",
+        "requestSchema": {
+          "schemaId": "agent.semantic-protocols.ast-verify",
+          "schemaVersion": "1"
+        },
+        "responseSchema": {
+          "schemaId": "agent.semantic-protocols.ast-verify",
+          "schemaVersion": "1"
+        }
+      },
       {
         "operation": "projection-batch",
         "requestSchema": {

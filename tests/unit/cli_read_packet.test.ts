@@ -64,10 +64,7 @@ test("query direct-source-read emits semantic read packet", () => {
   assert.equal(packet.fromHook, "direct-source-read");
   assert.equal(packet.outputMode, "read-packet");
   assert.equal(packet.truncated, false);
-  assert.equal(
-    packet.syntaxQueryRef,
-    "semantic-tree-sitter-query/typescript-owner-items:src_demo.ts:all",
-  );
+  assert.equal(packet.syntaxQueryRef, "native-ast/typescript-owner-items:src_demo.ts:all");
   assert.deepEqual(packet.syntaxMatchRefs, ["match:1"]);
   assert.deepEqual(packet.syntaxCaptureRefs, ["capture:1"]);
   assert.deepEqual(packet.syntaxAnchor, {

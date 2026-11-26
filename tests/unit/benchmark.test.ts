@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 import { parseModule } from "../../src/syntax/parse-module.js";
 import { evaluateRules } from "../../src/syntax/rules/catalog.js";
 import { parseOrReuse } from "../../src/cache/invalidation.js";
-import { runCliCapture } from "./cli_helpers.js";
+import { handleAstInspect } from "../../src/parser/native_syntax/ast-ops.js";
 
 function tmpDir(): string {
   return fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-bench-"));
@@ -118,30 +118,25 @@ describe("benchmark: small project", () => {
   });
 });
 
-describe("benchmark: CLI exact-query stable path", () => {
-  it("embedded declaration catalog stays on the lightweight locator path", () => {
-    const dir = tmpDir();
-    writeFile(dir, "tsconfig.json", JSON.stringify({ include: ["src/**/*.ts"] }));
-    writeFile(
-      dir,
-      "src/sample.ts",
-      [
-        "export function alpha(): string {",
-        "  const contentBlocks = [];",
-        "  contentBlocks.push('ok');",
-        "  return contentBlocks.join(',');",
-        "}",
-        "export function beta(): number { return 1; }",
-        "",
-      ].join("\n"),
-    );
+describe("benchmark: native AST inspect stable path", () => {
+  it("native compiler ast-inspect extracts exact declaration spans cleanly", () => {
+    const sourceUtf8 = [
+      "export function alpha(): string {",
+      "  const contentBlocks: string[] = [];",
+      "  contentBlocks.push('ok');",
+      "  return contentBlocks.join(',');",
+      "}",
+      "export function beta(): number { return 1; }",
+      "",
+    ].join("\n");
 
-    const result = runCliCapture(
-      ["query", "--catalog", "declarations", "--selector", "src/sample.ts:1:7", "--workspace", "."],
-      dir,
+    const response = handleAstInspect({ path: "src/sample.ts", sourceUtf8 });
+    assert.equal(response.accepted, true);
+    const nodes = response.nodes as Array<{ locator: string; name: string }>;
+    assert.deepEqual(
+      nodes.map((node) => node.name),
+      ["alpha", "beta"],
     );
-    assert.equal(result.exitCode, 0, result.stderr);
-    assert.match(result.stdout, /src\/sample\.ts:1\nalpha/u);
-    fs.rmSync(dir, { recursive: true, force: true });
+    assert.equal(nodes[0]?.locator, "src/sample.ts#fn:alpha");
   });
 });

@@ -414,7 +414,7 @@ function ownerItemSyntaxRefs(
   "syntaxQueryRef" | "syntaxMatchRefs" | "syntaxCaptureRefs" | "syntaxAnchor"
 > {
   if (matches.length === 0) return {};
-  const syntaxQueryRef = `semantic-tree-sitter-query/typescript-owner-items:${stableRefSegment(
+  const syntaxQueryRef = `native-ast/typescript-owner-items:${stableRefSegment(
     ownerPath,
   )}:${stableRefSegment(queryTerms.join("|") || "all")}`;
   const syntaxMatchRefs = matches.map((_, index) => `match:${index + 1}`);
@@ -425,9 +425,9 @@ function ownerItemSyntaxRefs(
     syntaxMatchRefs,
     syntaxCaptureRefs,
     syntaxAnchor: {
-      nodeType: treeSitterNodeTypeForItem(first.kind),
+      nodeType: nativeAstNodeKindForItem(first.kind),
       field: "name",
-      capture: treeSitterCaptureForItem(first.kind),
+      capture: nativeAstCaptureForItem(first.kind),
       location: {
         path: ownerPath,
         lineRange: `${first.lineStart}:${first.lineEnd}`,
@@ -436,7 +436,7 @@ function ownerItemSyntaxRefs(
   };
 }
 
-function treeSitterNodeTypeForItem(kind: string): string {
+function nativeAstNodeKindForItem(kind: string): string {
   switch (kind) {
     case "function":
       return "function_declaration";
@@ -455,7 +455,7 @@ function treeSitterNodeTypeForItem(kind: string): string {
   }
 }
 
-function treeSitterCaptureForItem(kind: string): string {
+function nativeAstCaptureForItem(kind: string): string {
   switch (kind) {
     case "function":
       return "function.name";

@@ -16,12 +16,8 @@ export const SEMANTIC_READ_PACKET_SCHEMA_ID =
   "agent.semantic-protocols.semantic-read-packet" as const;
 export const SEMANTIC_SOURCE_LOCATION_SCHEMA_ID =
   "agent.semantic-protocols.semantic-source-location" as const;
-export const SEMANTIC_TREE_SITTER_PROVENANCE_SCHEMA_ID =
-  "agent.semantic-protocols.semantic-tree-sitter-provenance" as const;
-export const SEMANTIC_TREE_SITTER_QUERY_SCHEMA_ID =
-  "agent.semantic-protocols.semantic-tree-sitter-query" as const;
-export const SEMANTIC_TREE_SITTER_GRAMMAR_PROFILE_SCHEMA_ID =
-  "agent.semantic-protocols.semantic-tree-sitter-grammar-profile" as const;
+export const AST_INSPECT_SCHEMA_ID = "agent.semantic-protocols.ast-inspect" as const;
+export const AST_VERIFY_SCHEMA_ID = "agent.semantic-protocols.ast-verify" as const;
 export const SEMANTIC_GRAPH_SCHEMA_ID = "agent.semantic-protocols.semantic-graph" as const;
 export const SEMANTIC_FACT_GRAPH_SCHEMA_ID =
   "agent.semantic-protocols.semantic-fact-graph" as const;
@@ -83,20 +79,8 @@ export interface SemanticLanguageMethodDescriptor {
   };
   readonly outputSchemaIds?: readonly string[];
   readonly packetSchemas?: readonly string[];
-  readonly queryInputForms?: readonly ("catalog-id" | "s-expression")[];
-  readonly queryCatalogs?: readonly SemanticLanguageQueryCatalogDescriptor[];
-  readonly grammarId?: string;
-  readonly grammarProfileVersion?: string;
-  readonly grammarProfileSchema?: string;
-  readonly grammarProfilePath?: string;
-  readonly adapterModes?: readonly ["native-projection"];
-  readonly sourceAuthorities?: readonly ("native-parser" | "native-parser-adapter")[];
+  readonly sourceAuthorities?: readonly "native-parser"[];
   readonly executionBackends?: readonly ["native-parser"];
-  readonly renderProfiles?: readonly ["corpus-locator"];
-  readonly supportedPredicates?: readonly string[];
-  readonly unsupportedPredicates?: readonly string[];
-  readonly cacheReplay?: boolean;
-  readonly unsupportedPatternBehavior?: "diagnostic";
   readonly requiredOptions?: readonly string[];
   readonly input?: string;
   readonly outputModes?: readonly string[];
@@ -104,15 +88,6 @@ export interface SemanticLanguageMethodDescriptor {
   readonly clients?: readonly string[];
   readonly supportsJson: boolean;
   readonly supportsCompact: boolean;
-}
-
-export interface SemanticLanguageQueryCatalogDescriptor {
-  readonly id: string;
-  readonly path: string;
-  readonly sourceDelivery: "provider-binary-embedded";
-  readonly captures: readonly string[];
-  readonly nodeTypes: readonly string[];
-  readonly fields: readonly string[];
 }
 
 export function semanticLanguageRegistryDocument(): SemanticLanguageRegistryDocument {
@@ -156,80 +131,12 @@ function typeScriptSemanticLanguageMethodDescriptors(): readonly SemanticLanguag
         argv: [TYPE_SCRIPT_BINARY, "query", "--catalog", "{query}", "--workspace", "{workspace}"],
         stdinMode: "none",
       },
-      input: "tree-sitter-compatible syntax query",
-      requiredOptions: ["--catalog|--treesitter-query"],
-      outputSchemaIds: [SEMANTIC_TREE_SITTER_QUERY_SCHEMA_ID],
-      packetSchemas: ["semantic-tree-sitter-query.v1"],
-      queryInputForms: ["catalog-id", "s-expression"],
-      queryCatalogs: [
-        queryCatalog(
-          "declarations",
-          "tree-sitter/tree-sitter-typescript/queries/declarations.scm",
-          [
-            "function.definition",
-            "function.name",
-            "class.definition",
-            "class.name",
-            "interface.definition",
-            "interface.name",
-            "type.definition",
-            "type.name",
-            "enum.definition",
-            "enum.name",
-            "variable.definition",
-            "variable.name",
-            "import.declaration",
-            "import.source",
-            "export.declaration",
-          ],
-          [
-            "function_declaration",
-            "class_declaration",
-            "interface_declaration",
-            "type_alias_declaration",
-            "enum_declaration",
-            "lexical_declaration",
-            "variable_declarator",
-            "import_statement",
-            "export_statement",
-          ],
-          ["name", "source"],
-        ),
-        queryCatalog(
-          "imports",
-          "tree-sitter/tree-sitter-typescript/queries/imports.scm",
-          ["import.declaration", "import.source", "export.declaration", "export.source"],
-          ["import_statement", "export_statement"],
-          ["source"],
-        ),
-        queryCatalog(
-          "calls",
-          "tree-sitter/tree-sitter-typescript/queries/calls.scm",
-          ["call.expression", "call.target"],
-          ["call_expression"],
-          ["function"],
-        ),
-      ],
-      grammarId: "tree-sitter-typescript",
-      grammarProfileVersion: "2026-06-05.v1",
-      grammarProfileSchema: "semantic-tree-sitter-grammar-profile.v1",
-      grammarProfilePath: "tree-sitter/tree-sitter-typescript/grammar-profile.json",
-      adapterModes: ["native-projection"],
-      sourceAuthorities: ["native-parser-adapter", "native-parser"],
+      input: "native compiler query",
+      requiredOptions: ["--catalog"],
+      outputSchemaIds: [AST_INSPECT_SCHEMA_ID],
+      packetSchemas: ["ast-inspect"],
+      sourceAuthorities: ["native-parser"],
       executionBackends: ["native-parser"],
-      renderProfiles: ["corpus-locator"],
-      supportedPredicates: [
-        "#eq?",
-        "#any-eq?",
-        "#any-of?",
-        "#match?",
-        "#any-match?",
-        "#not-eq?",
-        "#not-match?",
-      ],
-      unsupportedPredicates: [],
-      cacheReplay: true,
-      unsupportedPatternBehavior: "diagnostic",
       supportsCompact: true,
       supportsJson: true,
       outputModes: ["frontier", "json"],
@@ -303,14 +210,4 @@ function queryPackRecipe(
     trigger: { terms, match: "any" as const },
     clauses: [{ terms, roles: ["symbol", "concept"] as const, intentAxes }],
   };
-}
-
-function queryCatalog(
-  id: string,
-  path: string,
-  captures: readonly string[],
-  nodeTypes: readonly string[],
-  fields: readonly string[],
-): SemanticLanguageQueryCatalogDescriptor {
-  return { id, path, sourceDelivery: "provider-binary-embedded", captures, nodeTypes, fields };
 }

@@ -18,7 +18,7 @@ export const HELP_TEXT = `asp-typescript — TypeScript native-syntax provider
 Usage:
   asp search playbook --language typescript --rg -n -e <query> . --tantivy 'title:<query>^2 OR body:<query>'
   asp query playbook --language typescript --selector <exact-structural-selector> --projection <source|callable-skeleton> --workspace <root>
-  asp-typescript query (--catalog <id> | --treesitter-query <s-expression>) [--workspace <root>] [--selector <structural-selector>] [--json]
+  asp-typescript query --catalog flow-lite --where 'source.call=NAME sink.constructs=TYPE scope.fn=FUNCTION' [--workspace <root>] [--json]
   asp-typescript ast-patch dry-run --packet <semantic-ast-patch.json|->
   asp-typescript agent doctor [--json]
   asp-typescript agent guide
@@ -30,8 +30,6 @@ SEARCH
   Graph correlation into one version-1 receipt.
 
 QUERY
-  query --treesitter-query <s-expression> [--selector <structural-selector>]
-  query --catalog declarations
   query --catalog flow-lite --where 'source.call=NAME sink.constructs=TYPE scope.fn=FUNCTION'
 
 GENERAL
