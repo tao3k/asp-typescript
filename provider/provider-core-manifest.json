@@ -9,7 +9,11 @@
   "syntaxSurface": {
     "lineComment": "//",
     "blockComment": ["/*", "*/"],
-    "delimiterPairs": [["(", ")"], ["[", "]"], ["{", "}"]],
+    "delimiterPairs": [
+      ["(", ")"],
+      ["[", "]"],
+      ["{", "}"]
+    ],
     "statementTerminator": ";",
     "stringDelimiters": ["\"", "'", "`"]
   },
