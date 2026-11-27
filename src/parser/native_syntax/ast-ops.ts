@@ -92,18 +92,92 @@ function blockInteriorSpan(source: string, block: ts.Block): WireByteSpan {
   return { start, end };
 }
 
-function nodeAttrs(node: ts.Node): readonly WireAstNodeAttr[] {
+interface WireAstSemanticEdge {
+  readonly src: string;
+  readonly dst: string;
+  readonly relation: string;
+  readonly line: number;
+}
+
+function nodeAttrs(node: ts.Node): WireAstNodeAttr[] {
   const modifiers = ts.canHaveModifiers(node) ? ts.getModifiers(node) : undefined;
-  if (!modifiers) return [];
   const attrs: WireAstNodeAttr[] = [];
-  for (const mod of modifiers) {
-    if (mod.kind === ts.SyntaxKind.ExportKeyword) {
-      attrs.push({ key: "visibility", value: "export" });
-    } else if (mod.kind === ts.SyntaxKind.AsyncKeyword) {
-      attrs.push({ key: "async", value: "true" });
+  let hasVisibility = false;
+  if (modifiers) {
+    for (const mod of modifiers) {
+      if (mod.kind === ts.SyntaxKind.ExportKeyword) {
+        attrs.push({ key: "visibility", value: "export" });
+        attrs.push({ key: "exported", value: "true" });
+        hasVisibility = true;
+      } else if (mod.kind === ts.SyntaxKind.PrivateKeyword) {
+        attrs.push({ key: "visibility", value: "private" });
+        hasVisibility = true;
+      } else if (mod.kind === ts.SyntaxKind.ProtectedKeyword) {
+        attrs.push({ key: "visibility", value: "protected" });
+        hasVisibility = true;
+      } else if (mod.kind === ts.SyntaxKind.PublicKeyword) {
+        attrs.push({ key: "visibility", value: "public" });
+        hasVisibility = true;
+      } else if (mod.kind === ts.SyntaxKind.AsyncKeyword) {
+        attrs.push({ key: "async", value: "true" });
+      } else if (mod.kind === ts.SyntaxKind.AbstractKeyword) {
+        attrs.push({ key: "abstract", value: "true" });
+      } else if (mod.kind === ts.SyntaxKind.StaticKeyword) {
+        attrs.push({ key: "static", value: "true" });
+      } else if (mod.kind === ts.SyntaxKind.ReadonlyKeyword) {
+        attrs.push({ key: "readonly", value: "true" });
+      }
     }
   }
+  if (!hasVisibility) {
+    attrs.push({ key: "visibility", value: "private" });
+  }
   return attrs;
+}
+
+function collectBodyCallsAndErrors(
+  sf: ts.SourceFile,
+  callerLocator: string,
+  body: ts.Block,
+  edges: WireAstSemanticEdge[],
+  attrs: WireAstNodeAttr[],
+): void {
+  const seenCalls = new Set<string>();
+  const seenErrors = new Set<string>();
+  const visit = (node: ts.Node): void => {
+    if (ts.isCallExpression(node)) {
+      let callee: string | undefined;
+      if (ts.isIdentifier(node.expression)) {
+        callee = node.expression.text;
+      } else if (ts.isPropertyAccessExpression(node.expression)) {
+        callee = node.expression.name.text;
+      }
+      if (callee) {
+        const line = lineNumberAt(sf, node.getStart(sf));
+        const key = `${callee}@${line}`;
+        if (!seenCalls.has(key)) {
+          seenCalls.add(key);
+          edges.push({ src: callerLocator, dst: callee, relation: "calls", line });
+        }
+      }
+    } else if (ts.isThrowStatement(node) && node.expression) {
+      let arg: ts.Expression | undefined;
+      if (ts.isNewExpression(node.expression) && node.expression.arguments?.length) {
+        arg = node.expression.arguments[0];
+      } else if (ts.isCallExpression(node.expression) && node.expression.arguments.length) {
+        arg = node.expression.arguments[0];
+      }
+      if (arg && ts.isStringLiteral(arg)) {
+        const msg = arg.text;
+        if (msg.length >= 3 && msg.length <= 120 && seenErrors.size < 8 && !seenErrors.has(msg)) {
+          seenErrors.add(msg);
+          attrs.push({ key: "error_literal", value: msg });
+        }
+      }
+    }
+    ts.forEachChild(node, visit);
+  };
+  ts.forEachChild(body, visit);
 }
 
 function buildLocator(path: string, parent: string | undefined, tag: string, name: string): string {
@@ -117,6 +191,7 @@ function collectNodes(
   parent: string | undefined,
   statements: readonly ts.Statement[],
   out: WireAstNodeSpanRecord[],
+  edges: WireAstSemanticEdge[],
 ): void {
   for (const stmt of statements) {
     const outerStart = utf8Offset(source, stmt.getFullStart());
@@ -125,8 +200,13 @@ function collectNodes(
     const line = lineNumberAt(sf, stmt.getStart(sf));
     if (ts.isFunctionDeclaration(stmt) && stmt.name) {
       const name = stmt.name.text;
+      const locator = buildLocator(path, parent, "fn", name);
+      const attrs = nodeAttrs(stmt);
+      if (stmt.body) {
+        collectBodyCallsAndErrors(sf, locator, stmt.body, edges, attrs);
+      }
       out.push({
-        locator: buildLocator(path, parent, "fn", name),
+        locator,
         kind: "function",
         languageKind: "function_declaration",
         name,
@@ -135,11 +215,23 @@ function collectNodes(
         innerSpan: { start: innerStart, end },
         ...(stmt.body ? { bodySpan: blockInteriorSpan(source, stmt.body) } : {}),
         ...(parent ? { parent } : {}),
-        attrs: nodeAttrs(stmt),
+        attrs,
       });
     } else if (ts.isClassDeclaration(stmt) && stmt.name) {
       const name = stmt.name.text;
       const locator = buildLocator(path, parent, "class", name);
+      const attrs = nodeAttrs(stmt);
+      if (stmt.heritageClauses) {
+        for (const hc of stmt.heritageClauses) {
+          for (const hType of hc.types) {
+            const target = hType.expression.getText(sf).trim();
+            if (target) {
+              attrs.push({ key: "implements", value: target });
+              edges.push({ src: locator, dst: target, relation: "implements", line });
+            }
+          }
+        }
+      }
       out.push({
         locator,
         kind: "struct",
@@ -149,7 +241,7 @@ function collectNodes(
         outerSpan: { start: outerStart, end },
         innerSpan: { start: innerStart, end },
         ...(parent ? { parent } : {}),
-        attrs: nodeAttrs(stmt),
+        attrs,
       });
       for (const member of stmt.members) {
         if (ts.isMethodDeclaration(member) && ts.isIdentifier(member.name)) {
@@ -157,8 +249,13 @@ function collectNodes(
           const mOuter = utf8Offset(source, member.getFullStart());
           const mInner = utf8Offset(source, member.getStart(sf));
           const mEnd = utf8Offset(source, member.getEnd());
+          const mLocator = `${locator}#fn:${mName}`;
+          const mAttrs = nodeAttrs(member);
+          if (member.body) {
+            collectBodyCallsAndErrors(sf, mLocator, member.body, edges, mAttrs);
+          }
           out.push({
-            locator: `${locator}#fn:${mName}`,
+            locator: mLocator,
             kind: "method",
             languageKind: "method_declaration",
             name: mName,
@@ -167,10 +264,23 @@ function collectNodes(
             innerSpan: { start: mInner, end: mEnd },
             ...(member.body ? { bodySpan: blockInteriorSpan(source, member.body) } : {}),
             parent: locator,
-            attrs: nodeAttrs(member),
+            attrs: mAttrs,
           });
         }
       }
+    } else if (ts.isEnumDeclaration(stmt)) {
+      const name = stmt.name.text;
+      out.push({
+        locator: buildLocator(path, parent, "enum", name),
+        kind: "enum",
+        languageKind: "enum_declaration",
+        name,
+        line,
+        outerSpan: { start: outerStart, end },
+        innerSpan: { start: innerStart, end },
+        ...(parent ? { parent } : {}),
+        attrs: nodeAttrs(stmt),
+      });
     } else if (ts.isInterfaceDeclaration(stmt)) {
       const name = stmt.name.text;
       out.push({
@@ -199,6 +309,12 @@ function collectNodes(
       });
     } else if (ts.isImportDeclaration(stmt)) {
       const label = `import_line_${line}`;
+      const importAttrs: WireAstNodeAttr[] = [];
+      if (ts.isStringLiteral(stmt.moduleSpecifier)) {
+        const target = stmt.moduleSpecifier.text;
+        importAttrs.push({ key: "import_target", value: target });
+        edges.push({ src: path, dst: target, relation: "imports", line });
+      }
       out.push({
         locator: buildLocator(path, parent, "import", label),
         kind: "import",
@@ -208,7 +324,7 @@ function collectNodes(
         outerSpan: { start: innerStart, end },
         innerSpan: { start: innerStart, end },
         ...(parent ? { parent } : {}),
-        attrs: [],
+        attrs: importAttrs,
       });
     }
   }
@@ -233,10 +349,12 @@ export function handleAstInspect(payload: unknown): Record<string, unknown> {
   const sf = parseSourceFile(path, source);
   const diagnostics = extractParseDiagnostics(sf, source);
   const nodes: WireAstNodeSpanRecord[] = [];
-  collectNodes(sf, path, source, undefined, sf.statements, nodes);
+  const edges: WireAstSemanticEdge[] = [];
+  collectNodes(sf, path, source, undefined, sf.statements, nodes, edges);
   return {
     accepted: diagnostics.length === 0,
     nodes,
+    edges,
     diagnostics,
     syntaxSurface: TYPESCRIPT_SYNTAX_SURFACE,
   };
