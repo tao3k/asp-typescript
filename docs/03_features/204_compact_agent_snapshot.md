@@ -1,7 +1,7 @@
 # Compact Agent Snapshot
 
 The compact agent snapshot is the first reading surface for repair-oriented
-agents. It follows the Rust harness shape: a low-noise owner summary, not a
+agents. It follows the ASP Rust shape: a low-noise owner summary, not a
 JSON-like dump of every parser fact.
 
 ## Design Chain
@@ -11,7 +11,7 @@ TypeScript parser facts -> reasoning tree facts -> agent owner snapshot
 ```
 
 The single-package renderer consumes
-`TypeScriptHarnessReport.reasoningTree.ownerBranches`, `ownerDependencies`,
+`AspTypeScriptReport.reasoningTree.ownerBranches`, `ownerDependencies`,
 package owner facts, and grouped findings. The project-level snapshot renderer
 consumes package reports prepared by the runner from parser-owned
 workspace/project-reference facts. Neither renderer inspects raw source files,
@@ -20,7 +20,7 @@ workspace/project-reference facts. Neither renderer inspects raw source files,
 
 ## Format Shape
 
-The output uses the same section grammar as the Rust harness agent snapshot:
+The output uses the same section grammar as the ASP Rust agent snapshot:
 
 ```text
 pkg <path>
@@ -54,7 +54,7 @@ boilerplate is omitted.
   inventory.
 - `BuildTools:` lists known parser-owned build-tool facts such as Rspack or
   Rsbuild. It is emitted only when package dependencies, package scripts,
-  config files, or explicit harness config make that tool visible. It is not a
+  config files, or explicit ASP TypeScript config make that tool visible. It is not a
   bundler audit and does not replace `tsc` or framework build checks.
 - `shadowed=` counts parser-visible TypeScript source owners that have more
   than one source shape for the same owner namespace, such as a file owner and
@@ -84,7 +84,7 @@ boilerplate is omitted.
   `[rule] severity x<count>: repair intent (problem; facts: parser evidence)`.
   The body only keeps concrete `fix:` steps and capped `@ path:line:column`
   target examples. JSON remains a tool surface, not an agent repair surface.
-- `renderTypeScriptProjectHarnessAgentCompactText(report, options)` is the
+- `renderAspTypeScriptAgentCompactText(report, options)` is the
   public agent text interface. It defaults to visible advice and can select
   `findings: "advice"`, `"blocking"`, or `"all"` when a caller wants a
   different compact repair surface.

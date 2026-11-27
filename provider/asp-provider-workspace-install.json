@@ -9,7 +9,7 @@
   "providerRegistration": "asp-provider-registration.json",
   "schemaBundleReceipt": "../schemas/.asp-schema-manager-receipt.json",
   "workspaceArtifact": {
-    "root": "languages/typescript-lang-project-harness/dist",
+    "root": "languages/asp-typescript/dist",
     "entrypoint": "src/cli/main.js",
     "launch": {
       "program": "node",
@@ -21,15 +21,12 @@
   "workspaceBuild": {
     "program": "npm",
     "args": ["run", "build"],
-    "workingDirectory": "languages/typescript-lang-project-harness",
+    "workingDirectory": "languages/asp-typescript",
     "sourceSnapshotAnchors": [
-      "languages/typescript-lang-project-harness/package.json",
-      "languages/typescript-lang-project-harness/package-lock.json"
+      "languages/asp-typescript/package.json",
+      "languages/asp-typescript/package-lock.json"
     ],
-    "derivedPaths": [
-      "languages/typescript-lang-project-harness/dist",
-      "languages/typescript-lang-project-harness/node_modules"
-    ],
+    "derivedPaths": ["languages/asp-typescript/dist", "languages/asp-typescript/node_modules"],
     "env": {}
   }
 }

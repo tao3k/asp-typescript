@@ -1,7 +1,7 @@
 # Effect Extension Policy M13 Plan
 
 M13 adds the first package-owned extension policy without turning the TypeScript
-harness into a dependency checker or an Effect linter:
+ASP TypeScript into a dependency checker or an Effect linter:
 
 ```text
 package.json parser facts
@@ -33,8 +33,8 @@ Requirements>` models success, expected errors, and requirements.
 - Auto-activate the `effect` extension when the package has an `effect`
   dependency in package dependency fields.
 - Support explicit package config:
-  `typescriptProjectHarness.extensions.effect = "enable"` or
-  `typescriptProjectHarness.extensions.Effect = "enable"`.
+  `asp-typescript.extensions.effect = "enable"` or
+  `asp-typescript.extensions.Effect = "enable"`.
 - Emit `TS-EXT-EFFECT-R001` as an `error` when the project explicitly enables
   Effect but does not declare the `effect` dependency.
 - Emit `TS-EXT-EFFECT-R002` as `info` when the Effect extension is active and

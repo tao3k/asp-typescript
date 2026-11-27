@@ -3,6 +3,7 @@ import { createServer, type IncomingMessage, type ServerResponse } from "node:ht
 import type { AddressInfo } from "node:net";
 import type { Writable } from "node:stream";
 
+import { handleAstInspect, handleAstVerify } from "../parser/native_syntax/ast-ops.js";
 import { projectProjectionBatch } from "./projection-batch.js";
 import { projectExactRequest } from "./exact-projection.js";
 import { resolveProjectResolutionRequest } from "../parser/project-resolution.js";
@@ -77,7 +78,17 @@ function parseListenAddress(value: string): { host: string; port: number } {
   return { host, port };
 }
 
-function executeOperation(operation: string, payload: unknown, cwd: string): unknown {
+export function executeProviderOperation(
+  operation: string,
+  payload: unknown,
+  cwd: string,
+): unknown {
+  if (operation === "ast-inspect") {
+    return handleAstInspect(payload);
+  }
+  if (operation === "ast-verify") {
+    return handleAstVerify(payload);
+  }
   if (!OPERATIONS.some((candidate) => candidate.operation === operation)) {
     throw new Error(`resident TypeScript provider operation is not admitted: ${operation}`);
   }
@@ -167,7 +178,7 @@ function handleRequest(encoded: Buffer, cwd: string): Record<string, unknown> {
       throw new Error("resident TypeScript provider request identity is invalid");
     }
     requestId = request.requestId;
-    const response = executeOperation(request.operation, request.payload, cwd);
+    const response = executeProviderOperation(request.operation, request.payload, cwd);
     return {
       schemaId: RESPONSE_SCHEMA_ID,
       schemaVersion: "1",

@@ -72,6 +72,8 @@ export function projectProjectionBatch(requestValue: unknown): Record<string, un
     return {
       ownerPath: owner.ownerPath,
       sourceLeafDigest: owner.sourceLeafDigest,
+      projectionState: "ready",
+      diagnostic: null,
       items,
       relations: items.map((item) => ({
         from: { kind: "owner", id: ownerId },

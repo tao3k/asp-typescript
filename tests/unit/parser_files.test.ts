@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { describe, it } from "node:test";
 
-import { typeScriptHarnessConfigForProject } from "../../src/config.js";
+import { aspTypeScriptConfigForProject } from "../../src/config.js";
 import { discoverTypeScriptFiles } from "../../src/parser.js";
 
 function writeFile(root: string, relativePath: string, content: string): string {
@@ -60,7 +60,7 @@ describe("TypeScript file discovery", () => {
       ".agent-fixtures/generated.ts",
       "export const generated = 1;\n",
     );
-    const config = typeScriptHarnessConfigForProject(root);
+    const config = aspTypeScriptConfigForProject(root);
 
     const files = discoverTypeScriptFiles(
       [root],

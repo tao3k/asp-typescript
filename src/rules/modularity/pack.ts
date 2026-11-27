@@ -1,14 +1,14 @@
 import path from "node:path";
 
 import type {
-  TypeScriptHarnessFinding,
-  TypeScriptHarnessRule,
+  AspTypeScriptFinding,
+  AspTypeScriptRule,
   TypeScriptReasoningModule,
   TypeScriptReasoningTree,
 } from "../../model.js";
 import { relativeToProject } from "../common.js";
 
-const TS_MOD_R001: TypeScriptHarnessRule = {
+const TS_MOD_R001: AspTypeScriptRule = {
   ruleId: "TS-MOD-R001",
   packId: "typescript.modularity",
   severity: "info",
@@ -18,7 +18,7 @@ const TS_MOD_R001: TypeScriptHarnessRule = {
   labels: { surface: "module-graph", parser: "reasoning-tree" },
 };
 
-const TS_MOD_R002: TypeScriptHarnessRule = {
+const TS_MOD_R002: AspTypeScriptRule = {
   ruleId: "TS-MOD-R002",
   packId: "typescript.modularity",
   severity: "info",
@@ -31,22 +31,20 @@ const TS_MOD_R002: TypeScriptHarnessRule = {
 const PROJECT_OWNER_LINE_LIMIT = 1000;
 const PROJECT_OWNER_RESPONSIBILITY_LIMIT = 8;
 
-export function typeScriptModularityRules(): readonly TypeScriptHarnessRule[] {
+export function typeScriptModularityRules(): readonly AspTypeScriptRule[] {
   return [TS_MOD_R001, TS_MOD_R002];
 }
 
 export function evaluateModularityRules(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   return [
     ...evaluateSourceToTestRules(reasoningTree),
     ...evaluateResponsibilitySurfaceRules(reasoningTree),
   ];
 }
 
-function evaluateSourceToTestRules(
-  reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+function evaluateSourceToTestRules(reasoningTree: TypeScriptReasoningTree): AspTypeScriptFinding[] {
   return reasoningTree.ownerDependencies.flatMap((dependency) => {
     if (!isProductionRole(dependency.fromRole) || dependency.toRole !== "test") {
       return [];
@@ -69,7 +67,7 @@ function evaluateSourceToTestRules(
 
 function evaluateResponsibilitySurfaceRules(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   return reasoningTree.modules.flatMap((moduleReport) => {
     if (moduleReport.role === "declaration") {
       return [];

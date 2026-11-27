@@ -1,11 +1,11 @@
 /**
- * Configuration facade for TypeScript harness defaults and policy helpers.
+ * Configuration facade for ASP TypeScript defaults and policy helpers.
  *
  * This module re-exports the public configuration API from the root config
  * implementation while keeping model imports stable.
  */
 export {
-  defaultTypeScriptHarnessConfig,
+  defaultAspTypeScriptConfig,
   defaultTypeScriptVerificationPolicy,
   withDisabledTypeScriptRule,
   withDisabledTypeScriptRules,
@@ -25,4 +25,4 @@ export {
   withTypeScriptVerificationDependencySignal,
 } from "../config.js";
 
-export type { TypeScriptHarnessConfig } from "../model.js";
+export type { AspTypeScriptConfig } from "../model.js";

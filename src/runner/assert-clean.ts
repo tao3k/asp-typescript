@@ -1,51 +1,48 @@
-import { defaultTypeScriptHarnessConfig } from "../config.js";
-import {
-  renderAssertionMessage,
-  renderTypeScriptProjectHarnessAgentCompactText,
-} from "../render.js";
-import { advisoryFindings, isTypeScriptHarnessClean } from "../model.js";
-import { runTypeScriptProjectHarness } from "./run-project.js";
-import type { TypeScriptProjectHarnessEmbeddedOptions } from "./run-project.js";
-import type { TypeScriptHarnessConfig, TypeScriptHarnessReport } from "../model.js";
+import { defaultAspTypeScriptConfig } from "../config.js";
+import { renderAssertionMessage, renderAspTypeScriptAgentCompactText } from "../render.js";
+import { advisoryFindings, isAspTypeScriptClean } from "../model.js";
+import { runAspTypeScript } from "./run-project.js";
+import type { AspTypeScriptEmbeddedOptions } from "./run-project.js";
+import type { AspTypeScriptConfig, AspTypeScriptReport } from "../model.js";
 
-export { type TypeScriptProjectHarnessEmbeddedOptions } from "./run-project.js";
+export { type AspTypeScriptEmbeddedOptions } from "./run-project.js";
 
-export function assertTypeScriptProjectHarnessClean(
+export function assertAspTypeScriptClean(
   projectRootInput: string | URL,
-  config: TypeScriptHarnessConfig = defaultTypeScriptHarnessConfig(),
-): TypeScriptHarnessReport {
-  const report = runTypeScriptProjectHarness(projectRootInput, config);
-  if (!isTypeScriptHarnessClean(report)) {
+  config: AspTypeScriptConfig = defaultAspTypeScriptConfig(),
+): AspTypeScriptReport {
+  const report = runAspTypeScript(projectRootInput, config);
+  if (!isAspTypeScriptClean(report)) {
     throw new Error(renderAssertionMessage(report));
   }
   return report;
 }
 
-export function assertTypeScriptProjectHarnessAgentClean(
+export function assertAspTypeScriptAgentClean(
   projectRootInput: string | URL,
-  config: TypeScriptHarnessConfig = defaultTypeScriptHarnessConfig(),
-): TypeScriptHarnessReport {
-  const report = assertTypeScriptProjectHarnessClean(projectRootInput, config);
+  config: AspTypeScriptConfig = defaultAspTypeScriptConfig(),
+): AspTypeScriptReport {
+  const report = assertAspTypeScriptClean(projectRootInput, config);
   if (advisoryFindings(report).length > 0) {
-    throw new Error(renderTypeScriptProjectHarnessAgentCompactText(report));
+    throw new Error(renderAspTypeScriptAgentCompactText(report));
   }
   return report;
 }
 
-export function assertTypeScriptProjectHarnessEmbeddedClean(
+export function assertAspTypeScriptEmbeddedClean(
   projectRootInput: string | URL,
-  options: TypeScriptProjectHarnessEmbeddedOptions = {},
-): TypeScriptHarnessReport {
-  const report = runTypeScriptProjectHarness(
+  options: AspTypeScriptEmbeddedOptions = {},
+): AspTypeScriptReport {
+  const report = runAspTypeScript(
     projectRootInput,
-    options.config ?? defaultTypeScriptHarnessConfig(),
+    options.config ?? defaultAspTypeScriptConfig(),
     { collectSemanticDiagnostics: options.collectSemanticDiagnostics ?? false },
   );
-  if (!isTypeScriptHarnessClean(report)) {
+  if (!isAspTypeScriptClean(report)) {
     throw new Error(renderAssertionMessage(report));
   }
   if (options.emitAdvice !== false) {
-    const advice = renderTypeScriptProjectHarnessAgentCompactText(report, {
+    const advice = renderAspTypeScriptAgentCompactText(report, {
       findings: "advice",
     });
     if (advice) {

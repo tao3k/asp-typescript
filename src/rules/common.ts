@@ -1,7 +1,7 @@
 import type {
   SourceLocation,
-  TypeScriptHarnessFinding,
-  TypeScriptHarnessRule,
+  AspTypeScriptFinding,
+  AspTypeScriptRule,
   TypeScriptReasoningTree,
 } from "../model.js";
 import { relativeProjectPath } from "../reasoning/path_utils.js";
@@ -14,11 +14,11 @@ export interface DiagnosticFactLike {
 }
 
 export function diagnosticFinding(
-  rule: TypeScriptHarnessRule,
+  rule: AspTypeScriptRule,
   diagnostic: DiagnosticFactLike,
   label: string,
-): TypeScriptHarnessFinding {
-  const finding: TypeScriptHarnessFinding = {
+): AspTypeScriptFinding {
+  const finding: AspTypeScriptFinding = {
     ruleId: rule.ruleId,
     packId: rule.packId,
     severity: rule.severity,

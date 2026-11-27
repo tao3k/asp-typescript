@@ -1,7 +1,7 @@
 # Build Tool Rspack Surface M16 Plan
 
 M16 aligns modern TypeScript project shape with Rspack/Rsbuild without moving
-bundler behavior into the harness. The harness remains:
+bundler behavior into ASP TypeScript. ASP TypeScript remains:
 
 ```text
 TypeScript/parser-owned package facts
@@ -14,7 +14,7 @@ TypeScript/parser-owned package facts
 
 - Add parser-owned `packageBuildTools` facts for known Rspack/Rsbuild-family
   dependencies, package scripts, config files, and optional
-  `typescriptProjectHarness.buildTools` config.
+  `asp-typescript.buildTools` config.
 - Render `BuildTools:` in agent snapshots beside `Extensions:`.
 - Add one non-blocking Rspack advice rule when Rspack is visible but no package
   script exposes the build surface.
@@ -31,8 +31,8 @@ TypeScript/parser-owned package facts
 
 ## Acceptance
 
-- Parser tests cover package dependency, script, config-file, and harness-config
+- Parser tests cover package dependency, script, config-file, and asp-config
   build-tool facts.
 - Snapshot tests cover `BuildTools:` output.
 - Rule catalog tests keep the Rspack rule as `info`.
-- Self-apply remains clean under the default harness.
+- Self-apply remains clean under the default ASP TypeScript.

@@ -1,5 +1,5 @@
 /**
- * Public rule catalog facade for TypeScript harness policy packs.
+ * Public rule catalog facade for ASP TypeScript policy packs.
  *
  * This module re-exports built-in rule packs and descriptors so CLI and library
  * callers share the same policy catalog.

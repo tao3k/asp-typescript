@@ -4,11 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import {
-  isTypeScriptHarnessClean,
-  renderTypeScriptProjectHarness,
-  runTypeScriptProjectHarness,
-} from "../../src/index.js";
+import { isAspTypeScriptClean, renderAspTypeScript, runAspTypeScript } from "../../src/index.js";
 
 test("modularity pack reports production modules depending on tests without blocking", () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-modularity-"));
@@ -30,10 +26,10 @@ test("modularity pack reports production modules depending on tests without bloc
     'import { helper } from "../tests/helper.js";\nexport const value = helper;\n',
   );
 
-  const report = runTypeScriptProjectHarness(root);
-  const rendered = renderTypeScriptProjectHarness(report);
+  const report = runAspTypeScript(root);
+  const rendered = renderAspTypeScript(report);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.deepEqual(
     report.findings.map((finding) => `${finding.ruleId}:${finding.severity}`),
     ["TS-MOD-R001:info"],
@@ -61,10 +57,10 @@ test("modularity pack reports broad project modules without blocking", () => {
     ].join("\n"),
   );
 
-  const report = runTypeScriptProjectHarness(root);
-  const rendered = renderTypeScriptProjectHarness(report);
+  const report = runAspTypeScript(root);
+  const rendered = renderAspTypeScript(report);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.ok(report.findings.some((finding) => finding.ruleId === "TS-MOD-R002"));
   assert.match(rendered, /\[TS-MOD-R002\] Info/u);
   assert.match(
@@ -94,10 +90,10 @@ test("modularity pack reports broad test modules from parser-visible coverage", 
     ].join("\n"),
   );
 
-  const report = runTypeScriptProjectHarness(root);
-  const rendered = renderTypeScriptProjectHarness(report);
+  const report = runAspTypeScript(root);
+  const rendered = renderAspTypeScript(report);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.ok(report.findings.some((finding) => finding.ruleId === "TS-MOD-R002"));
   assert.match(rendered, /\[TS-MOD-R002\] Info/u);
   assert.match(

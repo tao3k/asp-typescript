@@ -1,5 +1,5 @@
 /**
- * PI agent cache adapter for TypeScript harness reports.
+ * PI agent cache adapter for ASP TypeScript reports.
  *
  * This module projects parser-owned reports into cache-aware context blocks
  * consumed by agent prompt assembly.
@@ -35,7 +35,7 @@ export interface PiAgentInput {
 }
 
 /**
- * Build a cache-friendly agent context from harness output.
+ * Build a cache-friendly agent context from ASP TypeScript output.
  *
  * The agent should:
  * 1. Check if `systemPrefix` fingerprint matches cached prefix → reuse

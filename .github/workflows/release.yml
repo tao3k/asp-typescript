@@ -62,7 +62,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build harness
+      - name: Build provider
         run: npm run build
 
       - name: Package provider binary

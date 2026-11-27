@@ -9,7 +9,7 @@
  */
 
 import fs from "node:fs";
-import type { TypeScriptHarnessReport, TypeScriptReasoningTree } from "../model.js";
+import type { AspTypeScriptReport, TypeScriptReasoningTree } from "../model.js";
 import { relativeProjectPath } from "../reasoning/path_utils.js";
 
 // ── Path utilities ────────────────────────────────────────
@@ -29,7 +29,7 @@ export interface TopologySignals {
 }
 
 /** Compute fan-in and fan-out from owner dependency edges. */
-export function computeTopology(report: TypeScriptHarnessReport): TopologySignals {
+export function computeTopology(report: AspTypeScriptReport): TopologySignals {
   const fanIn = new Map<string, number>();
   const fanOut = new Map<string, number>();
   for (const d of report.reasoningTree.ownerDependencies) {

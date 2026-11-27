@@ -1,5 +1,5 @@
 /**
- * Public configuration builders for the TypeScript harness.
+ * Public configuration builders for the ASP TypeScript.
  *
  * This module owns default policy configuration and immutable helper functions
  * for callers that tune rule or verification behavior.
@@ -10,7 +10,7 @@ import path from "node:path";
 import { DEFAULT_IGNORED_DIR_NAMES, pathFromInput } from "./parser.js";
 import type {
   TypeScriptDiagnosticSeverity,
-  TypeScriptHarnessConfig,
+  AspTypeScriptConfig,
   TypeScriptRulePack,
 } from "./model.js";
 import type {
@@ -25,7 +25,7 @@ import type {
   TypeScriptVerificationWaiver,
 } from "./verification/model.js";
 
-export function defaultTypeScriptHarnessConfig(): TypeScriptHarnessConfig {
+export function defaultAspTypeScriptConfig(): AspTypeScriptConfig {
   return {
     ignoredDirNames: [...DEFAULT_IGNORED_DIR_NAMES],
     includeHiddenDirNames: [],
@@ -42,13 +42,11 @@ export function defaultTypeScriptHarnessConfig(): TypeScriptHarnessConfig {
   };
 }
 
-export function typeScriptHarnessConfigForProject(
-  projectRootInput: string | URL,
-): TypeScriptHarnessConfig {
-  return applyAspProjectConfig(pathFromInput(projectRootInput), defaultTypeScriptHarnessConfig());
+export function aspTypeScriptConfigForProject(projectRootInput: string | URL): AspTypeScriptConfig {
+  return applyAspProjectConfig(pathFromInput(projectRootInput), defaultAspTypeScriptConfig());
 }
 
-export function defaultTypeScriptVerificationPolicy(): TypeScriptHarnessConfig["verificationPolicy"] {
+export function defaultTypeScriptVerificationPolicy(): AspTypeScriptConfig["verificationPolicy"] {
   return {
     profileHints: [],
     receipts: [],
@@ -63,66 +61,66 @@ export function defaultTypeScriptVerificationPolicy(): TypeScriptHarnessConfig["
 }
 
 export function withDisabledTypeScriptRule(
-  config: TypeScriptHarnessConfig,
+  config: AspTypeScriptConfig,
   ruleId: string,
-): TypeScriptHarnessConfig {
-  return cloneTypeScriptHarnessConfig(config, {
+): AspTypeScriptConfig {
+  return cloneAspTypeScriptConfig(config, {
     disabledRuleIds: appendUnique(config.disabledRuleIds, ruleId),
   });
 }
 
 export function withDisabledTypeScriptRules(
-  config: TypeScriptHarnessConfig,
+  config: AspTypeScriptConfig,
   ruleIds: readonly string[],
-): TypeScriptHarnessConfig {
-  return cloneTypeScriptHarnessConfig(config, {
+): AspTypeScriptConfig {
+  return cloneAspTypeScriptConfig(config, {
     disabledRuleIds: appendUniqueMany(config.disabledRuleIds, ruleIds),
   });
 }
 
 export function withDisabledTypeScriptRulePack(
-  config: TypeScriptHarnessConfig,
+  config: AspTypeScriptConfig,
   rulePack: TypeScriptRulePack,
-): TypeScriptHarnessConfig {
-  return cloneTypeScriptHarnessConfig(config, {
+): AspTypeScriptConfig {
+  return cloneAspTypeScriptConfig(config, {
     disabledRulePacks: appendUnique(config.disabledRulePacks, rulePack),
   });
 }
 
 export function withTypeScriptRuleSeverity(
-  config: TypeScriptHarnessConfig,
+  config: AspTypeScriptConfig,
   ruleId: string,
   severity: TypeScriptDiagnosticSeverity,
-): TypeScriptHarnessConfig {
-  return cloneTypeScriptHarnessConfig(config, {
+): AspTypeScriptConfig {
+  return cloneAspTypeScriptConfig(config, {
     ruleSeverityOverrides: { ...config.ruleSeverityOverrides, [ruleId]: severity },
   });
 }
 
 export function withTypeScriptRulePackSeverity(
-  config: TypeScriptHarnessConfig,
+  config: AspTypeScriptConfig,
   rulePack: TypeScriptRulePack,
   severity: TypeScriptDiagnosticSeverity,
-): TypeScriptHarnessConfig {
-  return cloneTypeScriptHarnessConfig(config, {
+): AspTypeScriptConfig {
+  return cloneAspTypeScriptConfig(config, {
     rulePackSeverityOverrides: { ...config.rulePackSeverityOverrides, [rulePack]: severity },
   });
 }
 
 export function withTypeScriptBlockingSeverities(
-  config: TypeScriptHarnessConfig,
+  config: AspTypeScriptConfig,
   severities: readonly TypeScriptDiagnosticSeverity[],
-): TypeScriptHarnessConfig {
-  return cloneTypeScriptHarnessConfig(config, {
+): AspTypeScriptConfig {
+  return cloneAspTypeScriptConfig(config, {
     blockingSeverities: [...severities],
   });
 }
 
 export function withTypeScriptVerificationProfileHint(
-  config: TypeScriptHarnessConfig,
+  config: AspTypeScriptConfig,
   hint: TypeScriptVerificationProfileHint,
-): TypeScriptHarnessConfig {
-  return cloneTypeScriptHarnessConfig(config, {
+): AspTypeScriptConfig {
+  return cloneAspTypeScriptConfig(config, {
     verificationPolicy: {
       ...config.verificationPolicy,
       profileHints: [...config.verificationPolicy.profileHints, cloneProfileHint(hint)],
@@ -131,10 +129,10 @@ export function withTypeScriptVerificationProfileHint(
 }
 
 export function withTypeScriptVerificationReceipt(
-  config: TypeScriptHarnessConfig,
+  config: AspTypeScriptConfig,
   receipt: TypeScriptVerificationReceipt,
-): TypeScriptHarnessConfig {
-  return cloneTypeScriptHarnessConfig(config, {
+): AspTypeScriptConfig {
+  return cloneAspTypeScriptConfig(config, {
     verificationPolicy: {
       ...config.verificationPolicy,
       receipts: [...config.verificationPolicy.receipts, cloneVerificationReceipt(receipt)],
@@ -143,10 +141,10 @@ export function withTypeScriptVerificationReceipt(
 }
 
 export function withTypeScriptVerificationWaiver(
-  config: TypeScriptHarnessConfig,
+  config: AspTypeScriptConfig,
   waiver: TypeScriptVerificationWaiver,
-): TypeScriptHarnessConfig {
-  return cloneTypeScriptHarnessConfig(config, {
+): AspTypeScriptConfig {
+  return cloneAspTypeScriptConfig(config, {
     verificationPolicy: {
       ...config.verificationPolicy,
       waivers: [...config.verificationPolicy.waivers, { ...waiver }],
@@ -155,17 +153,17 @@ export function withTypeScriptVerificationWaiver(
 }
 
 export function withDisabledTypeScriptVerificationTaskKind(
-  config: TypeScriptHarnessConfig,
+  config: AspTypeScriptConfig,
   kind: TypeScriptVerificationTaskKind,
-): TypeScriptHarnessConfig {
+): AspTypeScriptConfig {
   return withDisabledTypeScriptVerificationTaskKinds(config, [kind]);
 }
 
 export function withDisabledTypeScriptVerificationTaskKinds(
-  config: TypeScriptHarnessConfig,
+  config: AspTypeScriptConfig,
   kinds: readonly TypeScriptVerificationTaskKind[],
-): TypeScriptHarnessConfig {
-  return cloneTypeScriptHarnessConfig(config, {
+): AspTypeScriptConfig {
+  return cloneAspTypeScriptConfig(config, {
     verificationPolicy: {
       ...config.verificationPolicy,
       disabledTaskKinds: appendUniqueMany(config.verificationPolicy.disabledTaskKinds, kinds),
@@ -174,11 +172,11 @@ export function withDisabledTypeScriptVerificationTaskKinds(
 }
 
 export function withTypeScriptVerificationTaskContract(
-  config: TypeScriptHarnessConfig,
+  config: AspTypeScriptConfig,
   kind: TypeScriptVerificationTaskKind,
   contract: TypeScriptVerificationTaskContract,
-): TypeScriptHarnessConfig {
-  return cloneTypeScriptHarnessConfig(config, {
+): AspTypeScriptConfig {
+  return cloneAspTypeScriptConfig(config, {
     verificationPolicy: {
       ...config.verificationPolicy,
       taskContractOverrides: {
@@ -190,11 +188,11 @@ export function withTypeScriptVerificationTaskContract(
 }
 
 export function withTypeScriptVerificationResponsibilityTaskKinds(
-  config: TypeScriptHarnessConfig,
+  config: AspTypeScriptConfig,
   responsibility: TypeScriptOwnerResponsibility,
   taskKinds: readonly TypeScriptVerificationTaskKind[],
-): TypeScriptHarnessConfig {
-  return cloneTypeScriptHarnessConfig(config, {
+): AspTypeScriptConfig {
+  return cloneAspTypeScriptConfig(config, {
     verificationPolicy: {
       ...config.verificationPolicy,
       responsibilityTaskOverrides: {
@@ -206,11 +204,11 @@ export function withTypeScriptVerificationResponsibilityTaskKinds(
 }
 
 export function withTypeScriptVerificationSkillBinding(
-  config: TypeScriptHarnessConfig,
+  config: AspTypeScriptConfig,
   kind: TypeScriptVerificationTaskKind,
   binding: TypeScriptVerificationSkillBinding,
-): TypeScriptHarnessConfig {
-  return cloneTypeScriptHarnessConfig(config, {
+): AspTypeScriptConfig {
+  return cloneAspTypeScriptConfig(config, {
     verificationPolicy: {
       ...config.verificationPolicy,
       skillBindings: {
@@ -222,10 +220,10 @@ export function withTypeScriptVerificationSkillBinding(
 }
 
 export function withTypeScriptVerificationSkillDescriptor(
-  config: TypeScriptHarnessConfig,
+  config: AspTypeScriptConfig,
   descriptor: TypeScriptVerificationSkillDescriptor,
-): TypeScriptHarnessConfig {
-  return cloneTypeScriptHarnessConfig(config, {
+): AspTypeScriptConfig {
+  return cloneAspTypeScriptConfig(config, {
     verificationPolicy: {
       ...config.verificationPolicy,
       skillDescriptors: [
@@ -239,10 +237,10 @@ export function withTypeScriptVerificationSkillDescriptor(
 }
 
 export function withTypeScriptVerificationDependencySignal(
-  config: TypeScriptHarnessConfig,
+  config: AspTypeScriptConfig,
   signal: TypeScriptVerificationDependencySignal,
-): TypeScriptHarnessConfig {
-  return cloneTypeScriptHarnessConfig(config, {
+): AspTypeScriptConfig {
+  return cloneAspTypeScriptConfig(config, {
     verificationPolicy: {
       ...config.verificationPolicy,
       dependencySignals: [
@@ -253,10 +251,10 @@ export function withTypeScriptVerificationDependencySignal(
   });
 }
 
-function cloneTypeScriptHarnessConfig(
-  config: TypeScriptHarnessConfig,
-  overrides: Partial<TypeScriptHarnessConfig> = {},
-): TypeScriptHarnessConfig {
+function cloneAspTypeScriptConfig(
+  config: AspTypeScriptConfig,
+  overrides: Partial<AspTypeScriptConfig> = {},
+): AspTypeScriptConfig {
   return {
     ignoredDirNames: [...(overrides.ignoredDirNames ?? config.ignoredDirNames)],
     includeHiddenDirNames: [...(overrides.includeHiddenDirNames ?? config.includeHiddenDirNames)],
@@ -286,13 +284,13 @@ interface AspDiscoveryConfig {
 
 function applyAspProjectConfig(
   projectRoot: string,
-  config: TypeScriptHarnessConfig,
-): TypeScriptHarnessConfig {
+  config: AspTypeScriptConfig,
+): AspTypeScriptConfig {
   const configPath = nearestAspToml(projectRoot);
   if (configPath === undefined) return config;
   const discovery = readAspDiscoveryConfig(configPath);
   if (discovery === undefined) return config;
-  return cloneTypeScriptHarnessConfig(config, {
+  return cloneAspTypeScriptConfig(config, {
     ignoredDirNames: appendUniqueMany(config.ignoredDirNames, discovery.ignoredDirNames),
     includeHiddenDirNames: appendUniqueMany(
       config.includeHiddenDirNames,
@@ -371,8 +369,8 @@ function appendUniqueMany<T>(values: readonly T[], newValues: readonly T[]): rea
 }
 
 function cloneVerificationPolicy(
-  policy: TypeScriptHarnessConfig["verificationPolicy"],
-): TypeScriptHarnessConfig["verificationPolicy"] {
+  policy: AspTypeScriptConfig["verificationPolicy"],
+): AspTypeScriptConfig["verificationPolicy"] {
   return {
     profileHints: policy.profileHints.map(cloneProfileHint),
     receipts: policy.receipts.map(cloneVerificationReceipt),

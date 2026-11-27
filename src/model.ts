@@ -1,5 +1,5 @@
 /**
- * Public data model for TypeScript harness reports.
+ * Public data model for ASP TypeScript reports.
  *
  * This module defines the DTO boundary shared by parser facts, policy
  * findings, compact renderers, and external consumers.
@@ -75,7 +75,7 @@ export type {
 
 export type TypeScriptDiagnosticSeverity = "info" | "warning" | "error";
 
-export type TypeScriptHarnessRunMode = "project" | "explicit";
+export type AspTypeScriptRunMode = "project" | "explicit";
 
 export interface RulePackDescriptor {
   readonly id: string;
@@ -93,7 +93,7 @@ export type TypeScriptRulePack =
   | "agent_policy"
   | "extension_policy";
 
-export interface TypeScriptHarnessRule {
+export interface AspTypeScriptRule {
   readonly ruleId: string;
   readonly packId: string;
   readonly severity: TypeScriptDiagnosticSeverity;
@@ -108,7 +108,7 @@ export interface SourceLocation {
   readonly column: number;
 }
 
-export interface TypeScriptHarnessFinding {
+export interface AspTypeScriptFinding {
   readonly ruleId: string;
   readonly packId: string;
   readonly severity: TypeScriptDiagnosticSeverity;
@@ -285,7 +285,7 @@ export interface PackageJsonFacts {
   readonly diagnostics: readonly TypeScriptNativeDiagnostic[];
 }
 
-export interface TypeScriptProjectHarnessScope {
+export interface AspTypeScriptProjectScope {
   readonly projectRoot: string;
   readonly sourcePaths: readonly string[];
   readonly testPaths: readonly string[];
@@ -293,7 +293,7 @@ export interface TypeScriptProjectHarnessScope {
   readonly packageJson: PackageJsonFacts;
 }
 
-export interface TypeScriptHarnessConfig {
+export interface AspTypeScriptConfig {
   readonly ignoredDirNames: readonly string[];
   readonly includeHiddenDirNames: readonly string[];
   readonly includeTests: boolean;
@@ -403,7 +403,7 @@ export interface TypeScriptPackageImportOwnerFact {
 }
 
 export interface TypeScriptReasoningTree {
-  readonly runMode: TypeScriptHarnessRunMode;
+  readonly runMode: AspTypeScriptRunMode;
   readonly projectRoot: string;
   readonly packageName?: string;
   readonly configPath?: string;
@@ -436,31 +436,29 @@ export interface TypeScriptReasoningTree {
   readonly edges: readonly TypeScriptImportEdgeFact[];
 }
 
-export interface TypeScriptHarnessReport {
-  readonly runMode: TypeScriptHarnessRunMode;
+export interface AspTypeScriptReport {
+  readonly runMode: AspTypeScriptRunMode;
   readonly modules: readonly TypeScriptModuleReport[];
-  readonly findings: readonly TypeScriptHarnessFinding[];
+  readonly findings: readonly AspTypeScriptFinding[];
   readonly rootPaths: readonly string[];
   readonly blockingSeverities: readonly TypeScriptDiagnosticSeverity[];
   readonly blockingRuleIds: readonly string[];
-  readonly projectResolution?: TypeScriptProjectHarnessScope;
+  readonly projectResolution?: AspTypeScriptProjectScope;
   readonly reasoningTree: TypeScriptReasoningTree;
 }
 
-export interface TypeScriptProjectHarnessAgentSnapshotPackage {
+export interface AspTypeScriptAgentSnapshotPackage {
   readonly packageRoot: string;
   readonly packagePath: string;
-  readonly report: TypeScriptHarnessReport;
+  readonly report: AspTypeScriptReport;
 }
 
-export interface TypeScriptProjectHarnessAgentSnapshot {
+export interface AspTypeScriptAgentSnapshot {
   readonly projectRoot: string;
-  readonly packages: readonly TypeScriptProjectHarnessAgentSnapshotPackage[];
+  readonly packages: readonly AspTypeScriptAgentSnapshotPackage[];
 }
 
-export function blockingFindings(
-  report: TypeScriptHarnessReport,
-): readonly TypeScriptHarnessFinding[] {
+export function blockingFindings(report: AspTypeScriptReport): readonly AspTypeScriptFinding[] {
   const severities = new Set(report.blockingSeverities);
   const ruleIds = new Set(report.blockingRuleIds);
   return report.findings.filter(
@@ -468,20 +466,18 @@ export function blockingFindings(
   );
 }
 
-export function advisoryFindings(
-  report: TypeScriptHarnessReport,
-): readonly TypeScriptHarnessFinding[] {
+export function advisoryFindings(report: AspTypeScriptReport): readonly AspTypeScriptFinding[] {
   return report.findings.filter((finding) => finding.severity === "info");
 }
 
-export function isTypeScriptHarnessClean(report: TypeScriptHarnessReport): boolean {
+export function isAspTypeScriptClean(report: AspTypeScriptReport): boolean {
   return blockingFindings(report).length === 0;
 }
 
-export function fileCount(report: TypeScriptHarnessReport): number {
+export function fileCount(report: AspTypeScriptReport): number {
   return report.reasoningTree.modules.length;
 }
 
-export function parsedCount(report: TypeScriptHarnessReport): number {
+export function parsedCount(report: AspTypeScriptReport): number {
   return report.reasoningTree.modules.filter((moduleReport) => moduleReport.isValid).length;
 }

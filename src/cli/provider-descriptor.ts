@@ -20,8 +20,13 @@ export interface ProviderRegistrationDocument extends ProviderDescriptorIdentity
 
 export interface ProviderRuntimeOperation {
   readonly operation: string;
-  readonly requestSchemaId: string;
-  readonly responseSchemaId: string;
+  readonly requestSchema: ProviderSchemaReference;
+  readonly responseSchema: ProviderSchemaReference;
+}
+
+export interface ProviderSchemaReference {
+  readonly schemaId: string;
+  readonly schemaVersion: string;
 }
 
 export interface ProviderRuntimeContract {
@@ -65,10 +70,24 @@ export function loadProviderRuntimeContract(descriptorUrl: URL): ProviderRuntime
     throw new Error("ASP provider runtimeContract.operations must be an array");
   const operations = contract.operations.map((value, index) => {
     const operation = record(value, `runtimeContract.operations[${index}]`);
+    const requestSchema = record(
+      operation.requestSchema,
+      `runtimeContract.operations[${index}].requestSchema`,
+    );
+    const responseSchema = record(
+      operation.responseSchema,
+      `runtimeContract.operations[${index}].responseSchema`,
+    );
     return Object.freeze({
       operation: requiredString(operation.operation, "operation"),
-      requestSchemaId: requiredString(operation.requestSchemaId, "requestSchemaId"),
-      responseSchemaId: requiredString(operation.responseSchemaId, "responseSchemaId"),
+      requestSchema: Object.freeze({
+        schemaId: requiredString(requestSchema.schemaId, "requestSchema.schemaId"),
+        schemaVersion: requiredString(requestSchema.schemaVersion, "requestSchema.schemaVersion"),
+      }),
+      responseSchema: Object.freeze({
+        schemaId: requiredString(responseSchema.schemaId, "responseSchema.schemaId"),
+        schemaVersion: requiredString(responseSchema.schemaVersion, "responseSchema.schemaVersion"),
+      }),
     });
   });
   return Object.freeze({

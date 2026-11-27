@@ -5,12 +5,12 @@ import { fileURLToPath } from "node:url";
 import test from "node:test";
 
 import {
-  renderTypeScriptProjectHarnessAgentSnapshot,
-  renderTypeScriptProjectHarness,
+  renderAspTypeScriptAgentSnapshot,
+  renderAspTypeScript,
   renderTypeScriptReasoningTree,
-  runTypeScriptProjectHarnessAgentSnapshot,
-  runTypeScriptProjectHarness,
-  type TypeScriptHarnessReport,
+  runAspTypeScriptAgentSnapshot,
+  runAspTypeScript,
+  type AspTypeScriptReport,
   type TypeScriptImportEdgeFact,
   type TypeScriptReasoningOwnerBranchFact,
   type TypeScriptReasoningOwnerDependencyFact,
@@ -27,7 +27,7 @@ const snapshotSectionOrder = [
 test("agent snapshot matches the golden project reasoning surface", () => {
   const fixtureRoot = path.join(projectRoot, "tests", "fixtures", "agent_snapshot_project");
   const snapshotPath = path.join(projectRoot, "tests", "snapshots", "agent_snapshot_project.snap");
-  const report = runTypeScriptProjectHarness(fixtureRoot);
+  const report = runAspTypeScript(fixtureRoot);
   const rendered = `${renderTypeScriptReasoningTree(report)}\n`;
 
   assert.equal(fs.readFileSync(snapshotPath, "utf8"), rendered);
@@ -43,7 +43,7 @@ test("golden agent snapshot obeys the compact text design", () => {
 });
 
 test("repository agent snapshot self-applies the compact text design", () => {
-  const report = runTypeScriptProjectHarness(projectRoot);
+  const report = runAspTypeScript(projectRoot);
   const snapshot = `${renderTypeScriptReasoningTree(report)}\n`;
 
   assertCompactSnapshotDesign(snapshot, [projectRoot]);
@@ -53,8 +53,8 @@ test("repository agent snapshot self-applies the compact text design", () => {
 
 test("project agent snapshot segments workspace package scopes", () => {
   const fixtureRoot = path.join(projectRoot, "tests", "fixtures", "agent_snapshot_project");
-  const snapshot = runTypeScriptProjectHarnessAgentSnapshot(fixtureRoot);
-  const rendered = `${renderTypeScriptProjectHarnessAgentSnapshot(snapshot)}\n`;
+  const snapshot = runAspTypeScriptAgentSnapshot(fixtureRoot);
+  const rendered = `${renderAspTypeScriptAgentSnapshot(snapshot)}\n`;
 
   assert.equal(rendered, workspaceGoldenSnapshot());
   assert.deepEqual(
@@ -74,7 +74,7 @@ test("compact renderers normalize diagnostic messages to the reasoning root", ()
   const report = diagnosticReport(diagnosticRoot, sourcePath, message);
 
   const snapshot = renderTypeScriptReasoningTree(report);
-  const compact = renderTypeScriptProjectHarness(report);
+  const compact = renderAspTypeScript(report);
 
   assert.equal(snapshot.includes(diagnosticRoot), false);
   assert.match(snapshot, /FindingGroups:/u);
@@ -167,7 +167,7 @@ function snapshotReport(
   root: string,
   ownerBranches: readonly TypeScriptReasoningOwnerBranchFact[],
   ownerDependencies: readonly TypeScriptReasoningOwnerDependencyFact[] = [],
-): TypeScriptHarnessReport {
+): AspTypeScriptReport {
   const modulePaths = [
     ...new Set(
       [
@@ -224,7 +224,7 @@ function snapshotReport(
       modules: modulePaths.map((modulePath) => ({
         path: modulePath,
         role: "source",
-        layer: "harness",
+        layer: "asp",
         isValid: true,
         hasIntentDoc: false,
         lineCount: 1,
@@ -402,11 +402,7 @@ function assertOrderedSections(lines: readonly string[]): void {
   }
 }
 
-function diagnosticReport(
-  root: string,
-  sourcePath: string,
-  message: string,
-): TypeScriptHarnessReport {
+function diagnosticReport(root: string, sourcePath: string, message: string): AspTypeScriptReport {
   return {
     runMode: "project",
     modules: [],
@@ -475,7 +471,7 @@ function diagnosticReport(
         {
           path: sourcePath,
           role: "source",
-          layer: "harness",
+          layer: "asp",
           isValid: true,
           hasIntentDoc: false,
           lineCount: 1,

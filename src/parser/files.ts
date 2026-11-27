@@ -1,5 +1,5 @@
 /**
- * Project file discovery for TypeScript harness runs.
+ * Project file discovery for ASP TypeScript runs.
  *
  * This module selects parser-visible TypeScript and JavaScript files while
  * respecting ignored directories and generated artifact boundaries.

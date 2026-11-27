@@ -1,21 +1,19 @@
 import type {
-  TypeScriptHarnessFinding,
-  TypeScriptHarnessRule,
+  AspTypeScriptFinding,
+  AspTypeScriptRule,
   TypeScriptReasoningTree,
 } from "../../../model.js";
 import { TS_EXT_SHADCN_R001, TS_EXT_SHADCN_R002, TS_EXT_SHADCN_R003 } from "./policy.js";
 
-export function shadcnPolicyRules(): readonly TypeScriptHarnessRule[] {
+export function shadcnPolicyRules(): readonly AspTypeScriptRule[] {
   return [TS_EXT_SHADCN_R001, TS_EXT_SHADCN_R002, TS_EXT_SHADCN_R003];
 }
 
-export function evaluateShadcnPolicyRules(
-  tree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+export function evaluateShadcnPolicyRules(tree: TypeScriptReasoningTree): AspTypeScriptFinding[] {
   const ext = tree.packageExtensions.find((e) => e.name === "shadcn");
   if (!ext) return [];
 
-  const findings: TypeScriptHarnessFinding[] = [];
+  const findings: AspTypeScriptFinding[] = [];
 
   // R001: extension requires tailwindcss dependency
   if (ext.activation === "config-enabled-missing-dependency") {

@@ -3,14 +3,14 @@ import path from "node:path";
 import {
   blockingFindings,
   fileCount,
-  isTypeScriptHarnessClean,
+  isAspTypeScriptClean,
   parsedCount,
-  type TypeScriptHarnessFinding,
-  type TypeScriptHarnessReport,
+  type AspTypeScriptFinding,
+  type AspTypeScriptReport,
   type TypeScriptImportEdgeFact,
   type TypeScriptPackageBuildToolFact,
   type TypeScriptPackageExtensionFact,
-  type TypeScriptProjectHarnessAgentSnapshot,
+  type AspTypeScriptAgentSnapshot,
   type TypeScriptReasoningImportSummaryFact,
   type TypeScriptReasoningOwnerBranchFact,
   type TypeScriptReasoningOwnerDependencyFact,
@@ -25,8 +25,8 @@ export interface TypeScriptRenderOptions {
 const MAX_AGENT_SNAPSHOT_BRANCH_LINES = 24;
 const MAX_AGENT_SNAPSHOT_CHILD_EDGES = 8;
 
-export function renderTypeScriptProjectHarness(
-  report: TypeScriptHarnessReport,
+export function renderAspTypeScript(
+  report: AspTypeScriptReport,
   options: TypeScriptRenderOptions = {},
 ): string {
   const includeAdvice = options.includeAdvice ?? true;
@@ -39,16 +39,16 @@ export function renderTypeScriptProjectHarness(
   return findings.map((finding) => renderFinding(report, finding)).join("\n\n");
 }
 
-export function renderAssertionMessage(report: TypeScriptHarnessReport): string {
-  if (isTypeScriptHarnessClean(report)) {
-    return renderTypeScriptProjectHarness(report);
+export function renderAssertionMessage(report: AspTypeScriptReport): string {
+  if (isAspTypeScriptClean(report)) {
+    return renderAspTypeScript(report);
   }
   return blockingFindings(report)
     .map((finding) => renderFinding(report, finding))
     .join("\n\n");
 }
 
-export function renderTypeScriptReasoningTree(report: TypeScriptHarnessReport): string {
+export function renderTypeScriptReasoningTree(report: AspTypeScriptReport): string {
   const tree = report.reasoningTree;
   const sourceModules = tree.modules.filter(isAgentSourceModule);
   if (sourceModules.length === 0 && report.findings.length === 0) {
@@ -90,9 +90,7 @@ export function renderTypeScriptReasoningTree(report: TypeScriptHarnessReport): 
   return lines.join("\n");
 }
 
-export function renderTypeScriptProjectHarnessAgentSnapshot(
-  snapshot: TypeScriptProjectHarnessAgentSnapshot,
-): string {
+export function renderAspTypeScriptAgentSnapshot(snapshot: AspTypeScriptAgentSnapshot): string {
   const packageSnapshots = snapshot.packages.flatMap((packageSnapshot) => {
     const rendered = renderTypeScriptReasoningTree(packageSnapshot.report);
     if (rendered.length === 0) {
@@ -109,7 +107,7 @@ export function renderTypeScriptProjectHarnessAgentSnapshot(
     .join("\n");
 }
 
-function renderFinding(report: TypeScriptHarnessReport, finding: TypeScriptHarnessFinding): string {
+function renderFinding(report: AspTypeScriptReport, finding: AspTypeScriptFinding): string {
   const location = renderLocation(report, finding);
   const lines = [
     `[${finding.ruleId}] ${capitalizeSeverity(finding.severity)}: ${finding.title}`,
@@ -130,10 +128,7 @@ function capitalizeSeverity(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-function renderLocation(
-  report: TypeScriptHarnessReport,
-  finding: TypeScriptHarnessFinding,
-): string {
+function renderLocation(report: AspTypeScriptReport, finding: AspTypeScriptFinding): string {
   const rawPath = finding.location.path ?? "<project>";
   const displayPath =
     rawPath === "<project>"
@@ -433,9 +428,9 @@ function ownerDependencyCount(tree: TypeScriptReasoningTree): number {
 
 function renderFindingGroups(
   tree: TypeScriptReasoningTree,
-  findings: readonly TypeScriptHarnessFinding[],
+  findings: readonly AspTypeScriptFinding[],
 ): string[] {
-  const groups = new Map<string, { count: number; finding: TypeScriptHarnessFinding }>();
+  const groups = new Map<string, { count: number; finding: AspTypeScriptFinding }>();
   for (const finding of findings) {
     const key = `${finding.severity}\0${finding.ruleId}\0${finding.title}`;
     const group = groups.get(key);

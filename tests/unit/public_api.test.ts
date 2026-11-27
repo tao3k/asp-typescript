@@ -16,11 +16,11 @@ import type {
   TypeScriptCompilerOptionFacts,
   TypeScriptDiagnosticSeverity,
   TypeScriptExportFact,
-  TypeScriptHarnessConfig,
-  TypeScriptHarnessFinding,
-  TypeScriptHarnessReport,
-  TypeScriptHarnessRule,
-  TypeScriptHarnessRunMode,
+  AspTypeScriptConfig,
+  AspTypeScriptFinding,
+  AspTypeScriptReport,
+  AspTypeScriptRule,
+  AspTypeScriptRunMode,
   TypeScriptRulePack,
   TypeScriptImportEdgeFact,
   TypeScriptImportFact,
@@ -48,10 +48,10 @@ import type {
   TypeScriptPackageExtensionFact,
   TypeScriptPackageExtensionName,
   TypeScriptPathAliasFact,
-  TypeScriptProjectHarnessAgentSnapshot,
-  TypeScriptProjectHarnessAgentSnapshotPackage,
+  AspTypeScriptAgentSnapshot,
+  AspTypeScriptAgentSnapshotPackage,
   TypeScriptProjectConfigFacts,
-  TypeScriptProjectHarnessScope,
+  AspTypeScriptProjectScope,
   TypeScriptProjectReferencePackageFact,
   TypeScriptProjectReferenceResolutionFact,
   TypeScriptEffectErrorChannelKind,
@@ -141,11 +141,11 @@ type PublicModelContract = readonly [
   SourceLocation,
   TypeScriptDiagnosticSeverity,
   TypeScriptExportFact,
-  TypeScriptHarnessConfig,
-  TypeScriptHarnessFinding,
-  TypeScriptHarnessReport,
-  TypeScriptHarnessRule,
-  TypeScriptHarnessRunMode,
+  AspTypeScriptConfig,
+  AspTypeScriptFinding,
+  AspTypeScriptReport,
+  AspTypeScriptRule,
+  AspTypeScriptRunMode,
   TypeScriptRulePack,
   TypeScriptImportFact,
   TypeScriptImportEdgeFact,
@@ -173,10 +173,10 @@ type PublicModelContract = readonly [
   TypeScriptPackageExtensionFact,
   TypeScriptPackageExtensionName,
   TypeScriptPathAliasFact,
-  TypeScriptProjectHarnessAgentSnapshot,
-  TypeScriptProjectHarnessAgentSnapshotPackage,
+  AspTypeScriptAgentSnapshot,
+  AspTypeScriptAgentSnapshotPackage,
   TypeScriptProjectConfigFacts,
-  TypeScriptProjectHarnessScope,
+  AspTypeScriptProjectScope,
   TypeScriptProjectReferencePackageFact,
   TypeScriptProjectReferenceResolutionFact,
   TypeScriptEffectErrorChannelKind,
@@ -258,89 +258,92 @@ type PublicModelContract = readonly [
 const publicModelContract: PublicModelContract | undefined = undefined;
 
 test("public facade exposes the stable M13 runtime surface", () => {
-  assert.deepEqual(Object.keys(api).sort(), [
-    "DEFAULT_IGNORED_DIR_NAMES",
-    "TypeScriptVerificationReportWriteError",
-    "activeTypeScriptVerificationProfileCandidates",
-    "activeTypeScriptVerificationProfileHints",
-    "advisoryFindings",
-    "assertTypeScriptLangHarnessClean",
-    "assertTypeScriptProjectHarnessAgentClean",
-    "assertTypeScriptProjectHarnessClean",
-    "assertTypeScriptProjectHarnessEmbeddedClean",
-    "blockingFindings",
-    "buildTypeScriptProjectHarnessAgentSnapshot",
-    "buildTypeScriptVerificationPerformanceIndex",
-    "buildTypeScriptVerificationProfileIndex",
-    "buildTypeScriptVerificationProfileIndexForReport",
-    "buildTypeScriptVerificationProfileIndexWithConfig",
-    "buildTypeScriptVerificationReportBundle",
-    "buildTypeScriptVerificationReportBundleWithOptions",
-    "buildTypeScriptVerificationTaskIndex",
-    "defaultTypeScriptHarnessConfig",
-    "defaultTypeScriptVerificationPolicy",
-    "defaultTypeScriptVerificationReportOptions",
-    "discoverTypeScriptFiles",
-    "fileCount",
-    "isTypeScriptHarnessClean",
-    "parseTypeScriptProjectFiles",
-    "parseTypeScriptSourceFile",
-    "parsedCount",
-    "planTypeScriptProjectVerification",
-    "planTypeScriptProjectVerificationForReport",
-    "planTypeScriptProjectVerificationWithConfig",
-    "readProjectResolution",
-    "renderAssertionMessage",
-    "renderTypeScriptHarnessRulesMarkdown",
-    "renderTypeScriptProjectHarness",
-    "renderTypeScriptProjectHarnessAdvice",
-    "renderTypeScriptProjectHarnessAgentCompactText",
-    "renderTypeScriptProjectHarnessAgentSnapshot",
-    "renderTypeScriptProjectHarnessJson",
-    "renderTypeScriptReasoningTree",
-    "renderTypeScriptVerificationPerformanceIndex",
-    "renderTypeScriptVerificationPerformanceIndexJson",
-    "renderTypeScriptVerificationPlan",
-    "renderTypeScriptVerificationPlanJson",
-    "renderTypeScriptVerificationProfileIndex",
-    "renderTypeScriptVerificationProfileIndexJson",
-    "renderTypeScriptVerificationReportArtifactJson",
-    "renderTypeScriptVerificationReportBundleJson",
-    "renderTypeScriptVerificationSkillContracts",
-    "renderTypeScriptVerificationTaskIndexJson",
-    "runTypeScriptLangHarness",
-    "runTypeScriptProjectHarness",
-    "runTypeScriptProjectHarnessAgentSnapshot",
-    "typeScriptAgentPolicyRules",
-    "typeScriptExtensionPolicyRules",
-    "typeScriptHarnessRulesMarkdown",
-    "typeScriptModularityRules",
-    "typeScriptProjectPolicyRules",
-    "typeScriptRulePackDescriptors",
-    "typeScriptRulePackRuleIds",
-    "typeScriptSemanticRules",
-    "typeScriptSyntaxRules",
-    "typeScriptTestLayoutRules",
-    "typeScriptVerificationProfileIndexIsClear",
-    "withDisabledTypeScriptRule",
-    "withDisabledTypeScriptRulePack",
-    "withDisabledTypeScriptRules",
-    "withDisabledTypeScriptVerificationTaskKind",
-    "withDisabledTypeScriptVerificationTaskKinds",
-    "withTypeScriptBlockingSeverities",
-    "withTypeScriptRulePackSeverity",
-    "withTypeScriptRuleSeverity",
-    "withTypeScriptVerificationDependencySignal",
-    "withTypeScriptVerificationProfileHint",
-    "withTypeScriptVerificationReceipt",
-    "withTypeScriptVerificationResponsibilityTaskKinds",
-    "withTypeScriptVerificationSkillBinding",
-    "withTypeScriptVerificationSkillDescriptor",
-    "withTypeScriptVerificationTaskContract",
-    "withTypeScriptVerificationWaiver",
-    "writeTypeScriptHarnessRulesToUnitTests",
-    "writeTypeScriptVerificationReports",
-  ]);
+  assert.deepEqual(
+    Object.keys(api).sort(),
+    [
+      "DEFAULT_IGNORED_DIR_NAMES",
+      "TypeScriptVerificationReportWriteError",
+      "activeTypeScriptVerificationProfileCandidates",
+      "activeTypeScriptVerificationProfileHints",
+      "advisoryFindings",
+      "assertAspTypeScriptPathsClean",
+      "assertAspTypeScriptAgentClean",
+      "assertAspTypeScriptClean",
+      "assertAspTypeScriptEmbeddedClean",
+      "blockingFindings",
+      "buildAspTypeScriptAgentSnapshot",
+      "buildTypeScriptVerificationPerformanceIndex",
+      "buildTypeScriptVerificationProfileIndex",
+      "buildTypeScriptVerificationProfileIndexForReport",
+      "buildTypeScriptVerificationProfileIndexWithConfig",
+      "buildTypeScriptVerificationReportBundle",
+      "buildTypeScriptVerificationReportBundleWithOptions",
+      "buildTypeScriptVerificationTaskIndex",
+      "defaultAspTypeScriptConfig",
+      "defaultTypeScriptVerificationPolicy",
+      "defaultTypeScriptVerificationReportOptions",
+      "discoverTypeScriptFiles",
+      "fileCount",
+      "isAspTypeScriptClean",
+      "parseTypeScriptProjectFiles",
+      "parseTypeScriptSourceFile",
+      "parsedCount",
+      "planTypeScriptProjectVerification",
+      "planTypeScriptProjectVerificationForReport",
+      "planTypeScriptProjectVerificationWithConfig",
+      "readProjectResolution",
+      "renderAssertionMessage",
+      "renderAspTypeScriptRulesMarkdown",
+      "renderAspTypeScript",
+      "renderAspTypeScriptAdvice",
+      "renderAspTypeScriptAgentCompactText",
+      "renderAspTypeScriptAgentSnapshot",
+      "renderAspTypeScriptJson",
+      "renderTypeScriptReasoningTree",
+      "renderTypeScriptVerificationPerformanceIndex",
+      "renderTypeScriptVerificationPerformanceIndexJson",
+      "renderTypeScriptVerificationPlan",
+      "renderTypeScriptVerificationPlanJson",
+      "renderTypeScriptVerificationProfileIndex",
+      "renderTypeScriptVerificationProfileIndexJson",
+      "renderTypeScriptVerificationReportArtifactJson",
+      "renderTypeScriptVerificationReportBundleJson",
+      "renderTypeScriptVerificationSkillContracts",
+      "renderTypeScriptVerificationTaskIndexJson",
+      "runAspTypeScriptPaths",
+      "runAspTypeScript",
+      "runAspTypeScriptAgentSnapshot",
+      "typeScriptAgentPolicyRules",
+      "typeScriptExtensionPolicyRules",
+      "aspTypeScriptRulesMarkdown",
+      "typeScriptModularityRules",
+      "typeScriptProjectPolicyRules",
+      "typeScriptRulePackDescriptors",
+      "typeScriptRulePackRuleIds",
+      "typeScriptSemanticRules",
+      "typeScriptSyntaxRules",
+      "typeScriptTestLayoutRules",
+      "typeScriptVerificationProfileIndexIsClear",
+      "withDisabledTypeScriptRule",
+      "withDisabledTypeScriptRulePack",
+      "withDisabledTypeScriptRules",
+      "withDisabledTypeScriptVerificationTaskKind",
+      "withDisabledTypeScriptVerificationTaskKinds",
+      "withTypeScriptBlockingSeverities",
+      "withTypeScriptRulePackSeverity",
+      "withTypeScriptRuleSeverity",
+      "withTypeScriptVerificationDependencySignal",
+      "withTypeScriptVerificationProfileHint",
+      "withTypeScriptVerificationReceipt",
+      "withTypeScriptVerificationResponsibilityTaskKinds",
+      "withTypeScriptVerificationSkillBinding",
+      "withTypeScriptVerificationSkillDescriptor",
+      "withTypeScriptVerificationTaskContract",
+      "withTypeScriptVerificationWaiver",
+      "writeAspTypeScriptRulesToUnitTests",
+      "writeTypeScriptVerificationReports",
+    ].sort(),
+  );
   assert.equal("buildTypeScriptReasoningTree" in api, false);
   assert.equal("evaluateDefaultRulePacks" in api, false);
   assert.equal(publicModelContract, undefined);
@@ -387,12 +390,12 @@ test("public runner renders compact agent snapshots from parser-native facts", (
     ].join("\n"),
   );
 
-  const report = api.runTypeScriptProjectHarness(root);
+  const report = api.runAspTypeScript(root);
   const snapshot = api.renderTypeScriptReasoningTree(report);
-  const projectSnapshot = api.runTypeScriptProjectHarnessAgentSnapshot(root);
-  const renderedProjectSnapshot = api.renderTypeScriptProjectHarnessAgentSnapshot(projectSnapshot);
+  const projectSnapshot = api.runAspTypeScriptAgentSnapshot(root);
+  const renderedProjectSnapshot = api.renderAspTypeScriptAgentSnapshot(projectSnapshot);
 
-  assert.equal(api.isTypeScriptHarnessClean(report), true);
+  assert.equal(api.isAspTypeScriptClean(report), true);
   assert.equal(renderedProjectSnapshot, snapshot);
   assert.match(snapshot, /^Modules: source=3 branches=3 deps=3 paths=1 findings=2/u);
   assert.match(snapshot, /OwnerBranches:/u);
@@ -409,14 +412,14 @@ test("public agent-clean assertion surfaces advisory findings as test-gate feedb
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-agent-clean-"));
   writeAdviceOnlyProject(root);
 
-  const blockingOnlyReport = api.assertTypeScriptProjectHarnessClean(root);
-  assert.equal(api.isTypeScriptHarnessClean(blockingOnlyReport), true);
+  const blockingOnlyReport = api.assertAspTypeScriptClean(root);
+  assert.equal(api.isAspTypeScriptClean(blockingOnlyReport), true);
   assert.ok(
     blockingOnlyReport.findings.some((finding) => finding.ruleId === "TS-AGENT-POLICY-004"),
   );
 
   assert.throws(
-    () => api.assertTypeScriptProjectHarnessAgentClean(root),
+    () => api.assertAspTypeScriptAgentClean(root),
     (error: unknown) => {
       assert.ok(error instanceof Error);
       assert.match(error.message, /AgentCompactText: mode=advice findings=3 tasks=3/u);
@@ -441,10 +444,10 @@ test("public agent-clean assertion surfaces advisory findings as test-gate feedb
   );
 
   const config = api.withDisabledTypeScriptRulePack(
-    api.defaultTypeScriptHarnessConfig(),
+    api.defaultAspTypeScriptConfig(),
     "agent_policy",
   );
-  api.assertTypeScriptProjectHarnessAgentClean(root, config);
+  api.assertAspTypeScriptAgentClean(root, config);
 });
 
 test("public embedded assertion emits advice without failing info-only projects", () => {
@@ -452,11 +455,11 @@ test("public embedded assertion emits advice without failing info-only projects"
   writeAdviceOnlyProject(root);
   const advice: string[] = [];
 
-  const report = api.assertTypeScriptProjectHarnessEmbeddedClean(root, {
+  const report = api.assertAspTypeScriptEmbeddedClean(root, {
     writeAdvice: (message) => advice.push(message),
   });
 
-  assert.equal(api.isTypeScriptHarnessClean(report), true);
+  assert.equal(api.isAspTypeScriptClean(report), true);
   assert.equal(advice.length, 1);
   assert.match(advice[0] ?? "", /^AgentCompactText: mode=advice findings=3 tasks=3/u);
   assert.match(advice[0] ?? "", /Directive: edit listed targets/u);
@@ -469,11 +472,11 @@ test("public embedded assertion defaults to a fast non-semantic policy pass", ()
   fs.writeFileSync(path.join(root, "tsconfig.json"), JSON.stringify({ include: ["src/**/*.ts"] }));
   fs.writeFileSync(path.join(root, "src", "index.ts"), "export const bad: string = 1;\n");
 
-  const fullReport = api.runTypeScriptProjectHarness(root);
-  const embeddedFastReport = api.assertTypeScriptProjectHarnessEmbeddedClean(root, {
+  const fullReport = api.runAspTypeScript(root);
+  const embeddedFastReport = api.assertAspTypeScriptEmbeddedClean(root, {
     emitAdvice: false,
   });
-  const embeddedSemanticReport = api.assertTypeScriptProjectHarnessEmbeddedClean(root, {
+  const embeddedSemanticReport = api.assertAspTypeScriptEmbeddedClean(root, {
     collectSemanticDiagnostics: true,
     emitAdvice: false,
   });
@@ -487,11 +490,11 @@ test("public agent compact text renderer can select blocking or all findings", (
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "asp-typescript-agent-compact-"));
   writeAdviceOnlyProject(root);
 
-  const report = api.runTypeScriptProjectHarness(root);
-  const blockingCompact = api.renderTypeScriptProjectHarnessAgentCompactText(report, {
+  const report = api.runAspTypeScript(root);
+  const blockingCompact = api.renderAspTypeScriptAgentCompactText(report, {
     findings: "blocking",
   });
-  const allCompact = api.renderTypeScriptProjectHarnessAgentCompactText(report, {
+  const allCompact = api.renderAspTypeScriptAgentCompactText(report, {
     findings: "all",
     maxActionGroups: 1,
     maxTargetExamples: 1,

@@ -24,7 +24,7 @@ TypeScript native public data-field facts
 - Keep the finding at `info` severity. Projects can disable the rule, disable
   `agent_policy`, override severity, or promote it through existing policy
   config.
-- Exclude the harness `model` layer, including nested `src/**/model.ts`
+- Exclude ASP TypeScript `model` layer, including nested `src/**/model.ts`
   schema modules, so fact/schema definitions do not become generic DTO style
   findings. Application source modules remain covered.
 
@@ -49,6 +49,6 @@ direnv exec . npm ci
 direnv exec . npm run check
 direnv exec . npm run lint
 direnv exec . npm test
-direnv exec . npm run harness
+direnv exec . npm run check:policy
 direnv exec . git diff --check
 ```

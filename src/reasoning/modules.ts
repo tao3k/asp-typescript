@@ -5,14 +5,14 @@ import type {
   TypeScriptModuleReport,
   TypeScriptModuleRole,
   TypeScriptPackageEntryResolutionFact,
-  TypeScriptProjectHarnessScope,
+  AspTypeScriptProjectScope,
   TypeScriptReasoningModule,
 } from "../model.js";
 import { CONFIG_FILE_STEMS, MODULE_FILE_EXTENSIONS } from "./constants.js";
 import { isInsideAny, relativeProjectPath } from "./path_utils.js";
 
 export function reasoningModules(
-  scope: TypeScriptProjectHarnessScope,
+  scope: AspTypeScriptProjectScope,
   modules: readonly TypeScriptModuleReport[],
   entrypointOwnerPaths: ReadonlySet<string>,
 ): TypeScriptReasoningModule[] {
@@ -50,7 +50,7 @@ export function packageBinOwnerPaths(
 }
 
 export function packageEntrypointOwnerPaths(
-  scope: TypeScriptProjectHarnessScope,
+  scope: AspTypeScriptProjectScope,
   packageEntryResolutions: readonly TypeScriptPackageEntryResolutionFact[],
   modulePaths: ReadonlySet<string>,
 ): ReadonlySet<string> {
@@ -140,13 +140,13 @@ function moduleLayer(
     return "model";
   }
   if (relativePath.startsWith("src/")) {
-    return "harness";
+    return "asp";
   }
   return "unknown";
 }
 
 function moduleRole(
-  scope: TypeScriptProjectHarnessScope,
+  scope: AspTypeScriptProjectScope,
   moduleReport: TypeScriptModuleReport,
   entrypointOwnerPaths: ReadonlySet<string>,
   entrypointOwnerRoots: readonly string[],
@@ -324,7 +324,7 @@ function isScriptEntrypointTarget(token: string): boolean {
 }
 
 function resolveProjectModuleTarget(
-  scope: TypeScriptProjectHarnessScope,
+  scope: AspTypeScriptProjectScope,
   target: string,
   modulePaths: ReadonlySet<string>,
 ): string | undefined {
@@ -366,7 +366,7 @@ function resolveCandidatePath(
   return undefined;
 }
 
-function isFacadePath(scope: TypeScriptProjectHarnessScope, filePath: string): boolean {
+function isFacadePath(scope: AspTypeScriptProjectScope, filePath: string): boolean {
   const fileName = path.basename(filePath);
   if (!moduleFileNames("index").includes(fileName)) return false;
   if (isInsideAny(filePath, scope.sourcePaths)) return true;

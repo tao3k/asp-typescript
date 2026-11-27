@@ -38,10 +38,8 @@ const KNOWN_PACKAGE_EXTENSIONS = [
   },
 ] as const;
 
-const HARNESS_CONFIG_SOURCE_NAMES: readonly TypeScriptPackageExtensionConfigSource[] = [
-  "typescriptProjectHarness",
-  "typescriptLangProjectHarness",
-  "typescript-lang-project-harness",
+const ASP_CONFIG_SOURCE_NAMES: readonly TypeScriptPackageExtensionConfigSource[] = [
+  "asp-typescript",
 ];
 
 export function packageExtensionFacts(
@@ -91,7 +89,7 @@ function packageExtensionConfigProperty(
       readonly location: SourceLocation;
     }
   | undefined {
-  for (const source of HARNESS_CONFIG_SOURCE_NAMES) {
+  for (const source of ASP_CONFIG_SOURCE_NAMES) {
     const configProperty = packageJsonProperty(document, source);
     if (configProperty === undefined || !ts.isObjectLiteralExpression(configProperty.initializer)) {
       continue;

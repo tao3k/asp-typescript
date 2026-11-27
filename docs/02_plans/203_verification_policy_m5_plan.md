@@ -17,10 +17,10 @@ produce which receipt for a parser-visible owner.
 
 ## Scope
 
-- Add `TypeScriptVerificationPolicy` to `TypeScriptHarnessConfig`.
+- Add `TypeScriptVerificationPolicy` to `AspTypeScriptConfig`.
 - Expose immutable helpers for profile hints, receipts, waivers, responsibility
   task mapping, task contract overrides, skill bindings, and skill descriptors.
-- Add verification planning from an existing harness report or from a project
+- Add verification planning from an existing ASP TypeScript report or from a project
   root.
 - Keep verification state compact: pending and failed tasks render by default;
   satisfied receipts and complete waivers hide resolved tasks.
@@ -66,7 +66,7 @@ Library consumers can call:
 - `renderTypeScriptVerificationPlanJson(plan)`
 - `renderTypeScriptVerificationSkillContracts(plan)`
 
-The compact renderer is intentionally not a second harness report. It is a
+The compact renderer is intentionally not a second ASP TypeScript report. It is a
 reminder surface:
 
 ```text
@@ -85,7 +85,7 @@ the expanded command, inputs, pass criteria, and receipt fields.
 
 M5 does not add CLI flags, CI execution, report bundles, verifier subprocess
 management, profile index discovery, or manifest dependency policy. Those are
-M6+ topics if the TypeScript harness needs the fuller Rust verification
+M6+ topics if the ASP TypeScript needs the fuller Rust verification
 subsystem later.
 
 ## Validation
@@ -95,4 +95,4 @@ subsystem later.
 - Boundary tests ensure verification modules do not import parser helpers or
   TypeScript parser APIs.
 - Self-apply remains the default gate: the repository must produce zero default
-  harness findings.
+  ASP TypeScript findings.

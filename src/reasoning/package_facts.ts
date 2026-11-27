@@ -6,7 +6,7 @@ import type {
   TypeScriptModuleReport,
   TypeScriptPackageImportOwnerFact,
   TypeScriptPackageEntryResolutionFact,
-  TypeScriptProjectHarnessScope,
+  AspTypeScriptProjectScope,
   TypeScriptProjectReferencePackageFact,
   TypeScriptProjectReferenceResolutionFact,
   TypeScriptWorkspacePackageFact,
@@ -15,7 +15,7 @@ import { resolveCandidatePath } from "./candidate_paths.js";
 import { samePath } from "./path_utils.js";
 
 export function resolveProjectReferences(
-  scope: TypeScriptProjectHarnessScope,
+  scope: AspTypeScriptProjectScope,
 ): TypeScriptProjectReferenceResolutionFact[] {
   return scope.config.projectReferences
     .map((referencePath) => {
@@ -45,7 +45,7 @@ export function resolveProjectReferences(
 }
 
 export function resolvePackageImportOwners(
-  scope: TypeScriptProjectHarnessScope,
+  scope: AspTypeScriptProjectScope,
   modules: readonly TypeScriptModuleReport[],
 ): TypeScriptPackageImportOwnerFact[] {
   const namedPackages = namedPackageOwners(scope);
@@ -63,7 +63,7 @@ export function resolvePackageImportOwners(
 }
 
 export function resolvePackageEntries(
-  scope: TypeScriptProjectHarnessScope,
+  scope: AspTypeScriptProjectScope,
   modulePaths: ReadonlySet<string>,
 ): TypeScriptPackageEntryResolutionFact[] {
   return [
@@ -84,7 +84,7 @@ interface NamedPackageOwner {
   readonly ownerKind: TypeScriptPackageImportOwnerFact["ownerKind"];
 }
 
-function namedPackageOwners(scope: TypeScriptProjectHarnessScope): NamedPackageOwner[] {
+function namedPackageOwners(scope: AspTypeScriptProjectScope): NamedPackageOwner[] {
   const packagesByName = new Map<string, NamedPackageOwner>();
   for (const packageOwner of scope.config.projectReferencePackages) {
     addNamedPackageOwner(packagesByName, packageOwner, "project-reference");
@@ -142,7 +142,7 @@ function packageImportOwnerFact(
 function resolvePackageEntryGroup(
   kind: TypeScriptPackageEntryResolutionFact["kind"],
   entries: readonly PackageJsonEntryFact[],
-  scope: TypeScriptProjectHarnessScope,
+  scope: AspTypeScriptProjectScope,
   modulePaths: ReadonlySet<string>,
 ): TypeScriptPackageEntryResolutionFact[] {
   return entries.flatMap((entry) =>
@@ -182,7 +182,7 @@ function resolvePackageEntryGroup(
 }
 
 function resolvePackageTarget(
-  scope: TypeScriptProjectHarnessScope,
+  scope: AspTypeScriptProjectScope,
   target: string,
   modulePaths: ReadonlySet<string>,
 ): string | undefined {

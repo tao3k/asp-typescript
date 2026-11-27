@@ -1,5 +1,5 @@
 /**
- * Finding model facade for TypeScript harness diagnostics.
+ * Finding model facade for ASP TypeScript diagnostics.
  *
  * This module re-exports diagnostic, rule, and finding types that form the
  * public advice payload boundary.
@@ -7,12 +7,12 @@
 export type {
   SourceLocation,
   TypeScriptDiagnosticSeverity,
-  TypeScriptHarnessFinding,
+  AspTypeScriptFinding,
 } from "../model.js";
 export {
   blockingFindings,
   advisoryFindings,
-  isTypeScriptHarnessClean,
+  isAspTypeScriptClean,
   fileCount,
   parsedCount,
 } from "../model.js";

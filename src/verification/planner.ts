@@ -2,10 +2,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { defaultTypeScriptHarnessConfig } from "../config.js";
+import { defaultAspTypeScriptConfig } from "../config.js";
 import type {
-  TypeScriptHarnessConfig,
-  TypeScriptHarnessReport,
+  AspTypeScriptConfig,
+  AspTypeScriptReport,
   TypeScriptReasoningModule,
   TypeScriptReasoningOwnerBranchFact,
 } from "../model.js";
@@ -18,7 +18,7 @@ import type {
   TypeScriptVerificationTaskContract,
   TypeScriptVerificationTaskKind,
 } from "./model.js";
-import { runTypeScriptProjectHarness } from "../runner.js";
+import { runAspTypeScript } from "../runner.js";
 import { typeScriptVerificationTaskFingerprint } from "./fingerprint.js";
 import {
   profileEvidence,
@@ -48,13 +48,13 @@ export function planTypeScriptProjectVerification(
 ): TypeScriptVerificationPlan {
   return planTypeScriptProjectVerificationWithConfig(
     projectRootInput,
-    defaultTypeScriptHarnessConfig(),
+    defaultAspTypeScriptConfig(),
   );
 }
 
 export function planTypeScriptProjectVerificationWithConfig(
   projectRootInput: string | URL,
-  config: TypeScriptHarnessConfig,
+  config: AspTypeScriptConfig,
 ): TypeScriptVerificationPlan {
   const projectRoot =
     projectRootInput instanceof URL ? fileURLToPath(projectRootInput) : projectRootInput;
@@ -62,13 +62,13 @@ export function planTypeScriptProjectVerificationWithConfig(
     throw new Error(`project root does not exist: ${projectRoot}`);
   }
   return planTypeScriptProjectVerificationForReport(
-    runTypeScriptProjectHarness(projectRootInput, config),
+    runAspTypeScript(projectRootInput, config),
     config.verificationPolicy,
   );
 }
 
 export function planTypeScriptProjectVerificationForReport(
-  report: TypeScriptHarnessReport,
+  report: AspTypeScriptReport,
   policy: TypeScriptVerificationPolicy,
 ): TypeScriptVerificationPlan {
   const tasks = new Map<string, TypeScriptVerificationTask>();
@@ -98,7 +98,7 @@ export function planTypeScriptProjectVerificationForReport(
 }
 
 function collectProfileConfigTasks(
-  report: TypeScriptHarnessReport,
+  report: AspTypeScriptReport,
   moduleReport: TypeScriptReasoningModule,
   hint: TypeScriptVerificationProfileHint,
   policy: TypeScriptVerificationPolicy,
@@ -151,7 +151,7 @@ function collectProfileConfigTasks(
 }
 
 function collectProfileConflictTasks(
-  report: TypeScriptHarnessReport,
+  report: AspTypeScriptReport,
   moduleReport: TypeScriptReasoningModule,
   hint: TypeScriptVerificationProfileHint,
   policy: TypeScriptVerificationPolicy,
@@ -186,7 +186,7 @@ function collectProfileConflictTasks(
 }
 
 function collectSkillTasksFromProfile(
-  report: TypeScriptHarnessReport,
+  report: AspTypeScriptReport,
   moduleReport: TypeScriptReasoningModule,
   hint: TypeScriptVerificationProfileHint,
   policy: TypeScriptVerificationPolicy,
@@ -221,7 +221,7 @@ function collectSkillTasksFromProfile(
 }
 
 function newUnmatchedHintReviewTask(
-  report: TypeScriptHarnessReport,
+  report: AspTypeScriptReport,
   hint: TypeScriptVerificationProfileHint,
   policy: TypeScriptVerificationPolicy,
 ): TypeScriptVerificationTask {
@@ -245,7 +245,7 @@ function newUnmatchedHintReviewTask(
 }
 
 function newProfileReviewTask(
-  report: TypeScriptHarnessReport,
+  report: AspTypeScriptReport,
   moduleReport: TypeScriptReasoningModule,
   policy: TypeScriptVerificationPolicy,
   spec: {
@@ -269,7 +269,7 @@ function newProfileReviewTask(
 }
 
 function newTask(
-  report: TypeScriptHarnessReport,
+  report: AspTypeScriptReport,
   policy: TypeScriptVerificationPolicy,
   spec: VerificationTaskSpec,
 ): TypeScriptVerificationTask {
@@ -360,21 +360,21 @@ function pushTask(
 }
 
 function matchingHintModule(
-  report: TypeScriptHarnessReport,
+  report: AspTypeScriptReport,
   hint: TypeScriptVerificationProfileHint,
 ): TypeScriptReasoningModule | undefined {
   const ownerPath = normalizeHintOwnerPath(report, hint.ownerPath);
   return report.reasoningTree.modules.find((moduleReport) => moduleReport.path === ownerPath);
 }
 
-function normalizeHintOwnerPath(report: TypeScriptHarnessReport, ownerPath: string): string {
+function normalizeHintOwnerPath(report: AspTypeScriptReport, ownerPath: string): string {
   return path.isAbsolute(ownerPath)
     ? path.resolve(ownerPath)
     : path.resolve(report.reasoningTree.projectRoot, ownerPath);
 }
 
 function ownerNamespace(
-  report: TypeScriptHarnessReport,
+  report: AspTypeScriptReport,
   moduleReport: TypeScriptReasoningModule,
 ): string {
   const branch = ownerBranchForModule(report, moduleReport);
@@ -387,14 +387,14 @@ function ownerNamespace(
 }
 
 function ownerBranchForModule(
-  report: TypeScriptHarnessReport,
+  report: AspTypeScriptReport,
   moduleReport: TypeScriptReasoningModule,
 ): TypeScriptReasoningOwnerBranchFact | undefined {
   return report.reasoningTree.ownerBranches.find((branch) => branch.path === moduleReport.path);
 }
 
 function moduleDependencyFacts(
-  report: TypeScriptHarnessReport,
+  report: AspTypeScriptReport,
   moduleReport: TypeScriptReasoningModule,
 ): {
   readonly externalImports: number;
@@ -411,7 +411,7 @@ function moduleDependencyFacts(
 }
 
 function moduleEvidence(
-  report: TypeScriptHarnessReport,
+  report: AspTypeScriptReport,
   moduleReport: TypeScriptReasoningModule,
 ): TypeScriptVerificationEvidence[] {
   const dependencyFacts = moduleDependencyFacts(report, moduleReport);
@@ -428,7 +428,7 @@ function moduleEvidence(
   ];
 }
 
-function compactPath(report: TypeScriptHarnessReport, value: string): string {
+function compactPath(report: AspTypeScriptReport, value: string): string {
   return path.relative(report.reasoningTree.projectRoot, value).replaceAll("\\", "/") || ".";
 }
 

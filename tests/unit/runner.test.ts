@@ -5,12 +5,12 @@ import path from "node:path";
 import test from "node:test";
 
 import {
-  isTypeScriptHarnessClean,
+  isAspTypeScriptClean,
   parsedCount,
-  renderTypeScriptProjectHarness,
+  renderAspTypeScript,
   renderTypeScriptReasoningTree,
-  runTypeScriptLangHarness,
-  runTypeScriptProjectHarness,
+  runAspTypeScriptPaths,
+  runAspTypeScript,
 } from "../../src/index.js";
 import { relativePath } from "./path_helpers.js";
 
@@ -25,16 +25,16 @@ test("project runner uses tsconfig native file selection", () => {
   fs.writeFileSync(path.join(root, "src", "index.ts"), "export const ok = 1;\n");
   fs.writeFileSync(path.join(root, "ignored", "bad.ts"), "export const broken = ;\n");
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
 
   assert.equal(report.runMode, "project");
   assert.equal(report.reasoningTree.runMode, report.runMode);
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.deepEqual(
     report.modules.map((moduleReport) => relativePath(root, moduleReport.path)),
     ["src/index.ts"],
   );
-  assert.match(renderTypeScriptProjectHarness(report), /^\[ok\] typescript/u);
+  assert.match(renderAspTypeScript(report), /^\[ok\] typescript/u);
 });
 
 test("project runner anchors project scope at nearest package json", () => {
@@ -47,7 +47,7 @@ test("project runner anchors project scope at nearest package json", () => {
   fs.writeFileSync(path.join(root, "tsconfig.json"), JSON.stringify({ include: ["src/**/*.ts"] }));
   fs.writeFileSync(path.join(root, "src", "index.ts"), "export const ok = 1;\n");
 
-  const report = runTypeScriptProjectHarness(path.join(root, "src", "feature"));
+  const report = runAspTypeScript(path.join(root, "src", "feature"));
   const snapshot = renderTypeScriptReasoningTree(report);
 
   assert.equal(report.projectResolution?.projectRoot, root);
@@ -74,7 +74,7 @@ test("project runner does not inherit parent tsconfig across a package json anch
   );
   fs.writeFileSync(path.join(packageRoot, "src", "index.ts"), "export const utilValue = 1;\n");
 
-  const report = runTypeScriptProjectHarness(packageRoot);
+  const report = runAspTypeScript(packageRoot);
   const snapshot = renderTypeScriptReasoningTree(report);
 
   assert.equal(report.reasoningTree.configPath, undefined);
@@ -92,8 +92,8 @@ test("project runner routes missing tsconfig policy through reasoning facts", ()
   fs.mkdirSync(path.join(root, "src"));
   fs.writeFileSync(path.join(root, "src", "index.ts"), "export const ok = 1;\n");
 
-  const report = runTypeScriptProjectHarness(root);
-  const rendered = renderTypeScriptProjectHarness(report);
+  const report = runAspTypeScript(root);
+  const rendered = renderAspTypeScript(report);
   const snapshot = renderTypeScriptReasoningTree(report);
 
   assert.equal(report.reasoningTree.configPath, undefined);
@@ -104,7 +104,7 @@ test("project runner routes missing tsconfig policy through reasoning facts", ()
     })),
     [{ ruleId: "TS-AGENT-PROJECT-001", locationPath: root }],
   );
-  assert.equal(isTypeScriptHarnessClean(report), false);
+  assert.equal(isAspTypeScriptClean(report), false);
   assert.match(rendered, /\[TS-AGENT-PROJECT-001\] Warning/u);
   assert.match(snapshot, /^Modules: source=1 branches=1 findings=1/u);
   assert.match(snapshot, /FindingGroups:/u);
@@ -118,10 +118,10 @@ test("project runner renders native syntax findings", () => {
   fs.writeFileSync(path.join(root, "tsconfig.json"), JSON.stringify({ include: ["src/**/*.ts"] }));
   fs.writeFileSync(path.join(root, "src", "index.ts"), "export const broken = ;\n");
 
-  const report = runTypeScriptProjectHarness(root);
-  const rendered = renderTypeScriptProjectHarness(report);
+  const report = runAspTypeScript(root);
+  const rendered = renderAspTypeScript(report);
 
-  assert.equal(isTypeScriptHarnessClean(report), false);
+  assert.equal(isAspTypeScriptClean(report), false);
   assert.deepEqual(
     report.reasoningTree.diagnostics.map((diagnostic) => ({
       phase: diagnostic.phase,
@@ -147,11 +147,11 @@ test("project runner routes tsconfig diagnostics through reasoning facts", () =>
   fs.writeFileSync(path.join(root, "tsconfig.json"), '{ "compilerOptions": }\n');
   fs.writeFileSync(path.join(root, "src", "index.ts"), "export const ok = 1;\n");
 
-  const report = runTypeScriptProjectHarness(root);
-  const rendered = renderTypeScriptProjectHarness(report);
+  const report = runAspTypeScript(root);
+  const rendered = renderAspTypeScript(report);
   const snapshot = renderTypeScriptReasoningTree(report);
 
-  assert.equal(isTypeScriptHarnessClean(report), false);
+  assert.equal(isAspTypeScriptClean(report), false);
   assert.deepEqual(
     report.reasoningTree.diagnostics.map((diagnostic) => ({
       phase: diagnostic.phase,
@@ -174,8 +174,8 @@ test("explicit-path runner routes syntax diagnostics through reasoning facts", (
   const filePath = path.join(root, "broken.ts");
   fs.writeFileSync(filePath, "export const broken = ;\n");
 
-  const report = runTypeScriptLangHarness([filePath]);
-  const rendered = renderTypeScriptProjectHarness(report);
+  const report = runAspTypeScriptPaths([filePath]);
+  const rendered = renderAspTypeScript(report);
   const snapshot = renderTypeScriptReasoningTree(report);
 
   assert.equal(report.runMode, "explicit");

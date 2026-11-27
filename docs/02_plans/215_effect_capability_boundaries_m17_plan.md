@@ -1,7 +1,7 @@
 # Effect Capability Boundaries M17 Plan
 
 M17 extends the active Effect extension from async/resource advice into a
-capability-boundary surface while preserving the harness contract:
+capability-boundary surface while preserving the ASP TypeScript contract:
 
 ```text
 Effect extension activation
@@ -14,7 +14,7 @@ Effect extension activation
 ## Capability Map
 
 The current Effect policy surface already covers several official Effect
-capabilities without turning the harness into a style checker:
+capabilities without turning ASP TypeScript into a style checker:
 
 - error handling: `TS-EXT-EFFECT-R005` advises typed domain error channels, and
   `TS-EXT-EFFECT-R006` advises `Effect.tryPromise` for rejection-capable
@@ -64,4 +64,4 @@ explicitly promotes it.
   and agent compact text repair guidance.
 - Boundary tests ensure rules/reasoning stay downstream of parser-owned facts
   and do not import TypeScript or parser helpers.
-- Self-apply remains clean under the default project harness.
+- Self-apply remains clean under the default ASP TypeScript.

@@ -61,4 +61,4 @@ gates beyond explicit extension-config consistency.
 - Static-definition tests cover nested component and custom hook definitions.
 - Rule catalog/public API tests include the new rule ids and model fact types.
 - Boundary tests keep rules/reasoning downstream of parser-owned facts.
-- Self-apply remains clean under the default harness.
+- Self-apply remains clean under the default ASP TypeScript.

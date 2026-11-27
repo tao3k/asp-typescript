@@ -47,4 +47,4 @@ resource factories. The finding stays advisory because exposing
   suppression from TypeScript AST nodes.
 - Extension policy tests cover active Effect projects, resource-scope advice,
   and default non-blocking severity.
-- Self-apply remains clean under the default harness.
+- Self-apply remains clean under the default ASP TypeScript.

@@ -13,8 +13,9 @@ import {
 } from "../../src/cli/semantic-language.js";
 
 test("CLI documents the descriptor binary as the primary binary", () => {
-  assert.ok(HELP_TEXT.startsWith(`${TYPE_SCRIPT_BINARY} — TypeScript semantic search`));
-  assert.ok(HELP_TEXT.includes(`${TYPE_SCRIPT_BINARY} search prime --workspace .`));
+  assert.ok(HELP_TEXT.startsWith(`${TYPE_SCRIPT_BINARY} — TypeScript native-syntax provider`));
+  assert.ok(HELP_TEXT.includes("asp search playbook --language typescript"));
+  assert.doesNotMatch(HELP_TEXT, /search (?:prime|owner|lexical|ingest|pipe)/u);
   assert.doesNotMatch(HELP_TEXT, new RegExp(["typescript", "project", "harness"].join("-"), "u"));
 });
 

@@ -5,7 +5,7 @@ import path from "node:path";
 import test from "node:test";
 
 import {
-  defaultTypeScriptHarnessConfig,
+  defaultAspTypeScriptConfig,
   planTypeScriptProjectVerificationWithConfig,
   renderTypeScriptVerificationPlan,
   renderTypeScriptVerificationPlanJson,
@@ -24,7 +24,7 @@ import { relativePath } from "./path_helpers.js";
 test("verification policy plans compact external-skill tasks from profile hints", () => {
   const root = writeVerificationProject("profile-plan", "export const api = 1;\n");
   const config = withTypeScriptVerificationProfileHint(
-    defaultTypeScriptHarnessConfig(),
+    defaultAspTypeScriptConfig(),
     profileHint("src/index.ts", ["public_api", "latency_sensitive"]),
   );
 
@@ -56,7 +56,7 @@ test("verification policy emits responsibility review when hints drift from pars
     'import fs from "node:fs";\nexport const read = fs.readFileSync;\n',
   );
   const config = withTypeScriptVerificationProfileHint(
-    defaultTypeScriptHarnessConfig(),
+    defaultAspTypeScriptConfig(),
     profileHint("src/index.ts", ["pure_domain_logic"]),
   );
 
@@ -75,7 +75,7 @@ test("verification policy emits responsibility review when hints drift from pars
 test("verification receipts and waivers control active compact reminders", () => {
   const root = writeVerificationProject("receipt-waiver", "export const api = 1;\n");
   const baseConfig = withTypeScriptVerificationProfileHint(
-    defaultTypeScriptHarnessConfig(),
+    defaultAspTypeScriptConfig(),
     profileHint("src/index.ts", ["public_api"]),
   );
   const initialPlan = planTypeScriptProjectVerificationWithConfig(root, baseConfig);
@@ -126,7 +126,7 @@ test("verification policy disables external task kinds but reviews owner-local d
   const root = writeVerificationProject("disabled-kind", "export const api = 1;\n");
   const disabledConfig = withDisabledTypeScriptVerificationTaskKind(
     withTypeScriptVerificationProfileHint(
-      defaultTypeScriptHarnessConfig(),
+      defaultAspTypeScriptConfig(),
       profileHint("src/index.ts", ["latency_sensitive"]),
     ),
     "performance",
@@ -136,7 +136,7 @@ test("verification policy disables external task kinds but reviews owner-local d
   assert.deepEqual(disabledPlan.tasks, []);
 
   const ownerOverrideConfig = withDisabledTypeScriptVerificationTaskKind(
-    withTypeScriptVerificationProfileHint(defaultTypeScriptHarnessConfig(), {
+    withTypeScriptVerificationProfileHint(defaultAspTypeScriptConfig(), {
       ownerPath: "src/index.ts",
       responsibilities: ["public_api"],
       taskKinds: ["performance"],
@@ -161,7 +161,7 @@ test("configured verification skill binding keeps compact output quiet and expan
   const config = withTypeScriptVerificationSkillDescriptor(
     withTypeScriptVerificationSkillBinding(
       withTypeScriptVerificationProfileHint(
-        defaultTypeScriptHarnessConfig(),
+        defaultAspTypeScriptConfig(),
         profileHint("src/index.ts", ["latency_sensitive"]),
       ),
       "performance",

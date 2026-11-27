@@ -1,6 +1,6 @@
 import type {
-  TypeScriptHarnessFinding,
-  TypeScriptHarnessRule,
+  AspTypeScriptFinding,
+  AspTypeScriptRule,
   TypeScriptPublicDataFieldFact,
   TypeScriptPublicDiscriminatedUnionVariantFieldFact,
   TypeScriptPublicTypeAliasFact,
@@ -8,7 +8,7 @@ import type {
   TypeScriptReasoningTree,
 } from "../../model.js";
 
-export const TS_AGENT_R009: TypeScriptHarnessRule = {
+export const TS_AGENT_R009: AspTypeScriptRule = {
   ruleId: "TS-AGENT-POLICY-009",
   packId: "typescript.agent_policy",
   severity: "info",
@@ -18,7 +18,7 @@ export const TS_AGENT_R009: TypeScriptHarnessRule = {
   labels: { surface: "agent", parser: "native-syntax" },
 };
 
-export const TS_AGENT_R010: TypeScriptHarnessRule = {
+export const TS_AGENT_R010: AspTypeScriptRule = {
   ruleId: "TS-AGENT-POLICY-010",
   packId: "typescript.agent_policy",
   severity: "info",
@@ -28,7 +28,7 @@ export const TS_AGENT_R010: TypeScriptHarnessRule = {
   labels: { surface: "agent", parser: "native-syntax" },
 };
 
-export const TS_AGENT_R011: TypeScriptHarnessRule = {
+export const TS_AGENT_R011: AspTypeScriptRule = {
   ruleId: "TS-AGENT-POLICY-011",
   packId: "typescript.agent_policy",
   severity: "info",
@@ -38,7 +38,7 @@ export const TS_AGENT_R011: TypeScriptHarnessRule = {
   labels: { surface: "agent", parser: "native-syntax" },
 };
 
-export const TS_AGENT_R012: TypeScriptHarnessRule = {
+export const TS_AGENT_R012: AspTypeScriptRule = {
   ruleId: "TS-AGENT-POLICY-012",
   packId: "typescript.agent_policy",
   severity: "info",
@@ -50,7 +50,7 @@ export const TS_AGENT_R012: TypeScriptHarnessRule = {
 
 export function evaluateNativeDataShapeAdvice(
   reasoningTree: TypeScriptReasoningTree,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   return sourceModules(reasoningTree)
     .filter((moduleReport) => moduleReport.layer !== "model")
     .flatMap((moduleReport) => [
@@ -62,9 +62,7 @@ export function evaluateNativeDataShapeAdvice(
     .sort((left, right) => findingSortKey(left).localeCompare(findingSortKey(right)));
 }
 
-function publicDataFieldAdvice(
-  moduleReport: TypeScriptReasoningModule,
-): TypeScriptHarnessFinding[] {
+function publicDataFieldAdvice(moduleReport: TypeScriptReasoningModule): AspTypeScriptFinding[] {
   const rule = TS_AGENT_R009;
   return groupedDataFields(moduleReport.publicDataFields).flatMap((fields) => {
     const semanticFields = fields.filter(publicDataFieldContractType);
@@ -91,9 +89,7 @@ function publicDataFieldAdvice(
   });
 }
 
-function publicTypeAliasAdvice(
-  moduleReport: TypeScriptReasoningModule,
-): TypeScriptHarnessFinding[] {
+function publicTypeAliasAdvice(moduleReport: TypeScriptReasoningModule): AspTypeScriptFinding[] {
   const rule = TS_AGENT_R010;
   return moduleReport.publicTypeAliases.flatMap((alias) => {
     const contractType = publicTypeAliasContractType(alias);
@@ -119,7 +115,7 @@ function publicTypeAliasAdvice(
 
 function publicStringlyStateFieldAdvice(
   moduleReport: TypeScriptReasoningModule,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   return [
     ...publicDataStringlyStateFieldAdvice(moduleReport.publicDataFields),
     ...publicUnionVariantStringlyStateFieldAdvice(
@@ -130,7 +126,7 @@ function publicStringlyStateFieldAdvice(
 
 function publicDataStringlyStateFieldAdvice(
   fields: readonly TypeScriptPublicDataFieldFact[],
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   const rule = TS_AGENT_R011;
   return groupedDataFields(fields).flatMap((group) => {
     const stringlyFields = group.filter((field) => isStringlyStateField(field.fieldName));
@@ -168,7 +164,7 @@ function publicDataStringlyStateFieldAdvice(
 
 function publicUnionVariantStringlyStateFieldAdvice(
   fields: readonly TypeScriptPublicDiscriminatedUnionVariantFieldFact[],
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   const rule = TS_AGENT_R011;
   return groupedUnionVariantFields(fields).flatMap((group) => {
     const stringlyFields = group.filter((field) => isStringlyStateField(field.fieldName));
@@ -206,7 +202,7 @@ function publicUnionVariantStringlyStateFieldAdvice(
 
 function publicDiscriminatedUnionVariantPayloadAdvice(
   moduleReport: TypeScriptReasoningModule,
-): TypeScriptHarnessFinding[] {
+): AspTypeScriptFinding[] {
   const rule = TS_AGENT_R012;
   return groupedUnionVariantFields(moduleReport.publicDiscriminatedUnionVariantFields).flatMap(
     (fields) => {
@@ -410,7 +406,7 @@ function sourceModules(tree: TypeScriptReasoningTree): readonly TypeScriptReason
   );
 }
 
-function findingSortKey(finding: TypeScriptHarnessFinding): string {
+function findingSortKey(finding: AspTypeScriptFinding): string {
   return `${finding.ruleId}\0${finding.location.path ?? ""}\0${finding.location.line}\0${finding.summary}`;
 }
 

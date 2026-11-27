@@ -2,7 +2,7 @@
  * File and directory hashing utilities for parser cache invalidation.
  *
  * This module owns stable file fingerprints used to decide which TypeScript
- * modules can be reused between harness runs.
+ * modules can be reused between ASP TypeScript runs.
  */
 import crypto from "node:crypto";
 import fs from "node:fs";

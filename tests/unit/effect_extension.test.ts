@@ -5,12 +5,12 @@ import path from "node:path";
 import test from "node:test";
 
 import {
-  defaultTypeScriptHarnessConfig,
-  isTypeScriptHarnessClean,
-  renderTypeScriptProjectHarnessAgentCompactText,
-  renderTypeScriptProjectHarness,
+  defaultAspTypeScriptConfig,
+  isAspTypeScriptClean,
+  renderAspTypeScriptAgentCompactText,
+  renderAspTypeScript,
   renderTypeScriptReasoningTree,
-  runTypeScriptProjectHarness,
+  runAspTypeScript,
   typeScriptExtensionPolicyRules,
   withDisabledTypeScriptRulePack,
 } from "../../src/index.js";
@@ -30,11 +30,11 @@ test("Effect dependency activates extension snapshot and async domain advice", (
     ],
   });
 
-  const report = runTypeScriptProjectHarness(root);
-  const rendered = renderTypeScriptProjectHarness(report);
+  const report = runAspTypeScript(root);
+  const rendered = renderAspTypeScript(report);
   const snapshot = renderTypeScriptReasoningTree(report);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.deepEqual(
     typeScriptExtensionPolicyRules().map((rule) => `${rule.ruleId}:${rule.severity}`),
     [
@@ -112,10 +112,10 @@ test("Effect dependency gives project-wide async migration advice", () => {
     },
   });
 
-  const report = runTypeScriptProjectHarness(root);
-  const advice = renderTypeScriptProjectHarnessAgentCompactText(report);
+  const report = runAspTypeScript(root);
+  const advice = renderAspTypeScriptAgentCompactText(report);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.deepEqual(
     report.findings
       .filter((finding) => finding.ruleId === "TS-EXT-EFFECT-R002")
@@ -156,8 +156,8 @@ test("Effect compact advice is prioritized before generic agent shape advice", (
     ],
   });
 
-  const report = runTypeScriptProjectHarness(root);
-  const advice = renderTypeScriptProjectHarnessAgentCompactText(report);
+  const report = runAspTypeScript(root);
+  const advice = renderAspTypeScriptAgentCompactText(report);
 
   assert.deepEqual(
     report.findings
@@ -179,16 +179,16 @@ test("Effect compact advice is prioritized before generic agent shape advice", (
 test("explicit Effect enablement without dependency is an error-level blocking finding", () => {
   const root = effectProject("config-missing-dependency", {
     packageJson: {
-      typescriptProjectHarness: { extensions: { Effect: "enable" } },
+      "asp-typescript": { extensions: { Effect: "enable" } },
     },
     source: "export const ok = 1;\n",
   });
 
-  const report = runTypeScriptProjectHarness(root);
-  const rendered = renderTypeScriptProjectHarness(report);
+  const report = runAspTypeScript(root);
+  const rendered = renderAspTypeScript(report);
   const snapshot = renderTypeScriptReasoningTree(report);
 
-  assert.equal(isTypeScriptHarnessClean(report), false);
+  assert.equal(isAspTypeScriptClean(report), false);
   assert.deepEqual(
     report.findings
       .filter((finding) => finding.ruleId.startsWith("TS-EXT-EFFECT"))
@@ -204,17 +204,17 @@ test("configured Effect dependency is active and can be disabled through the ext
   const root = effectProject("config-active", {
     packageJson: {
       dependencies: { effect: "^3.0.0" },
-      typescriptProjectHarness: { extensions: { effect: "enable" } },
+      "asp-typescript": { extensions: { effect: "enable" } },
     },
     source: ["export async function loadOwner(): Promise<string> {", "  return 'owner';", "}"],
   });
-  const defaultReport = runTypeScriptProjectHarness(root);
-  const configuredReport = runTypeScriptProjectHarness(
+  const defaultReport = runAspTypeScript(root);
+  const configuredReport = runAspTypeScript(
     root,
-    withDisabledTypeScriptRulePack(defaultTypeScriptHarnessConfig(), "extension_policy"),
+    withDisabledTypeScriptRulePack(defaultAspTypeScriptConfig(), "extension_policy"),
   );
 
-  assert.equal(isTypeScriptHarnessClean(defaultReport), true);
+  assert.equal(isAspTypeScriptClean(defaultReport), true);
   assert.deepEqual(
     defaultReport.projectResolution?.packageJson.packageExtensions.map((extension) => ({
       activation: extension.activation,
@@ -225,7 +225,7 @@ test("configured Effect dependency is active and can be disabled through the ext
       {
         activation: "config-enabled",
         coverage: "project",
-        configSource: "typescriptProjectHarness",
+        configSource: "asp-typescript",
       },
     ],
   );
@@ -258,9 +258,9 @@ test("Effect runtime execution advice stays out of entrypoints", () => {
     },
   });
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.deepEqual(
     report.findings
       .filter((finding) => finding.ruleId.startsWith("TS-EXT-EFFECT"))
@@ -304,9 +304,9 @@ test("Effect runtime execution advice treats React Query callbacks as runtime bo
     },
   });
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.deepEqual(
     report.findings
       .filter((finding) => finding.ruleId.startsWith("TS-EXT-EFFECT"))
@@ -351,7 +351,7 @@ test("Effect policy treats package script TypeScript targets as entrypoint adapt
     },
   });
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
   const roleByPath = new Map(
     report.reasoningTree.modules.map((moduleReport) => [
       relativePath(root, moduleReport.path),
@@ -359,7 +359,7 @@ test("Effect policy treats package script TypeScript targets as entrypoint adapt
     ]),
   );
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.equal(roleByPath.get("src/cli/bench.ts"), "entrypoint");
   assert.equal(roleByPath.get("src/cli/bench-helper.ts"), "entrypoint");
   assert.equal(roleByPath.get("src/domain.ts"), "source");
@@ -411,7 +411,7 @@ test("Effect policy treats parser-visible HTTP middleware adapters as entrypoint
     },
   });
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
   const roleByPath = new Map(
     report.reasoningTree.modules.map((moduleReport) => [
       relativePath(root, moduleReport.path),
@@ -419,7 +419,7 @@ test("Effect policy treats parser-visible HTTP middleware adapters as entrypoint
     ]),
   );
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.equal(roleByPath.get("src/server/http/wendaoApi.ts"), "entrypoint");
   assert.deepEqual(
     report.findings
@@ -440,7 +440,7 @@ test("Effect object config remains project-wide and does not suppress modules", 
   const root = effectProject("object-config-project-wide", {
     packageJson: {
       dependencies: { effect: "^3.0.0" },
-      typescriptProjectHarness: {
+      "asp-typescript": {
         extensions: {
           effect: {
             enabled: true,
@@ -472,17 +472,17 @@ test("Effect object config remains project-wide and does not suppress modules", 
     },
   });
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
   const snapshot = renderTypeScriptReasoningTree(report);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.deepEqual(
     report.projectResolution?.packageJson.packageExtensions.map((extension) => [
       extension.activation,
       extension.coverage,
       extension.configSource,
     ]),
-    [["config-enabled", "project", "typescriptProjectHarness"]],
+    [["config-enabled", "project", "asp-typescript"]],
   );
   assert.deepEqual(
     report.findings
@@ -503,7 +503,7 @@ test("Effect object config remains project-wide and does not suppress modules", 
       "TS-EXT-EFFECT-R003:info:src/domain.ts:source",
     ],
   );
-  assert.match(snapshot, /config=typescriptProjectHarness/u);
+  assert.match(snapshot, /config=asp-typescript/u);
   assert.doesNotMatch(snapshot, /adapters=/u);
 });
 
@@ -521,9 +521,9 @@ test("Effect service methods with requirement leaks receive layer-boundary advic
     ],
   });
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.deepEqual(
     report.findings
       .filter((finding) => finding.ruleId.startsWith("TS-EXT-EFFECT"))
@@ -547,9 +547,9 @@ test("Effect public APIs with weak error channels receive typed-error advice", (
     ],
   });
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.deepEqual(
     report.findings
       .filter((finding) => finding.ruleId.startsWith("TS-EXT-EFFECT"))
@@ -576,9 +576,9 @@ test("Effect.promise rejection-capable interop receives tryPromise advice", () =
     ],
   });
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.deepEqual(
     report.findings
       .filter((finding) => finding.ruleId.startsWith("TS-EXT-EFFECT"))
@@ -606,9 +606,9 @@ test("Effect.acquireRelease without local scoped boundary receives resource advi
     ],
   });
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.deepEqual(
     report.findings
       .filter((finding) => finding.ruleId.startsWith("TS-EXT-EFFECT"))
@@ -647,11 +647,11 @@ test("Effect async batch advice asks agents to declare concurrency policy", () =
     ],
   });
 
-  const report = runTypeScriptProjectHarness(root);
-  const advice = renderTypeScriptProjectHarnessAgentCompactText(report);
+  const report = runAspTypeScript(root);
+  const advice = renderAspTypeScriptAgentCompactText(report);
   const finding = report.findings.find((candidate) => candidate.ruleId === "TS-EXT-EFFECT-R008");
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.notEqual(finding, undefined);
   assert.equal(
     finding?.labels.concurrency_kinds,
@@ -705,11 +705,11 @@ test("Effect JSON boundary advice asks agents to decode with Schema", () => {
     },
   });
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
   const finding = report.findings.find((candidate) => candidate.ruleId === "TS-EXT-EFFECT-R009");
-  const advice = renderTypeScriptProjectHarnessAgentCompactText(report, { findings: "all" });
+  const advice = renderAspTypeScriptAgentCompactText(report, { findings: "all" });
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.equal(finding?.severity, "info");
   assert.equal(
     finding?.labels.schema_boundary_kinds,
@@ -758,11 +758,11 @@ test("Effect production boundary advice asks agents for observability and resili
     },
   });
 
-  const report = runTypeScriptProjectHarness(root);
+  const report = runAspTypeScript(root);
   const finding = report.findings.find((candidate) => candidate.ruleId === "TS-EXT-EFFECT-R010");
-  const advice = renderTypeScriptProjectHarnessAgentCompactText(report, { findings: "all" });
+  const advice = renderAspTypeScriptAgentCompactText(report, { findings: "all" });
 
-  assert.equal(isTypeScriptHarnessClean(report), true);
+  assert.equal(isAspTypeScriptClean(report), true);
   assert.equal(finding?.severity, "info");
   assert.equal(finding?.labels.missing_capabilities, "observability,resilience");
   assert.match(finding?.labels.production_boundary ?? "", /loadOwnerRaw/u);

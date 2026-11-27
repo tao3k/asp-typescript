@@ -8,7 +8,7 @@ import {
   buildTypeScriptVerificationPerformanceIndex,
   buildTypeScriptVerificationReportBundle,
   buildTypeScriptVerificationTaskIndex,
-  defaultTypeScriptHarnessConfig,
+  defaultAspTypeScriptConfig,
   planTypeScriptProjectVerificationWithConfig,
   renderTypeScriptVerificationPerformanceIndex,
   renderTypeScriptVerificationPerformanceIndexJson,
@@ -328,7 +328,7 @@ function verificationBundleConfig() {
   return withTypeScriptVerificationSkillDescriptor(
     withTypeScriptVerificationSkillBinding(
       withTypeScriptVerificationProfileHint(
-        defaultTypeScriptHarnessConfig(),
+        defaultAspTypeScriptConfig(),
         profileHint("src/index.ts", ["latency_sensitive"]),
       ),
       "performance",

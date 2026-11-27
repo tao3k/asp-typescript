@@ -48,7 +48,7 @@ export type TypeScriptModuleLayer =
   | "policy"
   | "render"
   | "model"
-  | "harness"
+  | "asp"
   | "test"
   | "config"
   | "unknown";
