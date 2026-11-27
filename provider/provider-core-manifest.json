@@ -6,14 +6,16 @@
   "displayName": "TypeScript",
   "extensions": [".ts", ".tsx", ".mts", ".cts"],
   "projectMarkers": ["tsconfig.json", "package.json"],
+  "project": {
+    "markers": ["tsconfig.json", "package.json"],
+    "entryFiles": ["src/index.ts", "src/main.ts"],
+    "workspaceFiles": ["package.json", "package-lock.json", "pnpm-workspace.yaml"],
+    "configFiles": ["tsconfig.json"]
+  },
   "syntaxSurface": {
     "lineComment": "//",
     "blockComment": ["/*", "*/"],
-    "delimiterPairs": [
-      ["(", ")"],
-      ["[", "]"],
-      ["{", "}"]
-    ],
+    "delimiterPairs": [["(", ")"], ["[", "]"], ["{", "}"]],
     "statementTerminator": ";",
     "stringDelimiters": ["\"", "'", "`"]
   },
@@ -29,5 +31,29 @@
     "astVerify": true,
     "openEdb": true,
     "projectResolution": true
+  },
+  "special": {
+    "kindMappings": [
+      { "nativeLanguageKind": "function_declaration", "generalKind": "function", "description": "TypeScript function declaration" },
+      { "nativeLanguageKind": "method_declaration", "generalKind": "method", "description": "TypeScript class method declaration" },
+      { "nativeLanguageKind": "class_declaration", "generalKind": "struct", "description": "TypeScript class declaration" },
+      { "nativeLanguageKind": "interface_declaration", "generalKind": "trait", "description": "TypeScript interface declaration" },
+      { "nativeLanguageKind": "type_alias_declaration", "generalKind": "type", "description": "TypeScript type alias declaration" },
+      { "nativeLanguageKind": "import_declaration", "generalKind": "import", "description": "TypeScript import declaration" }
+    ],
+    "specialRelations": ["ts_fn", "ts_class", "ts_interface", "ts_type"],
+    "schema": {
+      "type": "object",
+      "properties": {
+        "exported": {
+          "type": "boolean",
+          "description": "Filter exported TypeScript declarations"
+        },
+        "async": {
+          "type": "boolean",
+          "description": "Filter async TypeScript functions and methods"
+        }
+      }
+    }
   }
 }
